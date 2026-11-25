@@ -7,13 +7,59 @@
   "summary": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
   "entryPoint": "Main.swift",
   "icon": "assets/icon.png",
-  "permissions": ["native.execute", "ai.transform", "companion.message"],
-  "companion": { "chromeExtensionID": "ndmbmmhddeibbojclldpaabmkcielfmj" },
+  "permissions": [
+    "native.execute",
+    "ai.transform",
+    "companion.message"
+  ],
+  "companion": {
+    "browsers": [
+      {
+        "browser": "chrome",
+        "identifier": "ndmbmmhddeibbojclldpaabmkcielfmj",
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/releases/0.5.0/chromium-companion.json",
+        "packageSHA256": "50452519eb13aeeae7dfdc16db678e3de95f913144b59ca6c1d6b60596ed24c4"
+      },
+      {
+        "browser": "edge",
+        "identifier": "ndmbmmhddeibbojclldpaabmkcielfmj",
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/releases/0.5.0/chromium-companion.json",
+        "packageSHA256": "50452519eb13aeeae7dfdc16db678e3de95f913144b59ca6c1d6b60596ed24c4"
+      },
+      {
+        "browser": "firefox",
+        "identifier": "online-subtitle@nelson007.com",
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/releases/0.5.0/firefox-companion.json",
+        "packageSHA256": "006fd63bba875d8779b2710d32a78313339e99e69e884909c3928638da45e347"
+      },
+      {
+        "browser": "safari",
+        "identifier": "com.nelson007.online-subtitle.safari",
+        "sourceURL": "https://github.com/bosstwobread/OnlineSubtitle-MacHelper/blob/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/README.md"
+      }
+    ]
+  },
   "commands": [
-    { "identifier": "status", "title": "OnlineSubtitle status", "trigger": "manual" },
-    { "identifier": "translate-captions", "title": "Translate captions", "trigger": "companion" },
-    { "identifier": "caption-settings", "title": "Read caption preferences", "trigger": "companion" },
-    { "identifier": "explain-word", "title": "Explain clicked word", "trigger": "companion" }
+    {
+      "identifier": "status",
+      "title": "OnlineSubtitle status",
+      "trigger": "manual"
+    },
+    {
+      "identifier": "translate-captions",
+      "title": "Translate captions",
+      "trigger": "companion"
+    },
+    {
+      "identifier": "caption-settings",
+      "title": "Read caption preferences",
+      "trigger": "companion"
+    },
+    {
+      "identifier": "explain-word",
+      "title": "Explain clicked word",
+      "trigger": "companion"
+    }
   ],
   "settingsSchema": "settings.schema.json",
   "localizations": "localizations.json"
