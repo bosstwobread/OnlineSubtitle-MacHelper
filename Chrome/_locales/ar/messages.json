@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "ترجمة ثنائية اللغة لفيديوهات YouTube باستخدام الذكاء الاصطناعي المحلي في MacHelper."
+  },
+  "captionsUnavailable": {
+    "message": "الترجمة النصية غير متاحة لهذا الفيديو."
+  },
+  "translationUnavailable": {
+    "message": "الترجمة الصينية غير متاحة."
+  },
+  "macHelperUnavailable": {
+    "message": "تعذّر على OnlineSubtitle الاتصال بـ MacHelper."
+  },
+  "modelUnavailable": {
+    "message": "شغّل Ollama باستخدام نموذج محلي."
+  }
+}

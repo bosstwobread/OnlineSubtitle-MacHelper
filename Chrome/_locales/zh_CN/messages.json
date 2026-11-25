@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "通过 MacHelper 在本机生成 YouTube 双语字幕。"
+  },
+  "captionsUnavailable": {
+    "message": "此视频暂无可用字幕。"
+  },
+  "translationUnavailable": {
+    "message": "暂时无法提供中文字幕。"
+  },
+  "macHelperUnavailable": {
+    "message": "OnlineSubtitle 无法连接到 MacHelper。"
+  },
+  "modelUnavailable": {
+    "message": "请启动 Ollama 并准备一个本地模型。"
+  }
+}

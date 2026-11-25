@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "MacHelper의 로컬 AI로 YouTube 이중 언어 자막을 표시합니다."
+  },
+  "captionsUnavailable": {
+    "message": "이 동영상에는 사용할 수 있는 자막이 없습니다."
+  },
+  "translationUnavailable": {
+    "message": "중국어 번역을 사용할 수 없습니다."
+  },
+  "macHelperUnavailable": {
+    "message": "OnlineSubtitle이 MacHelper에 연결하지 못했습니다."
+  },
+  "modelUnavailable": {
+    "message": "로컬 모델을 준비하고 Ollama를 실행하세요."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "Legendas bilíngues no YouTube com IA local no MacHelper."
+  },
+  "captionsUnavailable": {
+    "message": "Legendas indisponíveis neste vídeo."
+  },
+  "translationUnavailable": {
+    "message": "Tradução para chinês indisponível."
+  },
+  "macHelperUnavailable": {
+    "message": "O OnlineSubtitle não conseguiu se conectar ao MacHelper."
+  },
+  "modelUnavailable": {
+    "message": "Inicie o Ollama com um modelo local."
+  }
+}

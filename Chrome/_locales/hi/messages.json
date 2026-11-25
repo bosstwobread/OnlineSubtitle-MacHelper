@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "MacHelper में स्थानीय AI के साथ YouTube पर द्विभाषी उपशीर्षक।"
+  },
+  "captionsUnavailable": {
+    "message": "इस वीडियो के लिए उपशीर्षक उपलब्ध नहीं हैं।"
+  },
+  "translationUnavailable": {
+    "message": "चीनी अनुवाद उपलब्ध नहीं है।"
+  },
+  "macHelperUnavailable": {
+    "message": "OnlineSubtitle, MacHelper से कनेक्ट नहीं हो सका।"
+  },
+  "modelUnavailable": {
+    "message": "स्थानीय मॉडल के साथ Ollama शुरू करें।"
+  }
+}

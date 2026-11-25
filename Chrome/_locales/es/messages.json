@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "Subtítulos bilingües en YouTube con IA local en MacHelper."
+  },
+  "captionsUnavailable": {
+    "message": "Este vídeo no tiene subtítulos disponibles."
+  },
+  "translationUnavailable": {
+    "message": "Traducción al chino no disponible."
+  },
+  "macHelperUnavailable": {
+    "message": "OnlineSubtitle no pudo conectarse a MacHelper."
+  },
+  "modelUnavailable": {
+    "message": "Inicia Ollama con un modelo local."
+  }
+}

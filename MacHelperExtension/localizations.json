@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "translations": {
+    "en": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.",
+      "OnlineSubtitle status": "OnlineSubtitle status"
+    },
+    "zh-Hans": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "使用本地 Ollama 和 OnlineSubtitle Chrome 扩展，将 YouTube 字幕翻译为简体中文。",
+      "OnlineSubtitle status": "OnlineSubtitle 状态"
+    },
+    "zh-Hant": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "使用本機 Ollama 和 OnlineSubtitle Chrome 擴充功能，將 YouTube 字幕翻譯為簡體中文。",
+      "OnlineSubtitle status": "OnlineSubtitle 狀態"
+    },
+    "es": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduce los subtítulos de YouTube al chino simplificado con Ollama local y la extensión OnlineSubtitle para Chrome.",
+      "OnlineSubtitle status": "Estado de OnlineSubtitle"
+    },
+    "fr": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduit les sous-titres YouTube en chinois simplifié avec Ollama en local et l’extension Chrome OnlineSubtitle.",
+      "OnlineSubtitle status": "État d’OnlineSubtitle"
+    },
+    "de": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Übersetzt YouTube-Untertitel mit lokalem Ollama und der Chrome-Erweiterung OnlineSubtitle ins vereinfachte Chinesisch.",
+      "OnlineSubtitle status": "OnlineSubtitle-Status"
+    },
+    "ja": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "ローカルの Ollama と Chrome 拡張機能 OnlineSubtitle で YouTube の字幕を簡体字中国語に翻訳します。",
+      "OnlineSubtitle status": "OnlineSubtitle の状態"
+    },
+    "ko": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "로컬 Ollama와 OnlineSubtitle Chrome 확장 프로그램으로 YouTube 자막을 중국어 간체로 번역합니다.",
+      "OnlineSubtitle status": "OnlineSubtitle 상태"
+    },
+    "pt": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduz legendas do YouTube para chinês simplificado usando o Ollama local e a extensão OnlineSubtitle do Chrome.",
+      "OnlineSubtitle status": "Status do OnlineSubtitle"
+    },
+    "ar": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "يترجم ترجمات YouTube النصية إلى الصينية المبسطة باستخدام Ollama محليًا وإضافة OnlineSubtitle لمتصفح Chrome.",
+      "OnlineSubtitle status": "حالة OnlineSubtitle"
+    },
+    "hi": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "स्थानीय Ollama और OnlineSubtitle Chrome एक्सटेंशन से YouTube उपशीर्षकों का सरल चीनी में अनुवाद करें।",
+      "OnlineSubtitle status": "OnlineSubtitle की स्थिति"
+    },
+    "ru": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Переводит субтитры YouTube на упрощённый китайский с помощью локального Ollama и расширения OnlineSubtitle для Chrome.",
+      "OnlineSubtitle status": "Статус OnlineSubtitle"
+    },
+    "it": {
+      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduce i sottotitoli di YouTube in cinese semplificato con Ollama in locale e l’estensione OnlineSubtitle per Chrome.",
+      "OnlineSubtitle status": "Stato di OnlineSubtitle"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "MacHelper のローカル AI で YouTube の二言語字幕を表示します。"
+  },
+  "captionsUnavailable": {
+    "message": "この動画の字幕は利用できません。"
+  },
+  "translationUnavailable": {
+    "message": "中国語の翻訳は利用できません。"
+  },
+  "macHelperUnavailable": {
+    "message": "OnlineSubtitle は MacHelper に接続できませんでした。"
+  },
+  "modelUnavailable": {
+    "message": "ローカルモデルを用意して Ollama を起動してください。"
+  }
+}

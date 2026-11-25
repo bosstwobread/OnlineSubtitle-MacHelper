@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "Zweisprachige YouTube-Untertitel mit lokaler KI in MacHelper."
+  },
+  "captionsUnavailable": {
+    "message": "Für dieses Video sind keine Untertitel verfügbar."
+  },
+  "translationUnavailable": {
+    "message": "Chinesische Übersetzung nicht verfügbar."
+  },
+  "macHelperUnavailable": {
+    "message": "OnlineSubtitle konnte keine Verbindung zu MacHelper herstellen."
+  },
+  "modelUnavailable": {
+    "message": "Starte Ollama mit einem lokalen Modell."
+  }
+}

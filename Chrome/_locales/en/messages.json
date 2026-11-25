@@ -1,0 +1,17 @@
+{
+  "extensionDescription": {
+    "message": "Bilingual YouTube captions with local AI in MacHelper."
+  },
+  "captionsUnavailable": {
+    "message": "Captions unavailable for this video."
+  },
+  "translationUnavailable": {
+    "message": "Chinese translation unavailable."
+  },
+  "macHelperUnavailable": {
+    "message": "OnlineSubtitle could not connect to MacHelper."
+  },
+  "modelUnavailable": {
+    "message": "Start Ollama with a local model."
+  }
+}
