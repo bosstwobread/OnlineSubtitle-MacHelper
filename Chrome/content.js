@@ -8,6 +8,7 @@
   const maximumCueBytes = 1_000;
   const maximumTranslationBytes = 2_000;
   const maximumVideoSeconds = 24 * 60 * 60;
+  const maximumCaptionEventLength = 24 * 1024 * 1024;
   const captionsTimeout = 20_000;
   const translationTimeout = 90_000;
   const settingsTimeout = 5_000;
@@ -441,7 +442,7 @@
     state.requestId = undefined;
     clearTimeout(state.captionTimer);
     if (id) {
-      document.dispatchEvent(new CustomEvent(captionCancelEvent, { detail: { id, videoId: state.videoId } }));
+      document.dispatchEvent(new CustomEvent(captionCancelEvent, { detail: JSON.stringify({ id, videoId: state.videoId }) }));
     }
   }
 
@@ -459,7 +460,7 @@
       cancelCaptionRequest(state);
       captionsUnavailable(state);
     }, captionsTimeout);
-    document.dispatchEvent(new CustomEvent(captionRequestEvent, { detail: { id: state.requestId, videoId: state.videoId } }));
+    document.dispatchEvent(new CustomEvent(captionRequestEvent, { detail: JSON.stringify({ id: state.requestId, videoId: state.videoId }) }));
   }
 
   function captionsUnavailable(state) {
@@ -474,9 +475,13 @@
 
   function receiveCaptions(event) {
     const state = session;
-    const detail = event.detail;
-    if (!state || !detail || !state.requestId || detail.id !== state.requestId ||
-        detail.videoId !== state.videoId || !isCurrent(state)) return;
+    // A string crosses Firefox's isolated and main worlds without sharing
+    // an object owned by the page. The page still supplies untrusted data.
+    if (!state?.requestId || !isCurrent(state) || typeof event.detail !== "string" ||
+        event.detail.length > maximumCaptionEventLength) return;
+    let detail;
+    try { detail = JSON.parse(event.detail); } catch { return; }
+    if (!detail || detail.id !== state.requestId || detail.videoId !== state.videoId) return;
     clearTimeout(state.captionTimer);
     state.requestId = undefined;
     if (detail.error) {

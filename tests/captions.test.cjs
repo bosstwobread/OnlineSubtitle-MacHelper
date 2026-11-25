@@ -96,12 +96,12 @@ function fixture({
     }
   });
   function request(id = 1) {
-    document.dispatchEvent(new CustomEvent("online-subtitle-request-captions", {detail: {id, videoId}}));
+    document.dispatchEvent(new CustomEvent("online-subtitle-request-captions", {detail: JSON.stringify({id, videoId})}));
   }
   function requestResult() {
     return new Promise(resolve => {
       document.addEventListener("online-subtitle-captions", event => {
-        resolve(JSON.parse(JSON.stringify(event.detail)));
+        resolve(JSON.parse(event.detail));
       }, {once: true});
       request();
     });
@@ -386,11 +386,11 @@ test("cancels only the matching pending caption request and allows a fresh reque
   });
   function cancel(id, currentVideoId = videoId) {
     harness.document.dispatchEvent(new CustomEvent("online-subtitle-cancel-captions", {
-      detail: {id, videoId: currentVideoId}
+      detail: JSON.stringify({id, videoId: currentVideoId})
     }));
   }
   const responses = [];
-  harness.document.addEventListener("online-subtitle-captions", event => responses.push(event.detail.id));
+  harness.document.addEventListener("online-subtitle-captions", event => responses.push(JSON.parse(event.detail).id));
   harness.request(12);
   cancel(99);
   cancel(12, nextVideoId);

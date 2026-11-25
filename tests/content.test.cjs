@@ -104,8 +104,8 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
   document.hidden = hidden;
   document.createElement = () => new Element();
   document.getElementById = name => name === "movie_player" ? player : null;
-  document.addEventListener("online-subtitle-request-captions", event => requests.push(event.detail));
-  document.addEventListener("online-subtitle-cancel-captions", event => cancelledRequests.push(event.detail));
+  document.addEventListener("online-subtitle-request-captions", event => requests.push(JSON.parse(event.detail)));
+  document.addEventListener("online-subtitle-cancel-captions", event => cancelledRequests.push(JSON.parse(event.detail)));
   window.top = window;
   vm.runInNewContext(script, {
     chrome: { runtime: {
@@ -184,7 +184,7 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
       };
     },
     captions(cues, { request = requests.at(-1), sourceLanguage = "en", error } = {}) {
-      document.dispatchEvent(new CustomEvent("online-subtitle-captions", { detail: { ...request, cues, sourceLanguage, error } }));
+      document.dispatchEvent(new CustomEvent("online-subtitle-captions", { detail: JSON.stringify({ ...request, cues, sourceLanguage, error }) }));
     },
     status(enabled, port = statusPorts.at(-1)) {
       port.onMessage.emit({ type: "status", enabled });

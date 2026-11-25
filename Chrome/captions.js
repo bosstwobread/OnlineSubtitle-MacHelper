@@ -391,8 +391,13 @@
     request?.controller.abort();
   }
 
+  function readRequest(event) {
+    if (typeof event.detail !== "string" || event.detail.length > 256) return {};
+    try { return JSON.parse(event.detail) ?? {}; } catch { return {}; }
+  }
+
   document.addEventListener(requestEvent, async event => {
-    const {id, videoId} = event.detail ?? {};
+    const {id, videoId} = readRequest(event);
     if (!validID(id) || typeof videoId !== "string" || !videoIDPattern.test(videoId) || !isCurrentVideo(videoId)) return;
     cancelActiveRequest();
     const request = {id, videoId, controller: new AbortController()};
@@ -409,12 +414,12 @@
       ? {cues: result.cues, sourceLanguage: result.track.language}
       : {cues: [], sourceLanguage: "", error: "captions-unavailable"};
     document.dispatchEvent(new CustomEvent(responseEvent, {
-      detail: {id, videoId, ...captions}
+      detail: JSON.stringify({id, videoId, ...captions})
     }));
   });
 
   document.addEventListener(cancelEvent, event => {
-    const {id, videoId} = event.detail ?? {};
+    const {id, videoId} = readRequest(event);
     if (location.origin === origin && activeRequest && activeRequest.id === id && activeRequest.videoId === videoId) {
       cancelActiveRequest();
     }

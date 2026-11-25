@@ -5,6 +5,7 @@ const { test } = require('node:test');
 const { runInNewContext } = require('node:vm');
 
 const source = readFileSync(resolve(__dirname, '../Chrome/background.js'), 'utf8');
+const managedSource = readFileSync(resolve(__dirname, '../BrowserCompanions/managed-transport.js'), 'utf8');
 const origin = 'https://www.youtube.com';
 const extensionID = 'ndmbmmhddeibbojclldpaabmkcielfmj';
 const sender = { id: extensionID, frameId: 0, origin, tab: { id: 1 }, url: origin + '/watch?v=abcdefghijk' };
@@ -32,21 +33,34 @@ function makePort(name, from) {
   };
 }
 
-function loadBackground() {
+function loadBackground({ managed = false, sendNativeMessage } = {}) {
   const nativePorts = [];
+  const timers = new Map();
+  let lastTimer = 0;
   const runtime = {
     id: extensionID,
     onConnect: event(),
     connectNative(host) {
-      assert.equal(host, 'com.nelson007.online_subtitle');
+      assert.equal(host, managed ? 'com.localaibasetools.companion' : 'com.nelson007.online_subtitle');
       const port = makePort(host);
       nativePorts.push(port);
       return port;
     },
   };
-  runInNewContext(source, { chrome: { runtime }, TextEncoder, URL });
+  const sandbox = { chrome: { runtime }, TextEncoder, URL };
+  if (sendNativeMessage) {
+    sandbox.onlineSubtitleSafari = true;
+    sandbox.browser = { runtime: { sendNativeMessage } };
+    sandbox.setTimeout = (callback, delay) => {
+      assert.equal(delay, 4000);
+      timers.set(++lastTimer, callback);
+      return lastTimer;
+    };
+    sandbox.clearTimeout = timer => timers.delete(timer);
+  }
+  runInNewContext(managed ? managedSource + '\n' + source : source, sandbox);
   return {
-    nativePorts,
+    nativePorts, timers,
     connect(from = sender, name = 'online-subtitle-status') {
       const port = makePort(name, from);
       runtime.onConnect.emit(port);
@@ -218,4 +232,81 @@ test('status bridge fails closed on invalid messages and propagates EOF', () => 
   otherBrowser.onMessage.emit(request);
   otherBrowser.onDisconnect.emit();
   assert.equal(background.nativePorts.at(-1).disconnected, true);
+});
+
+
+test('managed companion wraps approved command and status messages without changing the caption response', () => {
+  const background = loadBackground({ managed: true });
+  const extension = 'com.nelson007.online-subtitle';
+  const status = background.connect();
+  status.onMessage.emit(request);
+  const [watcher] = background.nativePorts;
+  assert.deepEqual(watcher.messages, [{ type: 'watchStatus', extension }]);
+  watcher.onMessage.emit(enabled);
+  assert.deepEqual(status.messages, [enabled]);
+
+  const commands = [
+    [settingsRequest, 'caption-settings', configuration],
+    [wordRequest, 'explain-word', { ...configuration, ...explanation }],
+    [{ type: 'translateSentences', cues: [{ id: 1, text: 'A sentence.' }] }, 'translate-captions',
+      { ...configuration, translations: [{ id: 1, text: 'Une phrase.' }] }],
+  ];
+  for (const [request, command, result] of commands) {
+    const page = background.connect(sender, 'online-subtitle-translate');
+    page.onMessage.emit(request);
+    const native = background.nativePorts.at(-1);
+    assert.deepEqual(native.messages, [{ type: 'invoke', extension, command, payload: JSON.stringify(request) }]);
+    native.onMessage.emit({ ok: true, payload: JSON.stringify({ ok: true, ...result }) });
+    assert.deepEqual(page.messages, [{ ok: true, ...result }]);
+    assert.equal(native.disconnected, true);
+  }
+  const page = background.connect(sender, 'online-subtitle-translate');
+  page.onMessage.emit(settingsRequest);
+  background.nativePorts.at(-1).onMessage.emit({ ok: false, error: 'failed' });
+  assert.deepEqual(page.messages, [{ ok: false, error: 'translation' }]);
+});
+
+test('Safari polls one valid status at a time and stops on disconnect', async () => {
+  const requests = [];
+  const background = loadBackground({
+    managed: true,
+    sendNativeMessage(host, message) {
+      assert.equal(host, 'com.localaibasetools.companion');
+      requests.push(JSON.parse(JSON.stringify(message)));
+      return Promise.resolve(requests.length === 1 ? enabled : { ...enabled, enabled: false });
+    },
+  });
+  const status = background.connect();
+  status.onMessage.emit(request);
+  await new Promise(setImmediate);
+  assert.deepEqual(requests, [{ type: 'getStatus', extension: 'com.nelson007.online-subtitle' }]);
+  assert.deepEqual(status.messages, [enabled]);
+  assert.equal(background.timers.size, 1);
+  const [timer, poll] = background.timers.entries().next().value;
+  background.timers.delete(timer);
+  poll();
+  await new Promise(setImmediate);
+  assert.deepEqual(status.messages, [enabled, { ...enabled, enabled: false }]);
+  assert.equal(background.timers.size, 1);
+  status.onDisconnect.emit();
+  assert.equal(background.timers.size, 0);
+  assert.equal(background.nativePorts.length, 0);
+});
+
+test('Safari discards a late command response when the content port closes', async () => {
+  let respond;
+  const background = loadBackground({
+    managed: true,
+    sendNativeMessage(host, message) {
+      assert.equal(host, 'com.localaibasetools.companion');
+      assert.equal(message.command, 'explain-word');
+      return new Promise(resolve => { respond = resolve; });
+    },
+  });
+  const page = background.connect(sender, 'online-subtitle-translate');
+  page.onMessage.emit(wordRequest);
+  page.onDisconnect.emit();
+  respond({ ok: true, payload: JSON.stringify({ ok: true, ...configuration, ...explanation }) });
+  await new Promise(setImmediate);
+  assert.deepEqual(page.messages, []);
 });

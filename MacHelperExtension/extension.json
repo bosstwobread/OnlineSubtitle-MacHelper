@@ -3,7 +3,7 @@
   "runtime": "native",
   "identifier": "com.nelson007.online-subtitle",
   "displayName": "OnlineSubtitle",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "summary": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
   "entryPoint": "Main.swift",
   "icon": "assets/icon.png",

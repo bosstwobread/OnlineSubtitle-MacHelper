@@ -89,6 +89,10 @@ function sanitizeReply(reply, request) {
   return { ok: true, translations, ...settings };
 }
 
+function connectNative(watch) {
+  return globalThis.onlineSubtitleConnectManaged?.(watch) ?? chrome.runtime.connectNative(host);
+}
+
 function connectStatus(port) {
   let native = null;
   let closed = false;
@@ -108,7 +112,7 @@ function connectStatus(port) {
       return;
     }
     try {
-      native = chrome.runtime.connectNative(host);
+      native = connectNative(true);
       native.onDisconnect.addListener(() => {
         void chrome.runtime.lastError;
         native = null;
@@ -172,7 +176,7 @@ chrome.runtime.onConnect.addListener(port => {
       return;
     }
     try {
-      native = chrome.runtime.connectNative(host);
+      native = connectNative(false);
       native.onDisconnect.addListener(() => {
         void chrome.runtime.lastError;
         native = null;
