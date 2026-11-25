@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "単語の解説を利用できません。"
   },
-  "wordMeaning": {
-    "message": "この文での意味"
-  },
-  "sentenceMeaning": {
-    "message": "文全体の意味"
-  },
   "wordLookupTitle": {
     "message": "単語の解説"
   }

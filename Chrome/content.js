@@ -74,7 +74,7 @@
     return encoder.encode(text).length <= maximumBytes ? text : "";
   }
 
-  function normalizeCues(raw) {
+  function normalizeCues(raw, language) {
     if (!Array.isArray(raw) || raw.length > maximumCues) return { cues: [], soundOnly: [] };
     const cues = [];
     const soundOnly = [];
@@ -89,7 +89,7 @@
     }
     const byTime = (a, b) => a.start - b.start || a.end - b.end;
     return {
-      cues: indexCues(globalThis.onlineSubtitleGroupCaptionSentences(cues.sort(byTime), maximumCues)),
+      cues: indexCues(globalThis.onlineSubtitleGroupCaptionSentences(cues.sort(byTime), maximumCues, language)),
       soundOnly: indexCues(soundOnly.sort(byTime))
     };
   }
@@ -147,8 +147,8 @@
     root.append(stack, status);
     player.append(root);
     const interactions = globalThis.onlineSubtitleCreateInteractions({
-      player, root, stack, original, translated, message,
-      onWord: (word, row) => startLookup(state, word, row),
+      player, root, stack, original, message,
+      onWord: word => startLookup(state, word),
       onDismiss: () => {
         dismissLookup(state);
         translateNext(state);
@@ -175,7 +175,7 @@
     if (state.lookup && (!canShow || state.lookup.cue !== cue)) dismissLookup(state);
     state.presentedCue = bilingual ? cue : undefined;
     overlay.interactions.renderSource(bilingual?.original ?? "", state.sourceLanguage);
-    overlay.interactions.renderTranslation(bilingual?.translation ?? "", overlay.translated.lang);
+    setText(overlay.translated, bilingual?.translation ?? "");
     overlay.stack.hidden = !bilingual;
     // Keep native CC enabled in YouTube. Mask it only while this cue is
     // waiting for both languages or being replaced by the bilingual overlay.
@@ -299,9 +299,8 @@
         render(state);
       } else {
         const meaning = captionText(reply?.meaning, maximumTranslationBytes);
-        const sentenceMeaning = captionText(reply?.sentenceMeaning, maximumTranslationBytes);
-        if (configuration && meaning && sentenceMeaning) {
-          state.overlay.interactions.completeLookup({ meaning, sentenceMeaning, targetLanguage: configuration.targetLanguage });
+        if (configuration && meaning) {
+          state.overlay.interactions.completeLookup({ meaning, targetLanguage: configuration.targetLanguage });
         } else {
           state.overlay.interactions.failLookup();
         }
@@ -310,11 +309,11 @@
     });
   }
 
-  function startLookup(state, word, row) {
+  function startLookup(state, word) {
     const cue = state.presentedCue;
-    const sentence = row === "translation" ? cue?.bilingual?.translation : cue?.bilingual?.original;
+    const sentence = cue?.bilingual?.original;
     if (!isCurrent(state) || state.video.seeking || state.video.ended || showingAd(state.player) ||
-        !captionText(sentence, maximumTranslationBytes) || !captionText(word, 256) || !sentence.includes(word)) return;
+        !captionText(sentence, maximumCueBytes) || !captionText(word, 256) || !sentence.includes(word)) return;
     dismissLookup(state);
     cancelBatch(state);
     if (state.settingsRequest) {
@@ -484,17 +483,17 @@
       captionsUnavailable(state);
       return;
     }
-    const { cues, soundOnly } = normalizeCues(detail.cues);
+    const sourceLanguage = typeof detail.sourceLanguage === "string" &&
+      /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8}){0,4}$/.test(detail.sourceLanguage) ? detail.sourceLanguage : "";
+    const { cues, soundOnly } = normalizeCues(detail.cues, sourceLanguage);
     if (!cues.length && !soundOnly.length) {
       captionsUnavailable(state);
       return;
     }
     state.cues = cues;
     state.soundOnly = soundOnly;
-    if (typeof detail.sourceLanguage === "string" && /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8}){0,4}$/.test(detail.sourceLanguage)) {
-      state.sourceLanguage = detail.sourceLanguage;
-      state.overlay.original.lang = state.sourceLanguage;
-    }
+    state.sourceLanguage = sourceLanguage;
+    state.overlay.original.lang = sourceLanguage;
     updatePlayback(state);
   }
 

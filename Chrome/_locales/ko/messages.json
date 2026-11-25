@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "단어 설명을 사용할 수 없습니다."
   },
-  "wordMeaning": {
-    "message": "이 문장에서의 뜻"
-  },
-  "sentenceMeaning": {
-    "message": "문장 전체의 뜻"
-  },
   "wordLookupTitle": {
     "message": "단어 설명"
   }

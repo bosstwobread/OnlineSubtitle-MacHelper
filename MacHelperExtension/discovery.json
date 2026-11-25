@@ -4,10 +4,11 @@
   "capabilities": [
     "Show original captions with translations in the chosen language over the YouTube player.",
     "Drag the bilingual subtitles vertically.",
-    "Click a subtitle word to see its meaning in context and the meaning of the whole sentence."
+    "Click a word in the original subtitles to see its meaning in context."
   ],
   "exampleQueries": [
-    "Watch YouTube in English with Chinese subtitles."
+    "Watch YouTube in English with Chinese subtitles.",
+    "Learn Spanish with original YouTube captions, English translations, and clickable words."
   ],
   "keywords": [
     "YouTube",
@@ -18,7 +19,11 @@
     "English",
     "MacHelper",
     "vocabulary",
-    "word lookup"
+    "word lookup",
+    "Spanish",
+    "Japanese",
+    "multilingual",
+    "language learning"
   ],
   "limitations": [
     "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection."
@@ -34,7 +39,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Show original captions with translations in the chosen language over the YouTube player.",
       "Drag the bilingual subtitles vertically.": "Drag the bilingual subtitles vertically.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Click a subtitle word to see its meaning in context and the meaning of the whole sentence."
+      "Click a word in the original subtitles to see its meaning in context.": "Click a word in the original subtitles to see its meaning in context.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Learn Spanish with original YouTube captions, English translations, and clickable words."
     },
     "zh-Hans": {
       "Watch YouTube in English with Chinese subtitles.": "看 YouTube 英语视频时显示中文字幕。",
@@ -42,7 +52,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 连接翻译 YouTube 字幕，并解释点击的词语。",
       "Show original captions with translations in the chosen language over the YouTube player.": "在 YouTube 播放器上同时显示原文字幕和所选语言的译文。",
       "Drag the bilingual subtitles vertically.": "上下拖动双语字幕。",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "点击字幕中的词语，查看它在句中的含义以及整句话的意思。"
+      "Click a word in the original subtitles to see its meaning in context.": "点击原文字幕中的词语，查看它在句中的含义。",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "使用 macOS 14 或更新版本、MacHelper 6.8.0 或更新版本、Chrome 116 或更新版本，以及 Xcode 命令行工具。",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "选择「添加到 MacHelper」，查看原生代码和浏览器配套扩展的权限，然后在 MacHelper 中配置 AI 连接。",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "打开「查看完整源代码」，按其中的设置链接下载项目。在解压后的项目文件夹中，通过终端运行 ./scripts/register-chrome-host.sh。",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "在 chrome://extensions 页面启用开发者模式，选择「加载已解压的扩展程序」，选中项目的 Chrome 文件夹，然后重新加载带字幕的 YouTube 视频。",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "用 YouTube 西班牙语原文字幕、英语译文和可点击的词语学习西班牙语。"
     },
     "zh-Hant": {
       "Watch YouTube in English with Chinese subtitles.": "觀看 YouTube 英語影片時顯示中文字幕。",
@@ -50,7 +65,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 連線翻譯 YouTube 字幕，並解釋點選的詞語。",
       "Show original captions with translations in the chosen language over the YouTube player.": "在 YouTube 播放器上同時顯示原文字幕和所選語言的譯文。",
       "Drag the bilingual subtitles vertically.": "上下拖曳雙語字幕。",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "點選字幕中的詞語，查看它在句中的含義以及整句話的意思。"
+      "Click a word in the original subtitles to see its meaning in context.": "點選原文字幕中的詞語，查看它在句中的含義。",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "使用 macOS 14 或更新版本、MacHelper 6.8.0 或更新版本、Chrome 116 或更新版本，以及 Xcode 命令列工具。",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "選擇「加入 MacHelper」，檢視原生程式碼及瀏覽器擴充功能的權限，然後在 MacHelper 中設定 AI 連線。",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "開啟「查看完整原始碼」，依照其中的設定連結下載專案。在解壓縮後的專案資料夾中，透過終端機執行 ./scripts/register-chrome-host.sh。",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "在 chrome://extensions 啟用開發人員模式，選擇「載入未封裝項目」，選取專案中的 Chrome 資料夾，然後重新載入有字幕的 YouTube 影片。",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "透過 YouTube 西班牙文原文字幕、英文譯文及可點選的詞語學習西班牙文。"
     },
     "es": {
       "Watch YouTube in English with Chinese subtitles.": "Ver vídeos de YouTube en inglés con subtítulos en chino.",
@@ -58,7 +78,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce los subtítulos de YouTube y explica las palabras seleccionadas mediante la conexión de IA de MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Muestra los subtítulos originales y su traducción al idioma elegido en el reproductor de YouTube.",
       "Drag the bilingual subtitles vertically.": "Arrastra los subtítulos bilingües en sentido vertical.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Haz clic en una palabra de los subtítulos para ver su significado en contexto y el de la frase completa."
+      "Click a word in the original subtitles to see its meaning in context.": "Haz clic en una palabra de los subtítulos originales para ver su significado en contexto.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "Usa MacHelper 6.8.0 o posterior en macOS 14+, Chrome 116+ y las herramientas de línea de comandos de Xcode.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "Selecciona Añadir a MacHelper, revisa los permisos de ejecución nativa y del complemento del navegador y configura la conexión de IA en MacHelper.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "Abre Ver código fuente completo y sigue su enlace de configuración para descargar el proyecto. En la carpeta extraída, ejecuta ./scripts/register-chrome-host.sh en Terminal.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "En chrome://extensions, activa el modo de desarrollador. Selecciona Cargar descomprimida, elige la carpeta Chrome del proyecto y vuelve a cargar un vídeo de YouTube que tenga subtítulos.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Aprender español con subtítulos originales de YouTube, traducciones al inglés y palabras que se pueden pulsar."
     },
     "fr": {
       "Watch YouTube in English with Chinese subtitles.": "Regarder des vidéos YouTube en anglais avec des sous-titres chinois.",
@@ -66,7 +91,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduit les sous-titres YouTube et explique les mots sélectionnés avec la connexion IA de MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Affiche le texte original et sa traduction dans la langue choisie sur le lecteur YouTube.",
       "Drag the bilingual subtitles vertically.": "Déplacez les sous-titres bilingues verticalement en les faisant glisser.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Cliquez sur un mot des sous-titres pour voir son sens en contexte et celui de la phrase entière."
+      "Click a word in the original subtitles to see its meaning in context.": "Cliquez sur un mot des sous-titres d’origine pour voir son sens en contexte.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "Utilisez MacHelper 6.8.0 ou ultérieur sur macOS 14+, Chrome 116+ et les outils en ligne de commande de Xcode.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "Sélectionnez Ajouter à MacHelper, examinez les autorisations d’exécution native et du module de navigateur, puis configurez la connexion IA dans MacHelper.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "Ouvrez Voir le code source complet et suivez le lien de configuration pour télécharger le projet. Dans le dossier extrait, exécutez ./scripts/register-chrome-host.sh dans Terminal.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "Dans chrome://extensions, activez le mode développeur. Sélectionnez Charger l’extension non empaquetée, choisissez le dossier Chrome du projet et rechargez une vidéo YouTube sous-titrée.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Apprendre l’espagnol avec les sous-titres originaux de YouTube, une traduction en anglais et des mots cliquables."
     },
     "de": {
       "Watch YouTube in English with Chinese subtitles.": "Englische YouTube-Videos mit chinesischen Untertiteln ansehen.",
@@ -74,7 +104,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Übersetzt YouTube-Untertitel und erklärt angeklickte Wörter mit der KI-Verbindung von MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Zeigt die Originaluntertitel und die Übersetzung in der gewählten Sprache im YouTube-Player an.",
       "Drag the bilingual subtitles vertically.": "Verschiebe die zweisprachigen Untertitel nach oben oder unten.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Klicke auf ein Wort im Untertitel, um seine Bedeutung im Kontext und die Bedeutung des ganzen Satzes zu sehen."
+      "Click a word in the original subtitles to see its meaning in context.": "Klicke auf ein Wort im Originaluntertitel, um seine Bedeutung im Kontext zu sehen.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "Verwende MacHelper 6.8.0 oder neuer unter macOS 14+, Chrome 116+ und die Xcode-Befehlszeilentools.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "Wähle Zu MacHelper hinzufügen, prüfe die Berechtigungen für die native Ausführung und die Browsererweiterung und richte die KI-Verbindung in MacHelper ein.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "Öffne Vollständigen Quellcode ansehen und folge dem Einrichtungslink zum Projektdownload. Führe im entpackten Projektordner ./scripts/register-chrome-host.sh im Terminal aus.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "Aktiviere auf chrome://extensions den Entwicklermodus. Wähle Entpackte Erweiterung laden und den Chrome-Ordner des Projekts. Lade ein YouTube-Video mit Untertiteln neu.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Spanisch mit Originaluntertiteln auf YouTube, englischer Übersetzung und anklickbaren Wörtern lernen."
     },
     "ja": {
       "Watch YouTube in English with Chinese subtitles.": "YouTube の英語動画を中国語字幕で視聴したい。",
@@ -82,7 +117,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper の AI 接続を使って YouTube の字幕を翻訳し、クリックした単語の意味を説明します。",
       "Show original captions with translations in the chosen language over the YouTube player.": "YouTube プレーヤーに原文の字幕と選択した言語の翻訳を同時に表示します。",
       "Drag the bilingual subtitles vertically.": "二言語字幕を上下にドラッグできます。",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "字幕の単語をクリックすると、その文脈での単語の意味と文全体の意味を確認できます。"
+      "Click a word in the original subtitles to see its meaning in context.": "原文字幕の単語をクリックすると、その文脈での意味を確認できます。",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "macOS 14 以降、MacHelper 6.8.0 以降、Chrome 116 以降、Xcode コマンドラインツールを用意します。",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "「MacHelper に追加」を選び、ネイティブコードとブラウザー拡張機能の権限を確認して、MacHelper の AI 接続を設定します。",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "「完全なソースを表示」から設定リンクを開き、プロジェクトをダウンロードします。解凍したフォルダで、ターミナルから ./scripts/register-chrome-host.sh を実行します。",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "chrome://extensions でデベロッパー モードを有効にします。「パッケージ化されていない拡張機能を読み込む」でプロジェクト内の Chrome フォルダを選び、字幕付きの YouTube 動画を再読み込みします。",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "YouTube のスペイン語字幕、英語訳、クリックできる単語でスペイン語を学ぶ。"
     },
     "ko": {
       "Watch YouTube in English with Chinese subtitles.": "영어 YouTube 영상을 중국어 자막과 함께 보기.",
@@ -90,7 +130,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper의 AI 연결로 YouTube 자막을 번역하고 클릭한 단어의 뜻을 설명합니다.",
       "Show original captions with translations in the chosen language over the YouTube player.": "YouTube 플레이어에서 원본 자막과 선택한 언어의 번역을 함께 표시합니다.",
       "Drag the bilingual subtitles vertically.": "이중 언어 자막을 위아래로 드래그할 수 있습니다.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "자막의 단어를 클릭하면 문맥 속 단어의 뜻과 문장 전체의 의미를 볼 수 있습니다."
+      "Click a word in the original subtitles to see its meaning in context.": "원본 자막의 단어를 클릭하면 문맥 속 뜻을 볼 수 있습니다.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "macOS 14 이상, MacHelper 6.8.0 이상, Chrome 116 이상과 Xcode 명령줄 도구를 사용합니다.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "MacHelper에 추가를 선택하고 네이티브 실행 및 브라우저 확장 권한을 확인한 뒤 MacHelper의 AI 연결을 설정합니다.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "전체 소스 보기를 열고 설정 링크를 따라 프로젝트를 다운로드합니다. 압축을 푼 프로젝트 폴더에서 터미널로 ./scripts/register-chrome-host.sh를 실행합니다.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "chrome://extensions에서 개발자 모드를 켭니다. 압축해제된 확장 프로그램을 로드합니다를 선택하고 프로젝트의 Chrome 폴더를 지정한 뒤 자막이 있는 YouTube 동영상을 새로고침합니다.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "YouTube의 스페인어 원문 자막, 영어 번역, 클릭할 수 있는 단어로 스페인어를 학습하기."
     },
     "pt": {
       "Watch YouTube in English with Chinese subtitles.": "Assistir a vídeos do YouTube em inglês com legendas em chinês.",
@@ -98,7 +143,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduz legendas do YouTube e explica as palavras selecionadas usando a conexão de IA do MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Exibe as legendas originais e a tradução no idioma escolhido sobre o player do YouTube.",
       "Drag the bilingual subtitles vertically.": "Arraste as legendas bilíngues para cima ou para baixo.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Clique em uma palavra da legenda para ver o significado no contexto e o sentido da frase inteira."
+      "Click a word in the original subtitles to see its meaning in context.": "Clique em uma palavra da legenda original para ver o significado no contexto.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "Use o MacHelper 6.8.0 ou posterior no macOS 14+, o Chrome 116+ e as ferramentas de linha de comando do Xcode.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "Selecione Adicionar ao MacHelper, revise as permissões de execução nativa e da extensão do Chrome e configure a conexão de IA no MacHelper.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "Abra Ver código-fonte completo e siga o link de configuração para baixar o projeto. Na pasta extraída, execute ./scripts/register-chrome-host.sh no Terminal.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "Em chrome://extensions, ative o modo de desenvolvedor. Selecione Carregar sem compactação, escolha a pasta Chrome do projeto e recarregue um vídeo do YouTube com legendas.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Aprender espanhol com legendas originais do YouTube, traduções em inglês e palavras clicáveis."
     },
     "ar": {
       "Watch YouTube in English with Chinese subtitles.": "مشاهدة فيديوهات YouTube بالإنجليزية مع ترجمة صينية.",
@@ -106,7 +156,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "يترجم ترجمات YouTube النصية ويشرح الكلمات التي تنقر عليها باستخدام اتصال الذكاء الاصطناعي في MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "يعرض النص الأصلي وترجمته باللغة المختارة معًا على مشغل YouTube.",
       "Drag the bilingual subtitles vertically.": "اسحب الترجمة ثنائية اللغة إلى أعلى أو أسفل.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "انقر على كلمة في الترجمة لعرض معناها في السياق ومعنى الجملة كاملة."
+      "Click a word in the original subtitles to see its meaning in context.": "انقر على كلمة في النص الأصلي المصاحب للفيديو لعرض معناها في السياق.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "استخدم MacHelper 6.8.0 أو أحدث على macOS 14 أو أحدث، وChrome 116 أو أحدث، وأدوات سطر أوامر Xcode.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "اختر «إضافة إلى MacHelper»، وراجع أذونات تشغيل الشيفرة وإضافة المتصفح، ثم اضبط اتصال الذكاء الاصطناعي في MacHelper.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "افتح «عرض الشيفرة المصدرية الكاملة» واتبع رابط الإعداد لتنزيل المشروع. في مجلد المشروع بعد فك الضغط، شغّل ./scripts/register-chrome-host.sh في الطرفية.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "فعّل وضع المطوّر في chrome://extensions. اختر تحميل إضافة غير مضغوطة، وحدد مجلد Chrome داخل المشروع، ثم أعِد تحميل فيديو YouTube يتضمن نصًا مصاحبًا.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "تعلم الإسبانية بالنص الإسباني الأصلي على YouTube وترجمته الإنجليزية وإمكانية النقر على الكلمات."
     },
     "hi": {
       "Watch YouTube in English with Chinese subtitles.": "अंग्रेज़ी YouTube वीडियो चीनी उपशीर्षकों के साथ देखें।",
@@ -114,7 +169,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper के AI कनेक्शन से YouTube उपशीर्षकों का अनुवाद करें और क्लिक किए गए शब्दों का अर्थ जानें।",
       "Show original captions with translations in the chosen language over the YouTube player.": "YouTube प्लेयर पर मूल उपशीर्षक और चुनी हुई भाषा में उनका अनुवाद साथ दिखाएँ।",
       "Drag the bilingual subtitles vertically.": "द्विभाषी उपशीर्षकों को ऊपर या नीचे खींचें।",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "संदर्भ में शब्द का अर्थ और पूरे वाक्य का मतलब देखने के लिए उपशीर्षक में किसी शब्द पर क्लिक करें।"
+      "Click a word in the original subtitles to see its meaning in context.": "संदर्भ में किसी शब्द का अर्थ देखने के लिए मूल उपशीर्षक में उस शब्द पर क्लिक करें।",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "macOS 14 या बाद का संस्करण, MacHelper 6.8.0 या बाद का संस्करण, Chrome 116 या बाद का संस्करण और Xcode के कमांड लाइन टूल इस्तेमाल करें।",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "MacHelper में जोड़ें चुनें, नेटिव कोड और ब्राउज़र एक्सटेंशन की अनुमतियाँ देखें, फिर MacHelper में AI कनेक्शन सेट करें।",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "पूरा सोर्स देखें खोलें और सेटअप लिंक से प्रोजेक्ट डाउनलोड करें। अनज़िप किए गए प्रोजेक्ट फ़ोल्डर में Terminal से ./scripts/register-chrome-host.sh चलाएँ।",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "chrome://extensions में डेवलपर मोड चालू करें। Load unpacked चुनकर प्रोजेक्ट का Chrome फ़ोल्डर चुनें और कैप्शन वाला YouTube वीडियो फिर से लोड करें।",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "YouTube के मूल स्पैनिश कैप्शन, अंग्रेज़ी अनुवाद और क्लिक करने योग्य शब्दों से स्पैनिश सीखें।"
     },
     "ru": {
       "Watch YouTube in English with Chinese subtitles.": "Смотреть YouTube на английском с китайскими субтитрами.",
@@ -122,7 +182,12 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Переводит субтитры YouTube и объясняет выбранные слова через подключение ИИ в MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Показывает оригинальные субтитры и перевод на выбранный язык поверх проигрывателя YouTube.",
       "Drag the bilingual subtitles vertically.": "Перетаскивайте двуязычные субтитры вверх или вниз.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Нажмите на слово в субтитрах, чтобы узнать его значение в контексте и смысл всего предложения."
+      "Click a word in the original subtitles to see its meaning in context.": "Нажмите на слово в оригинальных субтитрах, чтобы узнать его значение в контексте.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "Используйте MacHelper 6.8.0 или новее на macOS 14+, Chrome 116+ и инструменты командной строки Xcode.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "Нажмите «Добавить в MacHelper», проверьте разрешения нативного кода и расширения браузера, затем настройте подключение к ИИ в MacHelper.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "Откройте «Посмотреть полный исходный код» и перейдите по ссылке на настройки, чтобы скачать проект. В папке распакованного проекта запустите ./scripts/register-chrome-host.sh в Терминале.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "На chrome://extensions включите режим разработчика. Нажмите «Загрузить распакованное расширение», выберите папку Chrome проекта и перезагрузите видео YouTube с субтитрами.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Учить испанский по оригинальным субтитрам на YouTube, их английскому переводу и словам, значение которых можно открыть нажатием."
     },
     "it": {
       "Watch YouTube in English with Chinese subtitles.": "Guardare video di YouTube in inglese con sottotitoli in cinese.",
@@ -130,7 +195,18 @@
       "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce i sottotitoli di YouTube e spiega le parole selezionate con la connessione IA di MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Mostra i sottotitoli originali e la traduzione nella lingua scelta sul player di YouTube.",
       "Drag the bilingual subtitles vertically.": "Trascina i sottotitoli bilingui verso l’alto o verso il basso.",
-      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Fai clic su una parola nei sottotitoli per vederne il significato nel contesto e quello dell’intera frase."
+      "Click a word in the original subtitles to see its meaning in context.": "Fai clic su una parola nei sottotitoli originali per vederne il significato nel contesto.",
+      "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.": "Usa MacHelper 6.8.0 o successivo su macOS 14+, Chrome 116+ e gli strumenti da riga di comando di Xcode.",
+      "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.": "Seleziona Aggiungi a MacHelper, controlla i permessi di esecuzione nativa e dell’estensione del browser, quindi configura la connessione IA in MacHelper.",
+      "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.": "Apri Visualizza il codice sorgente completo e segui il link di configurazione per scaricare il progetto. Nella cartella estratta, esegui ./scripts/register-chrome-host.sh nel Terminale.",
+      "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions.": "In chrome://extensions attiva la modalità sviluppatore. Seleziona Carica estensione non pacchettizzata, scegli la cartella Chrome del progetto e ricarica un video YouTube con sottotitoli.",
+      "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Imparare lo spagnolo con sottotitoli originali di YouTube, traduzioni in inglese e parole cliccabili."
     }
-  }
+  },
+  "installSteps": [
+    "Use MacHelper 6.8.0 or later on macOS 14+, Chrome 116+, and Xcode Command Line Tools.",
+    "Choose Add to MacHelper, review the native and browser companion permissions, then configure AI Connection in MacHelper.",
+    "Open View complete source and follow its setup link to download the project. In the extracted project folder, run ./scripts/register-chrome-host.sh in Terminal.",
+    "In chrome://extensions, enable Developer mode. Choose Load unpacked, select the project’s Chrome folder, and reload a YouTube video with captions."
+  ]
 }

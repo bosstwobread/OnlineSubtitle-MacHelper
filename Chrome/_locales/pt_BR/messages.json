@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "A explicação da palavra está indisponível."
   },
-  "wordMeaning": {
-    "message": "Significado nesta frase"
-  },
-  "sentenceMeaning": {
-    "message": "Significado da frase"
-  },
   "wordLookupTitle": {
     "message": "Explicação da palavra"
   }

@@ -36,7 +36,7 @@ function transcriptResult(text, items) {
   return {actions: [{updateEngagementPanelAction: {targetId: transcriptPanelID, content}}]};
 }
 
-function playerMetadata(videoId, tracks, captionIndex) {
+function playerMetadata(videoId, tracks, captionIndex, audioTracks = [{captionTrackIndices: [captionIndex]}], defaultAudioTrackIndex = 0) {
   const response = {
     videoDetails: {videoId},
     playabilityStatus: {status: "OK"}
@@ -45,8 +45,8 @@ function playerMetadata(videoId, tracks, captionIndex) {
     response.captions = {
       playerCaptionsTracklistRenderer: {
         captionTracks: tracks,
-        audioTracks: [{captionTrackIndices: [captionIndex]}],
-        defaultAudioTrackIndex: 0
+        audioTracks,
+        defaultAudioTrackIndex
       }
     };
   }
@@ -55,11 +55,11 @@ function playerMetadata(videoId, tracks, captionIndex) {
 
 function fixture({
   tracks, captionIndex, playerVideo = videoId, initialPlayerResponse, initialDataVideo = videoId,
-  optionTracks, resourceURLs = [], modern = false, fetch
+  optionTracks, audioTracks, defaultAudioTrackIndex, resourceURLs = [], modern = false, fetch
 }) {
   const document = new EventTarget();
   const location = new URL(`${origin}/watch?v=${videoId}`);
-  const playerResponse = playerMetadata(playerVideo, tracks, captionIndex);
+  const playerResponse = playerMetadata(playerVideo, tracks, captionIndex, audioTracks, defaultAudioTrackIndex);
   const page = {
     currentVideoEndpoint: {watchEndpoint: {videoId: initialDataVideo}},
     engagementPanels: [{engagementPanelSectionListRenderer: {
@@ -134,6 +134,40 @@ test("prefers manual English and returns valid sorted cue timing", async () => {
   assert.equal(requested.length, 1);
   assert.equal(new URL(requested[0]).searchParams.get("fmt"), "json3");
   assert.equal(new URL(requested[0]).searchParams.get("lang"), "en-US");
+});
+
+test("uses the default audio's own caption language before an available English track", async () => {
+  const requested = [];
+  const harness = fixture({
+    tracks: [track("en", "English"), track("ja", "日本語（自動生成）", {kind: "asr"}), track("ja-JP", "日本語")],
+    audioTracks: [
+      {audioTrackId: "en.4", captionTrackIndices: [0], defaultCaptionTrackIndex: 0},
+      {audioTrackId: "ja.4", captionTrackIndices: [0, 1, 2], defaultCaptionTrackIndex: 0}
+    ],
+    defaultAudioTrackIndex: 1,
+    fetch: async url => {
+      requested.push(url.searchParams.get("lang"));
+      return Response.json({events: [{tStartMs: 0, dDurationMs: 1000, segs: [{utf8: "今日は晴れです。"}]}]});
+    }
+  });
+  assert.equal((await harness.requestResult()).sourceLanguage, "ja-JP");
+  assert.deepEqual(requested, ["ja-JP"]);
+});
+
+test("prefers speech recognition in the audio's language over authored captions in another language", async () => {
+  const requested = [];
+  const harness = fixture({
+    tracks: [track("en", "English"), track("es-419", "Español (automático)", {kind: "asr"})],
+    audioTracks: [{captionTrackIndices: [0, 1], defaultCaptionTrackIndex: 0}],
+    fetch: async url => {
+      requested.push(url.searchParams.get("lang"));
+      return Response.json({events: [{tStartMs: 0, dDurationMs: 1000, segs: [{utf8: "¿Cómo estás?"}]}]});
+    }
+  });
+  assert.deepEqual(await harness.requestResult(), {
+    id: 1, videoId, sourceLanguage: "es-419", cues: [{start: 0, end: 1, text: "¿Cómo estás?"}]
+  });
+  assert.deepEqual(requested, ["es-419"]);
 });
 
 test("uses the watch video's initial track while the player reports an ad video ID", async () => {

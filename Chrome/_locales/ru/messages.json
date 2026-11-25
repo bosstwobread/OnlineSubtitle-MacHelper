@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "Объяснение слова недоступно."
   },
-  "wordMeaning": {
-    "message": "Значение в этом предложении"
-  },
-  "sentenceMeaning": {
-    "message": "Смысл предложения"
-  },
   "wordLookupTitle": {
     "message": "Объяснение слова"
   }

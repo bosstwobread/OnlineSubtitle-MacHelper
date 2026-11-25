@@ -11,8 +11,8 @@ function cue(start, end, text) {
   return {start, end, text};
 }
 
-function grouped(cues) {
-  return structuredClone(context.onlineSubtitleGroupCaptionSentences(cues));
+function grouped(cues, language) {
+  return structuredClone(context.onlineSubtitleGroupCaptionSentences(cues, undefined, language));
 }
 
 test("joins adjacent unfinished cues using their real outer timestamps", () => {
@@ -88,6 +88,19 @@ test("uses Han and Kana spacing and retains case and punctuation verbatim", () =
   assert.deepEqual(grouped([cue(0, 1, "“Wait!”"), cue(1, 2, "He left.")]), [
     cue(0, 1, "“Wait!”"), cue(1, 2, "He left.")
   ]);
+});
+
+test("groups Spanish fragments and respects Japanese and right-to-left sentence punctuation", () => {
+  const texts = (cues, language) => grouped(cues, language).map(({text}) => text);
+  assert.deepEqual(texts([
+    cue(0, 1, "¿Quieres ir"), cue(1, 2, "al mercado? Sí, vamos."),
+  ], "es"), ["¿Quieres ir al mercado?", "Sí, vamos."]);
+  assert.deepEqual(texts([cue(0, 4, "今日は晴れです。明日も晴れます。")], "ja"),
+    ["今日は晴れです。", "明日も晴れます。"]);
+  assert.deepEqual(texts([cue(0, 4, "مرحبا، كيف الحال؟ أنا بخير.")], "ar"),
+    ["مرحبا، كيف الحال؟", "أنا بخير."]);
+  assert.deepEqual(texts([cue(0, 4, "آج اچھا دن ہے۔ چلو باہر جائیں۔")], "ur"),
+    ["آج اچھا دن ہے۔", "چلو باہر جائیں۔"]);
 });
 
 test("preserves repeated words, substantial overlaps and coincident cues", () => {

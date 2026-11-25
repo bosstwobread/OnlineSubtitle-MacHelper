@@ -69,7 +69,10 @@ class Element {
 
   emit(type, properties = {}) {
     const event = {
+      type,
+      target: this,
       isTrusted: true,
+      composedPath: () => this.path(),
       preventDefault() { this.defaultPrevented = true; },
       stopPropagation() { this.propagationStopped = true; },
       ...properties
@@ -77,6 +80,8 @@ class Element {
     for (const listener of this.handlers.get(type) ?? []) listener(event);
     return event;
   }
+
+  path() { return [this, ...(this.parent?.path() ?? [])]; }
 
   setAttribute(name, value) { this.attributes.set(name, value); }
   removeAttribute(name) { this.attributes.delete(name); }
@@ -87,7 +92,6 @@ class Element {
 
 function environment() {
   const calls = [];
-  const wordSides = [];
   const observers = new Set();
   let focused;
   const make = tag => new Element(tag, element => { focused = element; });
@@ -109,33 +113,35 @@ function environment() {
 
   return {
     calls,
-    wordSides,
     window,
+    gesture(type, element, properties = {}) {
+      return window.emit(type, {target: element, composedPath: () => element.path(), ...properties});
+    },
+    click(element, properties) { return this.gesture("click", element, properties); },
     get focused() { return focused; },
     resize() { for (const callback of observers) callback(); },
-    mount({withTranslation = false} = {}) {
+    mount() {
       const player = make("div");
       player.anchored = true;
       const root = make("div");
       const stack = make("div");
       const original = make("div");
-      const translated = withTranslation ? make("div") : undefined;
+      const translated = make("div");
       player.append(root);
       root.append(stack);
-      stack.append(original);
-      if (translated) stack.append(translated);
+      stack.append(original, translated);
       root.clientHeight = 600;
       root.getBoundingClientRect = () => ({top: 100, bottom: 100 + root.clientHeight});
       stack.offsetHeight = 80;
       const bottom = () => parseFloat(stack.properties.get("--online-subtitle-bottom") ?? "90px");
       stack.getBoundingClientRect = () => ({bottom: root.getBoundingClientRect().bottom - bottom(),
         top: root.getBoundingClientRect().bottom - bottom() - stack.offsetHeight});
-      const interaction = scope.onlineSubtitleCreateInteractions({player, root, stack, original, translated,
-        onWord(word, side) { calls.push(word); wordSides.push(side); interaction.showLookup(word); },
+      const interaction = scope.onlineSubtitleCreateInteractions({player, root, stack, original,
+        onWord(word) { calls.push(word); interaction.showLookup(word); },
         onDismiss() { calls.push("dismissed"); },
         message: key => key});
       const panel = root.children[1];
-      return {interaction, player, root, stack, original, translated, handle: stack.children.at(-1), panel,
+      return {interaction, player, root, stack, original, translated, panel,
         heading: panel.children[0].children[0], close: panel.children[0].children[1],
         status: panel.children[1], result: panel.children[2], bottom};
     }
@@ -157,14 +163,13 @@ test("word buttons preserve captions, segment multilingual words, and require tr
   const first = original.children[0];
   interaction.renderSource("We'll say ‘go!’ <img>", "en");
   assert.equal(first, original.children[0]);
-  assert.equal(first.emit("click", {isTrusted: false}).propagationStopped, true);
+  assert.equal(page.click(first, {isTrusted: false}).propagationStopped, true);
   stack.hidden = true;
-  first.emit("click");
+  page.click(first);
   assert.deepEqual(page.calls, []);
   stack.hidden = false;
-  first.emit("click");
+  page.click(first);
   assert.deepEqual(page.calls, ["We'll"]);
-  assert.deepEqual(page.wordSides, ["original"]);
   assert.equal(page.focused, close);
   assert.equal(heading.lang, "en");
 
@@ -172,42 +177,60 @@ test("word buttons preserve captions, segment multilingual words, and require tr
   assert.equal(original.textContent, "你好，世界！");
   assert.deepEqual(renderedWords(original).map(node => node.textContent),
     ["你好", "世界"]);
+  interaction.renderSource("今日は晴れです。", "ja");
+  assert.ok(renderedWords(original).some(node => node.textContent === "晴れ"));
+  interaction.renderSource("ما معنى الكلمة؟", "ar");
+  assert.equal(original.textContent, "ما معنى الكلمة؟");
+  assert.deepEqual(renderedWords(original).map(node => node.textContent), ["ما", "معنى", "الكلمة"]);
+  page.click(renderedWords(original).at(-1));
+  assert.equal(heading.lang, "ar");
+  assert.equal(heading.dir, "auto");
+  assert.deepEqual(page.calls, ["We'll", "الكلمة"]);
   interaction.renderSource("A word.", "invalid code");
   assert.equal(original.textContent, "A word.");
 });
 
-test("translated words activate the translation row and retain its spoken language", () => {
+test("translated text and caption background drag, while original word buttons are excluded", () => {
   const page = environment();
-  const {interaction, translated, heading} = page.mount({withTranslation: true});
+  const {interaction, original, translated, stack, panel, bottom} = page.mount();
   interaction.renderSource("Hello, world!", "en");
-  interaction.renderTranslation("你好，世界！", "zh-CN");
+  translated.textContent = "你好，世界！";
   assert.equal(translated.textContent, "你好，世界！");
-  const first = renderedWords(translated)[0];
-  first.emit("click", {isTrusted: false});
+  assert.equal(renderedWords(translated).length, 0);
+  assert.equal(stack.children.length, 2);
+  assert.equal(stack.tabIndex, 0);
+  assert.equal(stack.attributes.get("aria-label"), "moveSubtitles");
+  page.click(translated);
   assert.deepEqual(page.calls, []);
-  first.emit("click");
-  assert.deepEqual(page.calls, ["你好"]);
-  assert.deepEqual(page.wordSides, ["translation"]);
-  assert.equal(heading.lang, "zh-CN");
-  assert.equal(heading.textContent, "你好");
+
+  const word = renderedWords(original)[0];
+  const pointer = {pointerId: 24, isPrimary: true, button: 0, clientY: 300};
+  assert.equal(page.gesture("pointerdown", word, pointer).defaultPrevented, undefined);
+  assert.equal(stack.pointers.size, 0);
+  assert.equal(stack.emit("keydown", {key: "ArrowUp", target: word}).defaultPrevented, undefined);
+  assert.equal(page.gesture("pointerdown", panel, pointer).propagationStopped, undefined);
+  assert.equal(stack.pointers.size, 0);
+
+  assert.equal(page.gesture("pointerdown", translated, pointer).defaultPrevented, true);
+  assert.ok(stack.pointers.has(24));
+  assert.equal(page.focused, stack);
+  page.gesture("pointermove", stack, {pointerId: 24, clientY: 250});
+  assert.equal(bottom(), 140);
+  interaction.destroy();
 });
 
 test("closing punctuation stays with its word across wrapping and is excluded from lookups", () => {
   const page = environment();
-  const {interaction, original, translated} = page.mount({withTranslation: true});
+  const {interaction, original} = page.mount();
   interaction.renderSource("Go, then “wait!”", "en");
-  interaction.renderTranslation("你好，世界！", "zh-CN");
   assert.equal(original.textContent, "Go, then “wait!”");
-  assert.equal(translated.textContent, "你好，世界！");
   const comma = original.children[0];
   assert.equal(comma.className, "online-subtitle-word-group");
   assert.equal(comma.textContent, "Go,");
   assert.equal(comma.children[1].tagName, "#text");
   assert.equal(original.children.at(-1).textContent, "wait!”");
-  assert.equal(translated.children.at(-1).textContent, "世界！");
-  comma.children[0].emit("click");
+  page.click(comma.children[0]);
   assert.deepEqual(page.calls, ["Go"]);
-  assert.deepEqual(page.wordSides, ["original"]);
 });
 
 test("lookup panel presents plain-text results, fallback, and accessible dismissal", () => {
@@ -220,17 +243,17 @@ test("lookup panel presents plain-text results, fallback, and accessible dismiss
 
   interaction.renderSource("A word.", "en");
   const word = renderedWords(original)[1];
-  word.emit("click");
+  page.click(word);
   assert.equal(heading.textContent, "word");
   assert.equal(panel.hidden, false);
   assert.equal(panel.attributes.get("data-online-subtitle-placement"), "above");
   assert.equal(status.textContent, "wordLookupLoading");
   assert.equal(status.hidden, false);
   assert.equal(result.hidden, true);
-  interaction.completeLookup({meaning: "<strong>un mot</strong>", sentenceMeaning: "Un mot.", targetLanguage: "fr"});
-  assert.deepEqual(result.children.map(node => node.textContent), ["wordMeaning", "<strong>un mot</strong>", "sentenceMeaning", "Un mot."]);
-  assert.equal(result.children[1].lang, "fr");
-  assert.equal(result.children[3].lang, "fr");
+  interaction.completeLookup({meaning: "<strong>un mot</strong>", targetLanguage: "fr"});
+  assert.equal(result.textContent, "<strong>un mot</strong>");
+  assert.equal(result.children.length, 0);
+  assert.equal(result.lang, "fr");
   assert.equal(result.hidden, false);
   assert.equal(status.hidden, true);
   close.emit("click", {isTrusted: false});
@@ -239,9 +262,9 @@ test("lookup panel presents plain-text results, fallback, and accessible dismiss
   assert.deepEqual(page.calls, ["word", "dismissed"]);
   assert.equal(page.focused, word);
   assert.equal(panel.hidden, true);
-  assert.equal(result.children[1].textContent, "");
-  interaction.completeLookup({meaning: "Late", sentenceMeaning: "Stale", targetLanguage: "en"});
-  assert.equal(result.children[1].textContent, "");
+  assert.equal(result.textContent, "");
+  interaction.completeLookup({meaning: "Late", targetLanguage: "en"});
+  assert.equal(result.textContent, "");
 
   interaction.showLookup("another");
   interaction.failLookup();
@@ -254,46 +277,48 @@ test("lookup panel presents plain-text results, fallback, and accessible dismiss
 
 test("vertical drag captures only the initiating pointer, clamps, and survives resized or remounted players", () => {
   const page = environment();
-  const {interaction, root, stack, panel, handle, bottom} = page.mount();
+  const {interaction, player, root, stack, panel, bottom} = page.mount();
   const pointer = {pointerId: 42, isPrimary: true, button: 0, clientY: 300};
-  handle.emit("pointerdown", {...pointer, isTrusted: false});
-  assert.equal(handle.pointers.size, 0);
-  assert.equal(handle.emit("pointerdown", pointer).defaultPrevented, true);
-  assert.equal(handle.pointers.has(42), true);
-  assert.ok(handle.attributes.has("data-online-subtitle-dragging"));
-  handle.emit("pointermove", {pointerId: 43, clientY: 100});
-  handle.emit("pointermove", {pointerId: 42, clientY: Infinity});
-  handle.emit("pointermove", {pointerId: 42, clientY: 100, isTrusted: false});
+  page.gesture("pointerdown", stack, {...pointer, isTrusted: false});
+  assert.equal(stack.pointers.size, 0);
+  assert.equal(page.gesture("pointerdown", player, pointer).propagationStopped, undefined);
+  const start = page.gesture("pointerdown", stack, pointer);
+  assert.equal(start.defaultPrevented, true);
+  assert.equal(start.propagationStopped, true);
+  assert.equal(stack.pointers.has(42), true);
+  assert.ok(stack.attributes.has("data-online-subtitle-dragging"));
+  assert.equal(page.gesture("pointermove", player, {pointerId: 43, clientY: 100}).propagationStopped, undefined);
+  page.gesture("pointermove", stack, {pointerId: 42, clientY: Infinity});
+  page.gesture("pointermove", stack, {pointerId: 42, clientY: 100, isTrusted: false});
   assert.equal(bottom(), 90);
-  handle.emit("pointermove", {pointerId: 42, clientY: 250, clientX: 1_000});
+  assert.equal(page.gesture("pointermove", player, {pointerId: 42, clientY: 250, clientX: 1_000}).propagationStopped, true);
   assert.equal(bottom(), 140);
   assert.deepEqual([...stack.properties.keys()], ["--online-subtitle-bottom"]);
 
-  handle.emit("pointermove", {pointerId: 42, clientY: -1_000});
-  assert.equal(bottom(), 496);
+  page.gesture("pointermove", stack, {pointerId: 42, clientY: -1_000});
+  assert.equal(bottom(), 510);
   interaction.showLookup("word");
   assert.equal(panel.attributes.get("data-online-subtitle-placement"), "below");
-  handle.emit("pointerup", {pointerId: 42});
-  assert.ok(handle.pointers.has(42)); // Chrome releases capture after pointerup.
-  handle.releasePointerCapture(42);
-  handle.emit("lostpointercapture", {pointerId: 42});
-  assert.equal(handle.pointers.size, 0);
-  assert.equal(handle.attributes.has("data-online-subtitle-dragging"), false);
-  handle.emit("pointermove", {pointerId: 42, clientY: 800});
-  assert.equal(bottom(), 496);
+  assert.equal(page.gesture("pointerup", player, {pointerId: 42}).propagationStopped, true);
+  assert.ok(stack.pointers.has(42)); // Chrome releases capture after pointerup.
+  stack.releasePointerCapture(42);
+  page.gesture("lostpointercapture", stack, {pointerId: 42});
+  assert.equal(stack.pointers.size, 0);
+  assert.equal(stack.attributes.has("data-online-subtitle-dragging"), false);
+  assert.equal(page.gesture("pointermove", player, {pointerId: 42, clientY: 800}).propagationStopped, undefined);
+  assert.equal(bottom(), 510);
 
   root.clientHeight = 260;
   page.resize();
-  assert.equal(bottom(), 156);
-  assert.equal(handle.emit("keydown", {key: "ArrowDown"}).defaultPrevented, true);
-  assert.equal(bottom(), 144);
-  handle.emit("pointerdown", pointer);
-  handle.emit("pointermove", {pointerId: 42, clientY: 2_000});
+  assert.equal(bottom(), 170);
+  assert.equal(stack.emit("keydown", {key: "ArrowDown"}).defaultPrevented, true);
+  assert.equal(bottom(), 158);
+  page.gesture("pointerdown", stack, pointer);
+  page.gesture("pointermove", stack, {pointerId: 42, clientY: 2_000});
   assert.equal(bottom(), 44.2);
   interaction.destroy();
-  assert.equal(handle.pointers.size, 0);
+  assert.equal(stack.pointers.size, 0);
   assert.equal(panel.isConnected, false);
-  assert.equal(handle.isConnected, false);
 
   const next = page.mount();
   page.resize();
@@ -301,17 +326,20 @@ test("vertical drag captures only the initiating pointer, clamps, and survives r
   assert.ok(next.player.observed);
 });
 
-test("the grip isolates compatibility mouse actions from the player", () => {
+test("caption interactions isolate compatibility mouse actions from the player", () => {
   const page = environment();
-  const {interaction, handle, player} = page.mount();
+  const {interaction, original, stack, player} = page.mount();
   for (const type of ["mousedown", "mouseup", "click", "dblclick"]) {
-    const event = page.window.emit(type, {composedPath: () => [handle, player]});
+    const event = page.window.emit(type, {composedPath: () => stack.path()});
     assert.equal(event.propagationStopped, true);
     assert.equal(event.defaultPrevented, true);
   }
   const outside = page.window.emit("click", {composedPath: () => [player]});
   assert.equal(outside.propagationStopped, undefined);
-  assert.equal(handle.emit("keydown", {key: " "}).propagationStopped, true);
+  assert.equal(stack.emit("keydown", {key: " "}).propagationStopped, true);
+  interaction.renderSource("Lookup.", "en");
+  assert.equal(page.click(renderedWords(original)[0]).propagationStopped, true);
+  assert.deepEqual(page.calls, ["Lookup"]);
   interaction.destroy();
-  assert.equal(page.window.emit("click", {composedPath: () => [handle, player]}).propagationStopped, undefined);
+  assert.equal(page.click(stack).propagationStopped, undefined);
 });

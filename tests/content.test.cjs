@@ -145,12 +145,11 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
     CustomEvent,
     crypto,
     Date: class extends Date { static now() { return now; } },
-    onlineSubtitleCreateInteractions({ original, translated, onWord, onDismiss }) {
+    onlineSubtitleCreateInteractions({ original, onWord, onDismiss }) {
       interaction = {
         onWord, onDismiss,
         view: undefined,
         renderSource(text) { original.textContent = text; },
-        renderTranslation(text) { translated.textContent = text; },
         showLookup(word) { this.view = { word }; },
         completeLookup(reply) { this.view = { ...this.view, ...structuredClone(reply) }; },
         failLookup() { this.view = { ...this.view, failed: true }; },
@@ -194,7 +193,7 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
       video.currentTime = time;
       video.dispatchEvent(new Event(event));
     },
-    clickWord(word, row = "original") { interaction.onWord(word, row); },
+    clickWord(word) { interaction.onWord(word); },
     dismissLookup() { interaction.onDismiss(); },
     focus(nextSettings = settings) {
       settings = nextSettings;
@@ -261,26 +260,48 @@ test("reads the target before translating and refreshes paired captions after a 
   assert.equal(page.overlay.translation.textContent, "Mach weiter.");
 });
 
-test("a word click pauses playback and explains the word in the displayed complete sentence", () => {
+test("original words use the whole caption as context and show only the contextual meaning", () => {
   const page = browser({ currentTime: 1 });
   page.captions([{ start: 0, end: 5, text: "The bank groaned." }]);
   page.ports[0].onMessage.emit({
     ...defaultSettings, translations: [{ id: 1, source: "The bank closed.", text: "银行关门了。" }]
   });
   page.clickWord("groaned");
+  assert.equal(page.overlay.translation.textContent, "银行关门了。");
+  assert.equal(page.overlay.translation.children.length, 0);
+  page.clickWord("银行");
   assert.equal(page.lookupPorts.length, 0);
   page.clickWord("bank");
   assert.equal(page.pauses, 1);
   assert.deepEqual(page.lookupPorts[0].sent, { type: "explainWord", word: "bank", sentence: "The bank closed." });
   assert.deepEqual(page.lookup, { word: "bank" });
-  page.lookupPorts[0].onMessage.emit({ ...defaultSettings, meaning: "银行", sentenceMeaning: "银行关门了。" });
+  page.lookupPorts[0].onMessage.emit({ ...defaultSettings, meaning: "银行" });
   assert.deepEqual(page.lookup, {
-    word: "bank", meaning: "银行", sentenceMeaning: "银行关门了。", targetLanguage: "zh-CN"
+    word: "bank", meaning: "银行", targetLanguage: "zh-CN"
   });
   page.dismissLookup();
   assert.equal(page.lookup, undefined);
-  page.clickWord("银行", "translation");
-  assert.deepEqual(page.lookupPorts[1].sent, { type: "explainWord", word: "银行", sentence: "银行关门了。" });
+});
+
+test("non-English originals get synchronized translations and contextual word lookups", () => {
+  const settings = { ok: true, targetLanguage: "en", revision: "e".repeat(64) };
+  const page = browser({ currentTime: 1, settings });
+  const source = "ما معنى هذه الكلمة؟";
+  page.captions([
+    { start: 0, end: 1, text: "ما معنى" }, { start: 1, end: 3, text: "هذه الكلمة؟" }
+  ], { sourceLanguage: "ar" });
+  assert.deepEqual(page.ports[0].sent, { type: "translateSentences", cues: [{ id: 1, text: source }] });
+  page.ports[0].onMessage.emit({
+    ...settings, translations: [{ id: 1, text: "What does this word mean?" }]
+  });
+  assert.equal(page.overlay.original.textContent, source);
+  assert.equal(page.overlay.original.lang, "ar");
+  assert.equal(page.overlay.original.dir, "auto");
+  assert.equal(page.overlay.translation.textContent, "What does this word mean?");
+  page.clickWord("الكلمة");
+  assert.deepEqual(page.lookupPorts[0].sent, { type: "explainWord", word: "الكلمة", sentence: source });
+  page.lookupPorts[0].onMessage.emit({ ...settings, meaning: "The word." });
+  assert.deepEqual(page.lookup, { word: "الكلمة", meaning: "The word.", targetLanguage: "en" });
 });
 
 test("a visible tab picks up the next worker settings generation after a transient disconnect", () => {
@@ -310,7 +331,7 @@ test("a seek cancels an in-flight word lookup and ignores its late result", () =
   assert.equal(pending.disconnected, false);
   page.playAt(6, "seeking");
   assert.equal(pending.disconnected, true);
-  pending.onMessage.emit({ ...defaultSettings, meaning: "银行", sentenceMeaning: "银行关门了。" });
+  pending.onMessage.emit({ ...defaultSettings, meaning: "银行" });
   assert.equal(page.lookup, undefined);
 });
 

@@ -13,7 +13,7 @@ const enabled = { type: 'status', enabled: true };
 const settingsRequest = { type: 'getSettings' };
 const wordRequest = { type: 'explainWord', word: 'café', sentence: 'The café is open.' };
 const configuration = { targetLanguage: 'fr', revision: 'ac'.repeat(32) };
-const explanation = { meaning: 'Un établissement de restauration.', sentenceMeaning: 'Le café est ouvert.' };
+const explanation = { meaning: 'Un établissement de restauration.' };
 
 function event() {
   const listeners = [];
@@ -87,17 +87,22 @@ test('translation bridge passes an explicit invalid sentence response to the cal
 test('command bridge forwards settings and word lookups on a single connection each', () => {
   const background = loadBackground();
   const longLookup = {...wordRequest, sentence: 'café' + '茶'.repeat(665)};
-  for (const [request, result] of [[settingsRequest, configuration], [longLookup, { ...configuration, ...explanation }]]) {
+  const lookupResult = { ...configuration, ...explanation };
+  for (const [request, result, expected] of [
+    [settingsRequest, configuration, configuration],
+    [longLookup, lookupResult, lookupResult],
+    [wordRequest, { ...lookupResult, sentenceMeaning: 'Le café est ouvert.' }, lookupResult],
+  ]) {
     const browser = background.connect(sender, 'online-subtitle-translate');
     browser.onMessage.emit(request);
     const native = background.nativePorts.at(-1);
     assert.deepEqual(native.messages, [request]);
     native.onMessage.emit({ ok: true, ...result });
-    assert.deepEqual(browser.messages, [{ ok: true, ...result }]);
+    assert.deepEqual(browser.messages, [{ ok: true, ...expected }]);
     assert.equal(browser.disconnected, true);
     assert.equal(native.disconnected, true);
   }
-  assert.equal(background.nativePorts.length, 2);
+  assert.equal(background.nativePorts.length, 3);
 });
 
 test('command bridge rejects out-of-scope word, settings and command data before opening any native connection', () => {
@@ -131,9 +136,10 @@ test('command bridge rejects malformed reply metadata or an incomplete word expl
     [settingsRequest, { ...response, revision: response.revision.toUpperCase() }],
     [settingsRequest, { ...response, revision: response.revision + '\n' }],
     [settingsRequest, { ...response, prompt: 'Do not expose prompt data.' }],
-    [wordRequest, { ...response, meaning: explanation.meaning }],
+    [wordRequest, response],
     [wordRequest, { ...response, ...explanation, meaning: '\u0007bad' }],
     [wordRequest, { ...response, ...explanation, sentenceMeaning: '茶'.repeat(667) }],
+    [wordRequest, { ...response, ...explanation, sentenceMeaning: null }],
     [translation, { ok: true, translations: translated, targetLanguage: 'fr' }],
   ]) {
     const browser = background.connect(sender, 'online-subtitle-translate');

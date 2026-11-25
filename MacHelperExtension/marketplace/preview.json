@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "layout": "captions",
+  "slug": "online-subtitle",
+  "category": "Translation",
+  "sourceCaption": {
+    "language": "es",
+    "before": "Nos vemos en el ",
+    "word": "banco",
+    "after": " del parque."
+  },
+  "strings": {
+    "en": {
+      "description": "Try these sample captions. Click banco for its meaning. Drag the caption by its background, or focus it and press ↑ or ↓.",
+      "translatedCaption": "See you at the park bench.",
+      "meaning": "A bench in the park, where people can sit.",
+      "close": "Close word explanation",
+      "moveCaption": "Move subtitles up or down"
+    },
+    "zh-Hans": {
+      "description": "试用这组示例字幕。点击 banco 查看词义。拖动字幕背景，或将焦点移到字幕上并按 ↑ 或 ↓。",
+      "translatedCaption": "我们在公园的长椅那里见。",
+      "meaning": "指公园里供人坐的长椅。",
+      "close": "关闭词义解释",
+      "moveCaption": "向上或向下移动字幕"
+    },
+    "zh-Hant": {
+      "description": "試用這組範例字幕。點擊 banco 查看詞義。拖曳字幕背景，或將焦點移到字幕上並按 ↑ 或 ↓。",
+      "translatedCaption": "我們在公園的長椅那裡見。",
+      "meaning": "指公園裡供人坐的長椅。",
+      "close": "關閉詞義解釋",
+      "moveCaption": "向上或向下移動字幕"
+    },
+    "es": {
+      "description": "Prueba estos subtítulos de ejemplo. Pulsa «banco» para ver su significado. Arrastra el fondo del subtítulo o selecciónalo con Tab y pulsa ↑ o ↓.",
+      "translatedCaption": "See you at the park bench.",
+      "translationLanguage": "en",
+      "meaning": "Un asiento alargado en el parque.",
+      "close": "Cerrar la explicación de la palabra",
+      "moveCaption": "Mover los subtítulos hacia arriba o abajo"
+    },
+    "fr": {
+      "description": "Essayez ces sous-titres d’exemple. Cliquez sur « banco » pour lire sa définition. Faites glisser le fond du sous-titre ou placez-y le focus et appuyez sur ↑ ou ↓.",
+      "translatedCaption": "On se retrouve au banc du parc.",
+      "meaning": "Un banc où l’on peut s’asseoir dans le parc.",
+      "close": "Fermer l’explication du mot",
+      "moveCaption": "Déplacer les sous-titres vers le haut ou le bas"
+    },
+    "de": {
+      "description": "Probiere diese Beispieluntertitel aus. Klicke auf „banco“, um die Bedeutung zu sehen. Ziehe am Untertitelhintergrund oder fokussiere ihn und drücke ↑ oder ↓.",
+      "translatedCaption": "Wir sehen uns an der Parkbank.",
+      "meaning": "Eine Sitzbank im Park.",
+      "close": "Worterklärung schließen",
+      "moveCaption": "Untertitel nach oben oder unten bewegen"
+    },
+    "ja": {
+      "description": "サンプル字幕をお試しください。banco をクリックすると意味が表示されます。字幕の背景をドラッグするか、フォーカスして ↑ または ↓ を押すと移動できます。",
+      "translatedCaption": "公園のベンチで会おう。",
+      "meaning": "公園にある、腰掛けるためのベンチ。",
+      "close": "単語の説明を閉じる",
+      "moveCaption": "字幕を上下に移動"
+    },
+    "ko": {
+      "description": "예시 자막을 체험해 보세요. banco를 클릭하면 뜻이 표시됩니다. 자막 배경을 드래그하거나 포커스를 옮긴 뒤 ↑ 또는 ↓ 키를 누르세요.",
+      "translatedCaption": "공원 벤치에서 만나자.",
+      "meaning": "공원에 있는, 사람들이 앉을 수 있는 벤치.",
+      "close": "단어 설명 닫기",
+      "moveCaption": "자막을 위아래로 이동"
+    },
+    "pt": {
+      "description": "Experimente estas legendas de exemplo. Clique em «banco» para ver o seu significado. Arraste o fundo da legenda ou coloque o foco nela e prima ↑ ou ↓.",
+      "translatedCaption": "Encontramo-nos no banco do parque.",
+      "meaning": "Um assento comprido no parque.",
+      "close": "Fechar a explicação da palavra",
+      "moveCaption": "Mover as legendas para cima ou para baixo"
+    },
+    "ar": {
+      "description": "جرّب هذه الترجمة التوضيحية. انقر على كلمة banco لمعرفة معناها. اسحب خلفية الترجمة، أو انتقل إليها بلوحة المفاتيح واضغط ↑ أو ↓.",
+      "translatedCaption": "نلتقي عند مقعد الحديقة.",
+      "meaning": "مقعد في الحديقة يمكن الجلوس عليه.",
+      "close": "إغلاق شرح الكلمة",
+      "moveCaption": "تحريك الترجمة لأعلى أو لأسفل"
+    },
+    "hi": {
+      "description": "ये नमूना उपशीर्षक आज़माएँ। अर्थ देखने के लिए banco पर क्लिक करें। उपशीर्षक की पृष्ठभूमि खींचें या उस पर फ़ोकस करके ↑ या ↓ दबाएँ।",
+      "translatedCaption": "पार्क की बेंच पर मिलते हैं।",
+      "meaning": "पार्क में बैठने के लिए लगी बेंच।",
+      "close": "शब्द की व्याख्या बंद करें",
+      "moveCaption": "उपशीर्षक ऊपर या नीचे ले जाएँ"
+    },
+    "ru": {
+      "description": "Попробуйте эти демонстрационные субтитры. Нажмите на «banco», чтобы узнать значение. Перетащите фон субтитров или установите на него фокус и нажмите ↑ или ↓.",
+      "translatedCaption": "Увидимся у скамейки в парке.",
+      "meaning": "Скамейка в парке, на которой можно посидеть.",
+      "close": "Закрыть объяснение слова",
+      "moveCaption": "Переместить субтитры вверх или вниз"
+    },
+    "it": {
+      "description": "Prova questi sottotitoli di esempio. Fai clic su «banco» per leggerne il significato. Trascina lo sfondo del sottotitolo oppure selezionalo con Tab e premi ↑ o ↓.",
+      "translatedCaption": "Ci vediamo alla panchina del parco.",
+      "meaning": "Una panchina del parco su cui ci si può sedere.",
+      "close": "Chiudi la spiegazione della parola",
+      "moveCaption": "Sposta i sottotitoli verso l’alto o verso il basso"
+    }
+  }
+}

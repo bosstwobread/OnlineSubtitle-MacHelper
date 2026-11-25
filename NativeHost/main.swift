@@ -98,7 +98,6 @@ private struct CommandResponse: Codable {
     let targetLanguage: String?
     let revision: String?
     let meaning: String?
-    let sentenceMeaning: String?
 
     init(error: CommandError) {
         ok = false
@@ -107,7 +106,6 @@ private struct CommandResponse: Codable {
         targetLanguage = nil
         revision = nil
         meaning = nil
-        sentenceMeaning = nil
     }
 
     private var hasSettings: Bool {
@@ -138,10 +136,15 @@ private struct CommandResponse: Codable {
         case .getSettings:
             guard keys == settingsKeys, response.hasSettings else { throw BridgeError.unavailable }
         case .explainWord:
-            guard keys == settingsKeys.union(["meaning", "sentenceMeaning"]), response.hasSettings,
-                  let meaning = response.meaning, isBoundedText(meaning, bytes: 2_000),
-                  let sentenceMeaning = response.sentenceMeaning,
-                  isBoundedText(sentenceMeaning, bytes: 2_000) else { throw BridgeError.unavailable }
+            let meaningKeys = settingsKeys.union(["meaning"])
+            if keys == meaningKeys.union(["sentenceMeaning"]) {
+                guard let legacyMeaning = object["sentenceMeaning"] as? String,
+                      isBoundedText(legacyMeaning, bytes: 2_000) else { throw BridgeError.unavailable }
+            } else {
+                guard keys == meaningKeys else { throw BridgeError.unavailable }
+            }
+            guard response.hasSettings, let meaning = response.meaning,
+                  isBoundedText(meaning, bytes: 2_000) else { throw BridgeError.unavailable }
         }
         return response
     }

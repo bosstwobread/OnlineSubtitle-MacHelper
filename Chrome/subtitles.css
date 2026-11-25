@@ -32,6 +32,10 @@
   text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
   font-size: clamp(14px, 1.78cqw, 24px);
   line-height: 1.3;
+  pointer-events: auto;
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
 }
 
 .online-subtitle-line {
@@ -46,7 +50,6 @@
 }
 
 .online-subtitle-word,
-.online-subtitle-grab,
 .online-subtitle-lookup-close {
   border: 0;
   padding: 0;
@@ -69,6 +72,10 @@
   white-space: nowrap;
 }
 
+.online-subtitle-lines[data-online-subtitle-dragging] .online-subtitle-word {
+  cursor: ns-resize;
+}
+
 .online-subtitle-word:hover,
 .online-subtitle-word:focus-visible {
   background: rgb(255 255 255 / 17%);
@@ -76,37 +83,8 @@
   text-underline-offset: 0.13em;
 }
 
-.online-subtitle-grab {
-  position: absolute;
-  inset-block-start: -18px;
-  inset-inline: 0;
-  display: grid;
-  place-items: center;
-  inline-size: 74px;
-  min-block-size: 26px;
-  margin-inline: auto;
-  border-radius: 8px;
-  background: rgb(20 21 24 / 86%);
-  cursor: ns-resize;
-  touch-action: none;
-}
-
-.online-subtitle-grab::after {
-  display: block;
-  inline-size: 24px;
-  block-size: 2px;
-  border-radius: 2px;
-  background: #c9cdd2;
-  content: "";
-}
-
-.online-subtitle-grab:hover,
-.online-subtitle-grab[data-online-subtitle-dragging] {
-  background: #394048;
-}
-
 .online-subtitle-word:focus-visible,
-.online-subtitle-grab:focus-visible,
+.online-subtitle-lines:focus-visible,
 .online-subtitle-lookup-close:focus-visible {
   outline: 2px solid #b9dcfa;
   outline-offset: 2px;
@@ -124,20 +102,22 @@
   inset-block-start: 50%;
   inset-inline: 0;
   box-sizing: border-box;
-  inline-size: min(88%, 34rem);
+  inline-size: min(88%, 380px);
   max-block-size: 68%;
   margin-inline: auto;
-  padding: 0.7em 0.85em 0.8em;
+  padding-block: 10px 12px;
+  padding-inline: 14px 10px;
   overflow: auto;
   overscroll-behavior: contain;
-  border: 1px solid rgb(255 255 255 / 23%);
+  border: 1px solid rgb(255 255 255 / 16%);
   border-radius: 10px;
-  background: #1c2028;
+  background: rgb(34 34 36 / 88%);
+  backdrop-filter: blur(18px) saturate(120%);
   color: #f8f9fa;
-  box-shadow: 0 6px 30px rgb(0 0 0 / 38%);
+  box-shadow: 0 7px 24px rgb(0 0 0 / 33%);
   transform: translateY(-50%);
-  font-size: clamp(13px, 1.4cqw, 18px);
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.43;
   overflow-wrap: anywhere;
   pointer-events: auto;
 }
@@ -158,24 +138,29 @@
 
 .online-subtitle-lookup-header {
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.85em;
+  min-block-size: 24px;
+  gap: 8px;
 }
 
 .online-subtitle-lookup-word {
+  min-inline-size: 0;
   margin: 0;
-  color: #fff;
-  font-size: 1.2em;
-  font-weight: 700;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .online-subtitle-lookup-close {
   flex: 0 0 auto;
-  min-inline-size: 30px;
-  min-block-size: 28px;
-  border-radius: 6px;
-  font-size: 1.3em;
+  min-inline-size: 22px;
+  min-block-size: 22px;
+  border-radius: 5px;
+  color: #c0c0c3;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -185,19 +170,12 @@
 
 .online-subtitle-lookup-status,
 .online-subtitle-lookup-result {
-  margin: 0.5em 0 0;
-  color: #e2e8ee;
-}
-
-.online-subtitle-lookup-result dt {
-  margin-block-start: 0.65em;
-  color: #b9dcfa;
-  font-weight: 600;
-}
-
-.online-subtitle-lookup-result dd {
-  margin: 0.12em 0 0;
+  margin: 4px 0 0;
   white-space: pre-wrap;
+}
+
+.online-subtitle-lookup-status {
+  color: #c0c0c3;
 }
 
 .online-subtitle-status {

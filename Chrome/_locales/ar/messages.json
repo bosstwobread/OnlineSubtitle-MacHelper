@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "شرح الكلمة غير متاح."
   },
-  "wordMeaning": {
-    "message": "المعنى في هذه الجملة"
-  },
-  "sentenceMeaning": {
-    "message": "معنى الجملة"
-  },
   "wordLookupTitle": {
     "message": "شرح الكلمة"
   }

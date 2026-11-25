@@ -158,18 +158,19 @@ test("the standalone SDK worker validates captions, saved settings, and contextu
   );
 
   const context = { word: "duck", sentence: "Duck under the beam before you stand up." };
-  const answer = { meaning: "Se baisser pour passer sous un obstacle.", sentenceMeaning: "Baisse-toi sous la poutre avant de te relever." };
-  assert.deepEqual(await explain("lookup", { word: "Duck", sentence: context.sentence }, answer), {
-    ok: true, ...answer, targetLanguage, revision
-  });
-  const multibyteSentence = "這是一句用來測試譯文長度的例句。".repeat(30).slice(0, 400);
+  const answer = { meaning: "Se baisser pour passer sous un obstacle." };
+  const lookupResult = { ok: true, ...answer, targetLanguage, revision };
+  assert.deepEqual(await explain("lookup", { word: "Duck", sentence: context.sentence }, answer), lookupResult);
+  const multibyteSentence = "這是一句用來測試本文長度的例句。".repeat(30).slice(0, 400);
   assert.ok(Buffer.byteLength(multibyteSentence) > 1_000);
-  assert.deepEqual(await explain("translated-row", { word: "例句", sentence: multibyteSentence }, answer), {
-    ok: true, ...answer, targetLanguage, revision
-  });
-  assert.deepEqual(await explain("missing", { word: "beam", sentence: context.sentence }, { meaning: "Une poutre." }),
+  assert.deepEqual(await explain("long-context", { word: "例句", sentence: multibyteSentence }, answer), lookupResult);
+  assert.deepEqual(await explain("legacy-custom-prompt", { word: "Duck", sentence: context.sentence },
+    { ...answer, sentenceMeaning: "Baisse-toi sous la poutre avant de te relever." }), lookupResult);
+  assert.deepEqual(await explain("missing", { word: "beam", sentence: context.sentence }, { sentenceMeaning: "Le sens de la phrase." }),
     { ok: false, error: "translation" });
-  assert.deepEqual(await explain("oversized", { word: "beam", sentence: context.sentence },
+  assert.deepEqual(await explain("oversized", { word: "beam", sentence: context.sentence }, { meaning: "字".repeat(667) }),
+    { ok: false, error: "translation" });
+  assert.deepEqual(await explain("oversized-legacy-field", { word: "beam", sentence: context.sentence },
     { ...answer, sentenceMeaning: "字".repeat(667) }), { ok: false, error: "translation" });
   const invalidContexts = [
     context,

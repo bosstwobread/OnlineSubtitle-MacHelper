@@ -15,7 +15,7 @@ const response = { ok: true, translations: [{ id: 12, text: '一个简短的例�
 const settingsRequest = { type: 'getSettings' };
 const wordRequest = { type: 'explainWord', word: 'café', sentence: 'The café is open.' };
 const configuration = { targetLanguage: 'fr', revision: 'ac'.repeat(32) };
-const explanation = { meaning: 'Un établissement de restauration.', sentenceMeaning: 'Le café est ouvert.' };
+const explanation = { meaning: 'Un établissement de restauration.' };
 const statusRequest = { type: 'watchStatus' };
 const statusSubscription = { ...statusRequest, extension, companion };
 let directory;
@@ -174,9 +174,11 @@ test('native host preserves the legacy response shape and forwards unsupported s
 
 test('native host invokes only the matching approved settings or word command', { timeout: 8000 }, async (t) => {
   const longLookup = {...wordRequest, sentence: 'café' + '茶'.repeat(665)};
-  for (const [request, command, result] of [
-    [settingsRequest, 'caption-settings', configuration],
-    [longLookup, 'explain-word', { ...configuration, ...explanation }],
+  const lookupResult = { ...configuration, ...explanation };
+  for (const [request, command, result, expected] of [
+    [settingsRequest, 'caption-settings', configuration, configuration],
+    [longLookup, 'explain-word', lookupResult, lookupResult],
+    [wordRequest, 'explain-word', { ...lookupResult, sentenceMeaning: 'Le café est ouvert.' }, lookupResult],
   ]) {
     const reply = { ok: true, ...result };
     const socketDirectory = await openWorker(t, (message, socket) => {
@@ -185,17 +187,18 @@ test('native host invokes only the matching approved settings or word command', 
     });
     const { host, result: bytes } = launch(t, socketDirectory);
     host.stdin.write(frame(request));
-    assert.deepEqual(unframe(await bytes), reply);
+    assert.deepEqual(unframe(await bytes), { ok: true, ...expected });
   }
 });
 
-test('native host validates reply metadata and both parts of each word explanation', { timeout: 8000 }, async (t) => {
+test('native host validates reply metadata, the word meaning and any legacy sentence meaning', { timeout: 8000 }, async (t) => {
   const settings = { ok: true, ...configuration };
   const lookup = { ...settings, ...explanation };
   for (const [request, command, reply] of [
     [settingsRequest, 'caption-settings', { ...settings, prompt: 'Sensitive user prompt.' }],
     [settingsRequest, 'caption-settings', { ...settings, targetLanguage: 'en-US' }],
     [settingsRequest, 'caption-settings', { ...settings, revision: 'a'.repeat(64) + '\n' }],
+    [wordRequest, 'explain-word', settings],
     [wordRequest, 'explain-word', { ...lookup, sentenceMeaning: null }],
     [wordRequest, 'explain-word', { ...lookup, meaning: '茶'.repeat(667) }],
     [wordRequest, 'explain-word', { ...lookup, sentenceMeaning: 'a\u007f' }],

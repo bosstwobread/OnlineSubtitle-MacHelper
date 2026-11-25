@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "暂时无法解释该单词。"
   },
-  "wordMeaning": {
-    "message": "在这句话中的含义"
-  },
-  "sentenceMeaning": {
-    "message": "整句含义"
-  },
   "wordLookupTitle": {
     "message": "单词释义"
   }

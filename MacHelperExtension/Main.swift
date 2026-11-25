@@ -113,19 +113,19 @@ private struct CaptionModelResult: Decodable {
     }
 }
 
-private struct WordMeaning {
-    let meaning: String
-    let sentenceMeaning: String
-
-    static func decode(_ answer: String) throws -> Self {
-        let data = try modelJSON(answer)
-        guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: String],
-              Set(object.keys) == ["meaning", "sentenceMeaning"],
-              let meaning = object["meaning"], validText(meaning, maximumBytes: 2_000),
-              let sentenceMeaning = object["sentenceMeaning"],
-              validText(sentenceMeaning, maximumBytes: 2_000) else { throw CaptionFailure.translation }
-        return WordMeaning(meaning: meaning, sentenceMeaning: sentenceMeaning)
+private func wordMeaning(_ answer: String) throws -> String {
+    let data = try modelJSON(answer)
+    guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+          let meaning = object["meaning"], validText(meaning, maximumBytes: 2_000) else {
+        throw CaptionFailure.translation
     }
+    let keys = Set(object.keys)
+    // Older custom prompts may still return a full-sentence translation.
+    guard keys == ["meaning"] || (keys == ["meaning", "sentenceMeaning"] &&
+          object["sentenceMeaning"].map { validText($0, maximumBytes: 2_000) } == true) else {
+        throw CaptionFailure.translation
+    }
+    return meaning
 }
 
 private struct CaptionSettings {
@@ -161,7 +161,6 @@ private struct CaptionReply: Encodable {
     let ok: Bool
     var translations: [CaptionTranslation]? = nil
     var meaning: String? = nil
-    var sentenceMeaning: String? = nil
     var targetLanguage: String? = nil
     var revision: String? = nil
     var error: CaptionFailure? = nil
@@ -224,8 +223,8 @@ private enum OnlineSubtitle {
             guard let prompt = settings.wordPrompt else { throw CaptionFailure.unavailable }
             let data = ["targetLanguage": settings.targetLanguage, "word": context.word, "sentence": context.sentence]
             let answer = try await transform(input, data: data, settings: settings, prompt: prompt)
-            let result = try WordMeaning.decode(answer)
-            return try CaptionReply(ok: true, meaning: result.meaning, sentenceMeaning: result.sentenceMeaning,
+            let meaning = try wordMeaning(answer)
+            return try CaptionReply(ok: true, meaning: meaning,
                                     targetLanguage: settings.targetLanguage, revision: settings.revision).commandResult()
         } catch {
             try Task.checkCancellation()

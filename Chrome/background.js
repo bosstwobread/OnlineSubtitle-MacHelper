@@ -67,9 +67,10 @@ function sanitizeReply(reply, request) {
   }
   if (request.type === "explainWord") {
     const { meaning, sentenceMeaning } = reply;
-    if (!settings || !hasKeys(reply, "ok", "targetLanguage", "revision", "meaning", "sentenceMeaning") ||
-        !boundedText(meaning, 2000) || !boundedText(sentenceMeaning, 2000)) return failure;
-    return { ok: true, ...settings, meaning, sentenceMeaning };
+    const keys = ["ok", "targetLanguage", "revision", "meaning"];
+    const legacy = hasKeys(reply, ...keys, "sentenceMeaning") && boundedText(sentenceMeaning, 2000);
+    if (!settings || !boundedText(meaning, 2000) || !(hasKeys(reply, ...keys) || legacy)) return failure;
+    return { ok: true, ...settings, meaning };
   }
   if (!(hasKeys(reply, "ok", "translations") ||
         (settings && hasKeys(reply, "ok", "translations", "targetLanguage", "revision"))) ||

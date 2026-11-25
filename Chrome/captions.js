@@ -108,8 +108,9 @@
     }
     if (!Array.isArray(tracks)) return [];
     const audioTrack = captionData?.audioTracks?.[captionData.defaultAudioTrackIndex ?? 0];
-    const defaultCaption = audioTrack?.defaultCaptionTrackIndex ?? audioTrack?.captionTrackIndices?.[0];
-    return tracks.slice(0, 64).flatMap((track, index) => {
+    const captionIndices = Array.isArray(audioTrack?.captionTrackIndices) ? audioTrack.captionTrackIndices.slice(0, 64) : [];
+    const defaultCaption = audioTrack?.defaultCaptionTrackIndex ?? captionIndices[0];
+    const captionTracks = tracks.slice(0, 64).flatMap((track, index) => {
       const trackLanguage = track?.languageCode;
       const url = captionURL(track?.baseUrl ?? track?.url, videoId);
       if (typeof trackLanguage !== "string" || trackLanguage.length > 40
@@ -120,15 +121,36 @@
         name: typeof track.name === "string" ? track.name : runText(track.name) || track.displayName || "",
         automatic: track.kind === "asr" || track.isAsr === true,
         preferredByPlayer: index === defaultCaption,
+        belongsToAudioTrack: captionIndices.includes(index),
         url
       }];
-    }).sort((left, right) => trackRank(left) - trackRank(right));
+    });
+    const audioTrackID = audioTrack?.audioTrackId;
+    const audioLanguage = typeof audioTrackID === "string" && audioTrackID.length <= 48
+      ? audioTrackID.replace(/\.\d+$/, "") : "";
+    const automaticLanguages = new Set(captionTracks.filter(track => track.automatic)
+      .map(track => primaryLanguage(track.language)));
+    // YouTube can offer captions authored in other languages alongside the
+    // spoken-language track. Prefer the language of the default audio.
+    const spokenLanguage = languagePattern.test(audioLanguage) ? primaryLanguage(audioLanguage) :
+      primaryLanguage(captionTracks.find(track => track.automatic && track.belongsToAudioTrack)?.language) ||
+      primaryLanguage(captionTracks.find(track => track.preferredByPlayer)?.language) ||
+      (automaticLanguages.size === 1 ? automaticLanguages.values().next().value : "");
+    for (const track of captionTracks) track.matchesAudio = primaryLanguage(track.language) === spokenLanguage;
+    return captionTracks.sort((left, right) => trackRank(left) - trackRank(right));
+  }
+
+  function primaryLanguage(language) {
+    return language?.split("-", 1)[0].toLowerCase() ?? "";
   }
 
   function trackRank(track) {
-    if (/^en(?:-|$)/i.test(track.language)) return track.automatic ? 1 : 0;
-    if (track.preferredByPlayer) return 2;
-    return track.automatic ? 4 : 3;
+    if (track.matchesAudio) {
+      if (track.automatic) return 2;
+      return track.preferredByPlayer ? 0 : 1;
+    }
+    if (track.preferredByPlayer) return 3;
+    return track.automatic ? 5 : 4;
   }
 
   async function readJSON(url, signal, options = {}) {

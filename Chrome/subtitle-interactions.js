@@ -2,10 +2,9 @@
   "use strict";
 
   const edge = 10;
-  const captionTop = 24;
   const minimumLookupSpace = 120;
   const closingPunctuation = /^[\p{Pe}\p{Pf}\p{Terminal_Punctuation}"'%…]+$/u;
-  const handleMouseEvents = ["mousedown", "mouseup", "click", "dblclick"];
+  const captionMouseEvents = ["mousedown", "mouseup", "click", "dblclick"];
   let captionPosition;
 
   function clamp(value, min, max) {
@@ -19,13 +18,12 @@
     return node;
   }
 
-  globalThis.onlineSubtitleCreateInteractions = function createInteractions({player, root, stack, original, translated, onWord, onDismiss, message}) {
-    const handle = element("button", "online-subtitle-grab");
-    handle.type = "button";
-    handle.setAttribute("aria-label", message("moveSubtitles"));
-    handle.setAttribute("aria-keyshortcuts", "ArrowUp ArrowDown");
-    handle.title = message("moveSubtitles");
-    stack.append(handle);
+  globalThis.onlineSubtitleCreateInteractions = function createInteractions({player, root, stack, original, onWord, onDismiss, message}) {
+    stack.tabIndex = 0;
+    stack.setAttribute("role", "group");
+    stack.setAttribute("aria-label", message("moveSubtitles"));
+    stack.setAttribute("aria-keyshortcuts", "ArrowUp ArrowDown");
+    const wordActions = new WeakMap();
 
     const panel = element("section", "online-subtitle-lookup");
     panel.hidden = true;
@@ -42,23 +40,21 @@
 
     const status = element("p", "online-subtitle-lookup-status");
     status.setAttribute("role", "status");
-    const result = element("dl", "online-subtitle-lookup-result");
+    const result = element("p", "online-subtitle-lookup-result");
     result.setAttribute("aria-live", "polite");
-    const meaning = element("dd", "online-subtitle-lookup-text");
-    const sentence = element("dd", "online-subtitle-lookup-text");
-    const meaningLabel = element("dt", "", message("wordMeaning"));
-    const sentenceLabel = element("dt", "", message("sentenceMeaning"));
-    for (const item of [meaningLabel, meaning, sentenceLabel, sentence]) item.dir = "auto";
-    result.append(meaningLabel, meaning, sentenceLabel, sentence);
+    result.dir = "auto";
     panel.append(header, status, result);
     root.append(panel);
 
     let drag;
     let focusReturn;
+    let displayedText;
+    let displayedLanguage;
+    let segmenter;
 
     function captionRange() {
       const reserve = Math.min(68, root.clientHeight * 0.17);
-      const max = Math.max(0, root.clientHeight - stack.offsetHeight - captionTop);
+      const max = Math.max(0, root.clientHeight - stack.offsetHeight - edge);
       return { min: Math.min(reserve, max), max, reserve };
     }
 
@@ -99,41 +95,53 @@
       if (!drag) return;
       const {pointerId} = drag;
       drag = undefined;
-      handle.removeAttribute("data-online-subtitle-dragging");
-      if (releaseCapture && handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
+      stack.removeAttribute("data-online-subtitle-dragging");
+      if (releaseCapture && stack.hasPointerCapture(pointerId)) stack.releasePointerCapture(pointerId);
     }
 
-    handle.addEventListener("pointerdown", event => {
+    function beginDrag(event) {
+      const path = event.composedPath();
+      if (!path.includes(stack)) return;
       event.stopPropagation();
-      if (!event.isTrusted || !event.isPrimary || event.button !== 0 || !Number.isFinite(event.clientY) || drag || stack.hidden) return;
+      if (!event.isTrusted || !event.isPrimary || event.button !== 0 || !Number.isFinite(event.clientY) ||
+        drag || stack.hidden || path.some(node => wordActions.has(node))) return;
       event.preventDefault();
-      handle.setPointerCapture(event.pointerId);
+      stack.setPointerCapture(event.pointerId);
       drag = {pointerId: event.pointerId, startY: event.clientY, bottom: captionBottom()};
-      handle.setAttribute("data-online-subtitle-dragging", "");
-    });
-    handle.addEventListener("pointermove", event => {
+      stack.setAttribute("data-online-subtitle-dragging", "");
+      stack.focus({preventScroll: true});
+    }
+    function dragCaption(event) {
       if (!event.isTrusted || event.pointerId !== drag?.pointerId || !Number.isFinite(event.clientY)) return;
       event.stopPropagation();
       moveCaption(drag.bottom + drag.startY - event.clientY);
-    });
-    for (const name of ["pointerup", "pointercancel", "lostpointercapture"]) {
-      handle.addEventListener(name, event => {
-        if (!event.isTrusted || event.pointerId !== drag?.pointerId) return;
-        event.stopPropagation();
-        // Let the browser release capture after pointerup so its click is
-        // still targeted at the handle even if the pointer left the caption.
-        stopDrag(false);
-      });
     }
-    function shieldHandle(event) {
-      if (!event.composedPath().includes(handle)) return;
+    function endDrag(event) {
+      if (!event.isTrusted || event.pointerId !== drag?.pointerId) return;
+      event.stopPropagation();
+      // Let the browser release capture after pointerup so its click is
+      // still targeted at the caption even if the pointer left its bounds.
+      stopDrag(false);
+    }
+
+    function handleCaptionMouse(event) {
+      const path = event.composedPath();
+      if (!path.includes(stack)) return;
       event.preventDefault();
       event.stopPropagation();
+      if (event.type === "click" && event.isTrusted && !stack.hidden) {
+        const word = path.find(node => wordActions.has(node));
+        if (word?.isConnected) wordActions.get(word)();
+      }
     }
-    // YouTube also listens for compatibility mouse events in the player.
-    for (const name of handleMouseEvents) window.addEventListener(name, shieldHandle, true);
-    handle.addEventListener("keydown", event => {
-      if (!event.isTrusted || !["ArrowUp", "ArrowDown", "Enter", " "].includes(event.key)) return;
+    // Route caption-owned gestures before the player sees them, including
+    // the compatibility mouse events generated for a pointer gesture.
+    const gestures = {pointerdown: beginDrag, pointermove: dragCaption,
+      pointerup: endDrag, pointercancel: endDrag, lostpointercapture: endDrag};
+    for (const name of captionMouseEvents) gestures[name] = handleCaptionMouse;
+    for (const [name, listener] of Object.entries(gestures)) window.addEventListener(name, listener, true);
+    stack.addEventListener("keydown", event => {
+      if (!event.isTrusted || event.target !== stack || !["ArrowUp", "ArrowDown", "Enter", " "].includes(event.key)) return;
       event.preventDefault();
       event.stopPropagation();
       if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
@@ -145,8 +153,7 @@
       panel.hidden = true;
       status.textContent = "";
       heading.textContent = "";
-      meaning.textContent = "";
-      sentence.textContent = "";
+      result.textContent = "";
       focusReturn = undefined;
     }
 
@@ -177,12 +184,9 @@
     resize.observe(player);
     resize.observe(stack);
 
-    function makeRenderer(line, side) {
-      let displayedText;
-      let displayedLanguage;
-      let segmenter;
-      return (text, language) => {
-        if (!line || (displayedText === text && displayedLanguage === language)) return;
+    return {
+      renderSource(text, language) {
+        if (displayedText === text && displayedLanguage === language) return;
         if (!segmenter || displayedLanguage !== language) {
           try { segmenter = new Intl.Segmenter(language || undefined, {granularity: "word"}); }
           catch { segmenter = new Intl.Segmenter(undefined, {granularity: "word"}); }
@@ -199,13 +203,10 @@
           }
           const word = element("button", "online-subtitle-word", segment);
           word.type = "button";
-          word.addEventListener("pointerdown", event => event.stopPropagation());
           word.addEventListener("keydown", event => event.stopPropagation());
-          word.addEventListener("click", event => {
-            event.stopPropagation();
-            if (!event.isTrusted || stack.hidden || !word.isConnected) return;
+          wordActions.set(word, () => {
             heading.lang = language || "";
-            onWord(segment, side);
+            onWord(segment);
             if (!panel.hidden) focusReturn = word;
           });
           let punctuation = "";
@@ -221,30 +222,22 @@
             parts.append(word);
           }
         }
-        line.replaceChildren(parts);
-      };
-    }
-
-    return {
-      renderSource: makeRenderer(original, "original"),
-      renderTranslation: makeRenderer(translated, "translation"),
+        original.replaceChildren(parts);
+      },
       showLookup(word) {
         heading.textContent = word;
         result.hidden = true;
-        meaning.textContent = "";
-        sentence.textContent = "";
+        result.textContent = "";
         status.hidden = false;
         status.textContent = message("wordLookupLoading");
         panel.hidden = false;
         layout();
         close.focus({preventScroll: true});
       },
-      completeLookup({meaning: wordMeaning, sentenceMeaning, targetLanguage}) {
+      completeLookup({meaning, targetLanguage}) {
         if (panel.hidden) return;
-        meaning.lang = targetLanguage;
-        sentence.lang = targetLanguage;
-        meaning.textContent = wordMeaning;
-        sentence.textContent = sentenceMeaning;
+        result.lang = targetLanguage;
+        result.textContent = meaning;
         status.hidden = true;
         result.hidden = false;
       },
@@ -258,10 +251,9 @@
       destroy() {
         stopDrag();
         resize.disconnect();
-        for (const name of handleMouseEvents) window.removeEventListener(name, shieldHandle, true);
+        for (const [name, listener] of Object.entries(gestures)) window.removeEventListener(name, listener, true);
         root.removeEventListener("keydown", escapeLookup, true);
         panel.remove();
-        handle.remove();
       }
     };
   };

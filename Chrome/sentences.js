@@ -12,15 +12,15 @@
   const maximumBytes = 1_000;
   const timingTolerance = 1e-6;
   const encoder = new TextEncoder();
-  const sentenceBoundaries = new Intl.Segmenter(undefined, { granularity: "sentence" });
+  const defaultSentenceBoundaries = new Intl.Segmenter(undefined, { granularity: "sentence" });
   const wideCharacter = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Extended_Pictographic}\u3000-\u303f\uff01-\uff60\uffe0-\uffe6]/u;
   const captionMarker = /^(?:[\[(]|[-–—]\s|>>?|[\p{Lu}\p{Script=Han}][\p{L}\p{M}\p{N} .'’()-]{0,23}(?::\s|：))|[♪♫]|[\])]$/u;
   const dependentStarter = /^(?:(?:and|but|so) )?(?:if|when|while|because|although|though|unless|until|since|whereas|even (?:if|though|when)|as (?:if|long as))$/iu;
 
   function endsSentence(text, next) {
     const end = text.trimEnd().replace(/[\p{Pe}\p{Pf}"']+$/u, "").trimEnd();
-    if (/[!?。．！？｡…؟।॥]$/u.test(end) || end.endsWith("...")) return true;
-    if (!end.endsWith(".")) return false;
+    if (!end.endsWith(".")) return /[\p{Sentence_Terminal}…．｡]$/u.test(end);
+    if (end.endsWith("...")) return true;
 
     const following = next.trimStart();
     if (/\b(?:Mr|Mrs|Ms|Mx|Dr|Prof|Rev|Hon|Capt|Sgt)\.$/iu.test(end) && /^\p{L}/u.test(following)) return false;
@@ -41,7 +41,7 @@
     const leftUsesNoSpace = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}、，：；」』）】》〉]$/u.test(left);
     const rightUsesNoSpace = /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}「『（【《〈]/u.test(right);
     if ((leftUsesNoSpace && rightUsesNoSpace) || /[\s\p{Ps}\p{Pi}]$/u.test(left)
-        || /^[\s\p{Pe}\p{Pf},.;:!?%。，、！？：；…]/u.test(right)) return left + right;
+        || /^[\s\p{Pe}\p{Pf}\p{Sentence_Terminal},;:%。，、：；…،؛]/u.test(right)) return left + right;
     return left + " " + right;
   }
 
@@ -55,7 +55,7 @@
     return encoder.encode(text).length <= maximumBytes;
   }
 
-  function splitCue(cue, remainingSplits) {
+  function splitCue(cue, remainingSplits, sentenceBoundaries) {
     if (!remainingSplits) return [cue];
 
     const parts = [];
@@ -91,7 +91,7 @@
     return timed;
   }
 
-  function splitTimedCues(sortedCues, limit) {
+  function splitTimedCues(sortedCues, limit, sentenceBoundaries) {
     const fragments = [];
     let remainingSplits = Math.max(0, limit - sortedCues.length);
     let latestEnd = 0;
@@ -104,7 +104,7 @@
         nextOverlap > maximumOverlap + timingTolerance;
       const visible = replacesCue ? { ...cue, end: next.start } : cue;
       const overlap = Math.max(latestEnd - cue.start, replacesCue ? 0 : nextOverlap);
-      const parts = overlap > maximumOverlap + timingTolerance ? [visible] : splitCue(visible, remainingSplits);
+      const parts = overlap > maximumOverlap + timingTolerance ? [visible] : splitCue(visible, remainingSplits, sentenceBoundaries);
       fragments.push(...parts);
       remainingSplits -= parts.length - 1;
       latestEnd = Math.max(latestEnd, visible.end);
@@ -138,9 +138,14 @@
     return false;
   }
 
-  globalThis.onlineSubtitleGroupCaptionSentences = function groupCaptionSentences(sortedCues, limit = 10_000) {
+  globalThis.onlineSubtitleGroupCaptionSentences = function groupCaptionSentences(sortedCues, limit = 10_000, language) {
+    let sentenceBoundaries = defaultSentenceBoundaries;
+    if (language) {
+      try { sentenceBoundaries = new Intl.Segmenter(language, { granularity: "sentence" }); }
+      catch { /* Use the browser default if YouTube supplied an unrecognized language tag. */ }
+    }
     const groups = [];
-    const fragments = splitTimedCues(sortedCues, limit);
+    const fragments = splitTimedCues(sortedCues, limit, sentenceBoundaries);
     let previous;
     for (const [index, cue] of fragments.entries()) {
       const group = groups.at(-1);

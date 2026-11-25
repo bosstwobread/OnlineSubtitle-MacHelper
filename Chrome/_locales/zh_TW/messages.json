@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "暫時無法解釋這個單字。"
   },
-  "wordMeaning": {
-    "message": "在這句話中的含義"
-  },
-  "sentenceMeaning": {
-    "message": "整句含義"
-  },
   "wordLookupTitle": {
     "message": "單字釋義"
   }

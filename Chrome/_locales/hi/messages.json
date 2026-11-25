@@ -26,12 +26,6 @@
   "wordLookupUnavailable": {
     "message": "शब्द की व्याख्या उपलब्ध नहीं है।"
   },
-  "wordMeaning": {
-    "message": "इस वाक्य में अर्थ"
-  },
-  "sentenceMeaning": {
-    "message": "वाक्य का अर्थ"
-  },
   "wordLookupTitle": {
     "message": "शब्द की व्याख्या"
   }
