@@ -2,55 +2,55 @@
   "schemaVersion": 1,
   "translations": {
     "en": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.",
       "OnlineSubtitle status": "OnlineSubtitle status"
     },
     "zh-Hans": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "使用本地 Ollama 和 OnlineSubtitle Chrome 扩展，将 YouTube 字幕翻译为简体中文。",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "使用 MacHelper 中配置的 AI 连接，将 YouTube 字幕翻译为简体中文。",
       "OnlineSubtitle status": "OnlineSubtitle 状态"
     },
     "zh-Hant": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "使用本機 Ollama 和 OnlineSubtitle Chrome 擴充功能，將 YouTube 字幕翻譯為簡體中文。",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "使用 MacHelper 中設定的 AI 連線，將 YouTube 字幕翻譯為簡體中文。",
       "OnlineSubtitle status": "OnlineSubtitle 狀態"
     },
     "es": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduce los subtítulos de YouTube al chino simplificado con Ollama local y la extensión OnlineSubtitle para Chrome.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduce los subtítulos de YouTube al chino simplificado con la conexión de IA configurada en MacHelper.",
       "OnlineSubtitle status": "Estado de OnlineSubtitle"
     },
     "fr": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduit les sous-titres YouTube en chinois simplifié avec Ollama en local et l’extension Chrome OnlineSubtitle.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduit les sous-titres YouTube en chinois simplifié à l’aide de la connexion IA configurée dans MacHelper.",
       "OnlineSubtitle status": "État d’OnlineSubtitle"
     },
     "de": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Übersetzt YouTube-Untertitel mit lokalem Ollama und der Chrome-Erweiterung OnlineSubtitle ins vereinfachte Chinesisch.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Übersetzt YouTube-Untertitel mit der in MacHelper eingerichteten KI-Verbindung ins vereinfachte Chinesisch.",
       "OnlineSubtitle status": "OnlineSubtitle-Status"
     },
     "ja": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "ローカルの Ollama と Chrome 拡張機能 OnlineSubtitle で YouTube の字幕を簡体字中国語に翻訳します。",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper で設定した AI 接続を使い、YouTube の字幕を簡体字中国語に翻訳します。",
       "OnlineSubtitle status": "OnlineSubtitle の状態"
     },
     "ko": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "로컬 Ollama와 OnlineSubtitle Chrome 확장 프로그램으로 YouTube 자막을 중국어 간체로 번역합니다.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper에 설정된 AI 연결로 YouTube 자막을 중국어 간체로 번역합니다.",
       "OnlineSubtitle status": "OnlineSubtitle 상태"
     },
     "pt": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduz legendas do YouTube para chinês simplificado usando o Ollama local e a extensão OnlineSubtitle do Chrome.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduz legendas do YouTube para chinês simplificado com a ligação de IA configurada no MacHelper.",
       "OnlineSubtitle status": "Status do OnlineSubtitle"
     },
     "ar": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "يترجم ترجمات YouTube النصية إلى الصينية المبسطة باستخدام Ollama محليًا وإضافة OnlineSubtitle لمتصفح Chrome.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "يترجم ترجمات YouTube النصية إلى الصينية المبسطة باستخدام اتصال الذكاء الاصطناعي المضبوط في MacHelper.",
       "OnlineSubtitle status": "حالة OnlineSubtitle"
     },
     "hi": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "स्थानीय Ollama और OnlineSubtitle Chrome एक्सटेंशन से YouTube उपशीर्षकों का सरल चीनी में अनुवाद करें।",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper में कॉन्फ़िगर किए गए AI कनेक्शन से YouTube उपशीर्षकों का सरलीकृत चीनी में अनुवाद करें।",
       "OnlineSubtitle status": "OnlineSubtitle की स्थिति"
     },
     "ru": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Переводит субтитры YouTube на упрощённый китайский с помощью локального Ollama и расширения OnlineSubtitle для Chrome.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Переводит субтитры YouTube на упрощённый китайский через подключение ИИ, настроенное в MacHelper.",
       "OnlineSubtitle status": "Статус OnlineSubtitle"
     },
     "it": {
-      "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.": "Traduce i sottotitoli di YouTube in cinese semplificato con Ollama in locale e l’estensione OnlineSubtitle per Chrome.",
+      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduce i sottotitoli di YouTube in cinese semplificato tramite la connessione IA configurata in MacHelper.",
       "OnlineSubtitle status": "Stato di OnlineSubtitle"
     }
   }

@@ -1,8 +1,14 @@
 import Darwin
 import Foundation
 
-private let allowedOrigin = "chrome-extension://ndmbmmhddeibbojclldpaabmkcielfmj/"
+private let chromeExtensionID = "ndmbmmhddeibbojclldpaabmkcielfmj"
+private let allowedOrigin = "chrome-extension://\(chromeExtensionID)/"
+private let extensionID = "com.nelson007.online-subtitle"
+private let translationCommand = "translate-captions"
 private let maximumFrameBytes = 32 * 1024
+private let maximumBrokerFrameBytes = 128 * 1024
+private let maximumStatusFrameBytes = 1_024
+private let statusRequest = ["type": "watchStatus"]
 private let standardInput = STDIN_FILENO
 private let standardOutput = STDOUT_FILENO
 
@@ -17,22 +23,42 @@ private enum TranslationError: String, Codable {
 private struct Cue: Codable {
     let id: Int
     let text: String
+    private(set) var source: String?
+
+    private enum CodingKeys: String, CodingKey { case id, text, source }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(Int.self, forKey: .id)
+        text = try values.decode(String.self, forKey: .text)
+        source = try? values.decode(String.self, forKey: .source)
+    }
 
     func isValid(textLimit: Int) -> Bool {
         (1...9_007_199_254_740_991).contains(id) && !text.contains("\0") &&
             !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && text.utf8.count <= textLimit
     }
+
+    mutating func filterSource(allowed: Bool) {
+        guard allowed, let source, source.utf8.count <= 1_000,
+              !source.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !source.unicodeScalars.contains(where: { scalar in
+                  scalar.value == 127 || (scalar.value < 32 && ![9, 10, 13].contains(scalar.value))
+              }) else { self.source = nil; return }
+    }
 }
 
 private struct TranslationRequest: Codable {
-    let type: String
+    enum Kind: String, Codable { case translate, translateSentences }
+
+    let type: Kind
     let cues: [Cue]
 
     static func decode(_ data: Data) throws -> Self {
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               Set(object.keys) == ["type", "cues"], let rawCues = object["cues"] as? [[String: Any]],
               rawCues.allSatisfy({ Set($0.keys) == ["id", "text"] }),
-              let request = try? JSONDecoder().decode(Self.self, from: data), request.type == "translate",
+              let request = try? JSONDecoder().decode(Self.self, from: data),
               (1...8).contains(request.cues.count), request.cues.allSatisfy({ $0.isValid(textLimit: 1000) }),
               Set(request.cues.map(\.id)).count == request.cues.count else { throw BridgeError.invalid }
         return request
@@ -41,7 +67,7 @@ private struct TranslationRequest: Codable {
 
 private struct TranslationResponse: Codable {
     let ok: Bool
-    let translations: [Cue]?
+    private(set) var translations: [Cue]?
     let error: TranslationError?
 
     init(error: TranslationError) {
@@ -51,11 +77,15 @@ private struct TranslationResponse: Codable {
     }
 
     static func decode(_ data: Data, for request: TranslationRequest) throws -> Self {
-        guard let response = try? JSONDecoder().decode(Self.self, from: data) else { throw BridgeError.unavailable }
+        guard var response = try? JSONDecoder().decode(Self.self, from: data) else { throw BridgeError.unavailable }
         if response.ok {
-            guard response.error == nil, let translations = response.translations,
+            guard response.error == nil, var translations = response.translations,
                   translations.count == request.cues.count, translations.allSatisfy({ $0.isValid(textLimit: 2000) }),
                   Set(translations.map(\.id)) == Set(request.cues.map(\.id)) else { throw BridgeError.unavailable }
+            for index in translations.indices {
+                translations[index].filterSource(allowed: request.type == .translateSentences)
+            }
+            response.translations = translations
         } else {
             guard response.error != nil, response.translations == nil else { throw BridgeError.unavailable }
         }
@@ -63,15 +93,63 @@ private struct TranslationResponse: Codable {
     }
 }
 
-private func waitFor(_ descriptor: Int32, events: Int16, until deadline: DispatchTime,
+private struct StatusUpdate: Codable {
+    let type: String
+    let enabled: Bool
+
+    static func decode(_ data: Data) throws -> Self {
+        guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              Set(object.keys) == ["type", "enabled"],
+              let status = try? JSONDecoder().decode(Self.self, from: data), status.type == "status" else {
+            throw BridgeError.invalid
+        }
+        return status
+    }
+}
+
+private struct BrokerResponse: Decodable {
+    enum Failure: String, Decodable {
+        case invalid, unavailable, busy, failed
+
+        var translationError: TranslationError {
+            switch self {
+            case .invalid: return .invalid
+            case .unavailable: return .unavailable
+            case .busy: return .busy
+            case .failed: return .translation
+            }
+        }
+    }
+
+    let ok: Bool
+    let payload: String?
+    let error: Failure?
+
+    static func decode(_ data: Data, for request: TranslationRequest) throws -> TranslationResponse {
+        guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let reply = try? JSONDecoder().decode(Self.self, from: data) else { throw BridgeError.unavailable }
+        if reply.ok {
+            guard Set(object.keys) == ["ok", "payload"], let payload = reply.payload,
+                  payload.utf8.count <= maximumFrameBytes else { throw BridgeError.unavailable }
+            return try TranslationResponse.decode(Data(payload.utf8), for: request)
+        }
+        guard Set(object.keys) == ["ok", "error"], let error = reply.error else { throw BridgeError.unavailable }
+        return TranslationResponse(error: error.translationError)
+    }
+}
+
+private func waitFor(_ descriptor: Int32, events: Int16, until deadline: DispatchTime?,
                      monitorBrowser: Bool) throws {
     var watched = [pollfd(fd: descriptor, events: events, revents: 0)]
     if monitorBrowser { watched.append(pollfd(fd: standardInput, events: Int16(POLLIN), revents: 0)) }
     while true {
-        let now = DispatchTime.now().uptimeNanoseconds
-        guard now < deadline.uptimeNanoseconds else { throw BridgeError.unavailable }
-        let remaining = deadline.uptimeNanoseconds - now
-        let milliseconds = Int32(clamping: (remaining + 999_999) / 1_000_000)
+        var milliseconds: Int32 = -1
+        if let deadline {
+            let now = DispatchTime.now().uptimeNanoseconds
+            guard now < deadline.uptimeNanoseconds else { throw BridgeError.unavailable }
+            let remaining = deadline.uptimeNanoseconds - now
+            milliseconds = Int32(clamping: (remaining + 999_999) / 1_000_000)
+        }
         let ready = watched.withUnsafeMutableBufferPointer { poll($0.baseAddress, nfds_t($0.count), milliseconds) }
         if ready < 0, errno == EINTR { continue }
         guard ready > 0 else { throw BridgeError.unavailable }
@@ -106,16 +184,18 @@ private func readBytes(_ count: Int, from descriptor: Int32, until deadline: Dis
     return data
 }
 
-private func readFrame(from descriptor: Int32, until deadline: DispatchTime, monitorBrowser: Bool) throws -> Data {
+private func readFrame(from descriptor: Int32, until deadline: DispatchTime, monitorBrowser: Bool,
+                       limit: Int = maximumFrameBytes) throws -> Data {
     let header = try readBytes(4, from: descriptor, until: deadline, monitorBrowser: monitorBrowser)
     let length = header.withUnsafeBytes { Int(UInt32(littleEndian: $0.loadUnaligned(as: UInt32.self))) }
-    guard (1...maximumFrameBytes).contains(length) else { throw BridgeError.invalid }
+    guard (1...limit).contains(length) else { throw BridgeError.invalid }
     return try readBytes(length, from: descriptor, until: deadline, monitorBrowser: monitorBrowser)
 }
 
-private func writeFrame<T: Encodable>(_ value: T, to descriptor: Int32, until deadline: DispatchTime) throws {
+private func writeFrame<T: Encodable>(_ value: T, to descriptor: Int32, until deadline: DispatchTime,
+                                      limit: Int = maximumFrameBytes) throws {
     let data = try JSONEncoder().encode(value)
-    guard (1...maximumFrameBytes).contains(data.count) else { throw BridgeError.invalid }
+    guard (1...limit).contains(data.count) else { throw BridgeError.invalid }
     var length = UInt32(data.count).littleEndian
     var frame = withUnsafeBytes(of: &length) { Data($0) }
     frame.append(data)
@@ -144,7 +224,7 @@ private func socketDirectory() throws -> String {
           let directory = text.withUnsafeBufferPointer({ String(validatingCString: $0.baseAddress!) }) else {
         throw BridgeError.unavailable
     }
-    return directory + (directory.hasSuffix("/") ? "" : "/") + "online-subtitle"
+    return directory + (directory.hasSuffix("/") ? "" : "/") + "mh-companion"
 }
 
 private func socketPath() throws -> String {
@@ -166,7 +246,7 @@ private func socketPath() throws -> String {
     return directory + "/" + name
 }
 
-private func connectToWorker(until deadline: DispatchTime) throws -> Int32 {
+private func connectToMacHelper(until deadline: DispatchTime) throws -> Int32 {
     let path = try socketPath()
     var address = sockaddr_un()
     let pathBytes = Array(path.utf8CString)
@@ -203,11 +283,34 @@ private func connectToWorker(until deadline: DispatchTime) throws -> Int32 {
 
 private func translate(_ request: TranslationRequest) throws -> TranslationResponse {
     let connectionDeadline = DispatchTime.now() + .seconds(3)
-    let worker = try connectToWorker(until: connectionDeadline)
-    defer { close(worker) }
-    try writeFrame(request, to: worker, until: connectionDeadline)
-    let response = try readFrame(from: worker, until: .now() + .seconds(65), monitorBrowser: true)
-    return try TranslationResponse.decode(response, for: request)
+    let macHelper = try connectToMacHelper(until: connectionDeadline)
+    defer { close(macHelper) }
+    let payload = try JSONEncoder().encode(request)
+    guard payload.count <= maximumFrameBytes else { throw BridgeError.invalid }
+    let invocation = ["type": "invoke", "extension": extensionID, "companion": chromeExtensionID,
+                      "command": translationCommand, "payload": String(decoding: payload, as: UTF8.self)]
+    try writeFrame(invocation, to: macHelper, until: connectionDeadline, limit: maximumBrokerFrameBytes)
+    let response = try readFrame(from: macHelper, until: .now() + .seconds(65), monitorBrowser: true,
+                                 limit: maximumBrokerFrameBytes)
+    return try BrokerResponse.decode(response, for: request)
+}
+
+private func watchStatus() throws {
+    let connectionDeadline = DispatchTime.now() + .seconds(3)
+    let macHelper = try connectToMacHelper(until: connectionDeadline)
+    defer { close(macHelper) }
+    let subscription = ["type": "watchStatus", "extension": extensionID, "companion": chromeExtensionID]
+    try writeFrame(subscription, to: macHelper, until: connectionDeadline)
+
+    var deadline = DispatchTime.now() + .seconds(5)
+    while true {
+        let bytes = try readFrame(from: macHelper, until: deadline, monitorBrowser: true, limit: maximumStatusFrameBytes)
+        try writeFrame(try StatusUpdate.decode(bytes), to: standardOutput, until: .now() + .seconds(2))
+        // The status may remain unchanged indefinitely. Once a new frame
+        // becomes readable, bound the time to finish reading it.
+        try waitFor(macHelper, events: Int16(POLLIN), until: nil, monitorBrowser: true)
+        deadline = .now() + .seconds(3)
+    }
 }
 
 private func run() {
@@ -219,6 +322,12 @@ private func run() {
         let response: TranslationResponse
         do {
             let bytes = try readFrame(from: standardInput, until: .now() + .seconds(10), monitorBrowser: false)
+            if bytes.count <= maximumStatusFrameBytes,
+               (try? JSONDecoder().decode([String: String].self, from: bytes)) == statusRequest {
+                // EOF on this port is the failure signal for a subscription.
+                try? watchStatus()
+                return
+            }
             let request = try TranslationRequest.decode(bytes)
             do {
                 response = try translate(request)

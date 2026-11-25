@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "通过 MacHelper 在本机生成 YouTube 双语字幕。"
+    "message": "通过 MacHelper 中配置的 AI 连接显示 YouTube 双语字幕。"
   },
   "captionsUnavailable": {
     "message": "此视频暂无可用字幕。"
@@ -12,6 +12,6 @@
     "message": "OnlineSubtitle 无法连接到 MacHelper。"
   },
   "modelUnavailable": {
-    "message": "请启动 Ollama 并准备一个本地模型。"
+    "message": "请检查 MacHelper 中的「AI 连接」。"
   }
 }

@@ -36,18 +36,30 @@ function transcriptResult(text, items) {
   return {actions: [{updateEngagementPanelAction: {targetId: transcriptPanelID, content}}]};
 }
 
-function fixture({tracks, captionIndex, initialDataVideo = videoId, resourceURLs = [], modern = false, fetch}) {
+function playerMetadata(videoId, tracks, captionIndex) {
+  const response = {
+    videoDetails: {videoId},
+    playabilityStatus: {status: "OK"}
+  };
+  if (tracks) {
+    response.captions = {
+      playerCaptionsTracklistRenderer: {
+        captionTracks: tracks,
+        audioTracks: [{captionTrackIndices: [captionIndex]}],
+        defaultAudioTrackIndex: 0
+      }
+    };
+  }
+  return response;
+}
+
+function fixture({
+  tracks, captionIndex, playerVideo = videoId, initialPlayerResponse, initialDataVideo = videoId,
+  optionTracks, resourceURLs = [], modern = false, fetch
+}) {
   const document = new EventTarget();
   const location = new URL(`${origin}/watch?v=${videoId}`);
-  const playerResponse = {
-    videoDetails: {videoId},
-    playabilityStatus: {status: "OK"},
-    captions: {playerCaptionsTracklistRenderer: {
-      captionTracks: tracks,
-      audioTracks: [{captionTrackIndices: [captionIndex]}],
-      defaultAudioTrackIndex: 0
-    }}
-  };
+  const playerResponse = playerMetadata(playerVideo, tracks, captionIndex);
   const page = {
     currentVideoEndpoint: {watchEndpoint: {videoId: initialDataVideo}},
     engagementPanels: [{engagementPanelSectionListRenderer: {
@@ -69,12 +81,19 @@ function fixture({tracks, captionIndex, initialDataVideo = videoId, resourceURLs
       ]}}
     }});
   }
-  document.getElementById = () => ({getPlayerResponse: () => playerResponse});
+  document.getElementById = () => ({
+    getPlayerResponse: () => playerResponse,
+    getVideoData: () => ({video_id: playerVideo}),
+    getOption: () => optionTracks
+  });
   document.querySelector = () => ({data: page});
   vm.runInNewContext(captionScript, {
     document, location, fetch, URL, URLSearchParams, AbortSignal, AbortController, CustomEvent, setTimeout,
     TextEncoder, TextDecoder, performance: {getEntriesByType: () => resourceURLs.map(name => ({name}))},
-    window: {ytcfg: {get: () => ({client: {clientName: "WEB", clientVersion: "2.20261125"}})}}
+    window: {
+      ytInitialPlayerResponse: initialPlayerResponse,
+      ytcfg: {get: () => ({client: {clientName: "WEB", clientVersion: "2.20261125"}})}
+    }
   });
   function request(id = 1) {
     document.dispatchEvent(new CustomEvent("online-subtitle-request-captions", {detail: {id, videoId}}));
@@ -94,6 +113,7 @@ test("prefers manual English and returns valid sorted cue timing", async () => {
   const requested = [];
   const harness = fixture({
     tracks: [track("en", "English (automatic)", {kind: "asr"}), track("en-US", "English (United States)")],
+    initialPlayerResponse: playerMetadata(videoId, [track("en-GB", "English (United Kingdom)")]),
     fetch: async url => {
       requested.push(url.href);
       return Response.json({events: [
@@ -114,6 +134,70 @@ test("prefers manual English and returns valid sorted cue timing", async () => {
   assert.equal(requested.length, 1);
   assert.equal(new URL(requested[0]).searchParams.get("fmt"), "json3");
   assert.equal(new URL(requested[0]).searchParams.get("lang"), "en-US");
+});
+
+test("uses the watch video's initial track while the player reports an ad video ID", async () => {
+  const requests = [];
+  const harness = fixture({
+    playerVideo: nextVideoId,
+    tracks: [track("en", "Advertisement", {url: `${origin}/api/timedtext?v=${nextVideoId}&lang=en`})],
+    initialPlayerResponse: playerMetadata(videoId, [track("fr", "French")]),
+    fetch: async url => {
+      requests.push(url.href);
+      return Response.json({events: [{tStartMs: 0, dDurationMs: 1000, segs: [{utf8: "Bonjour."}]}]});
+    }
+  });
+  assert.deepEqual(await harness.requestResult(), {
+    id: 1, videoId, sourceLanguage: "fr", cues: [{start: 0, end: 1, text: "Bonjour."}]
+  });
+  assert.deepEqual(requests, [`${origin}/api/timedtext?v=${videoId}&lang=fr&fmt=json3`]);
+});
+
+test("an incomplete same-video live response falls back to ranked initial tracks", async () => {
+  const requests = [];
+  const harness = fixture({
+    initialPlayerResponse: playerMetadata(videoId, [
+      track("en", "English (automatic)", {kind: "asr"}), track("en-US", "English (United States)")
+    ]),
+    fetch: async url => {
+      requests.push(url.href);
+      return Response.json({events: [{tStartMs: 0, dDurationMs: 1000, segs: [{utf8: "Watch cue."}]}]});
+    }
+  });
+  assert.deepEqual(await harness.requestResult(), {
+    id: 1, videoId, sourceLanguage: "en-US", cues: [{start: 0, end: 1, text: "Watch cue."}]
+  });
+  assert.deepEqual(requests, [`${origin}/api/timedtext?v=${videoId}&lang=en-US&fmt=json3`]);
+});
+
+test("prefers usable current player options over matching initial tracks", async () => {
+  const requests = [];
+  const harness = fixture({
+    optionTracks: [track("fr", "French")],
+    initialPlayerResponse: playerMetadata(videoId, [track("en", "English")]),
+    fetch: async url => {
+      requests.push(url.href);
+      return Response.json({events: [{tStartMs: 0, dDurationMs: 1000, segs: [{utf8: "Bonjour."}]}]});
+    }
+  });
+  const result = await harness.requestResult();
+  assert.equal(result.sourceLanguage, "fr");
+  assert.deepEqual(requests, [`${origin}/api/timedtext?v=${videoId}&lang=fr&fmt=json3`]);
+});
+
+test("rejects initial tracks associated with an ad when the exact live response is incomplete", async () => {
+  const requests = [];
+  const harness = fixture({
+    initialPlayerResponse: playerMetadata(nextVideoId, [track("en", "Mismatched initial player data")]),
+    fetch: async url => {
+      requests.push(String(url));
+      return new Response("");
+    }
+  });
+  assert.deepEqual(await harness.requestResult(), {
+    id: 1, videoId, sourceLanguage: "", cues: [], error: "captions-unavailable"
+  });
+  assert.deepEqual(requests, []);
 });
 
 test("falls back to the matching viewer transcript when timed text is empty", async () => {
@@ -252,4 +336,40 @@ test("aborts extraction on watch-page navigation and discards the old result", a
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(requested.aborted, true);
   assert.equal(responses, 0);
+});
+
+test("cancels only the matching pending caption request and allows a fresh request", async () => {
+  const fetches = [];
+  const harness = fixture({
+    tracks: [track("en", "English")],
+    fetch: async (_url, {signal}) => new Promise(resolve => {
+      const complete = () => resolve(Response.json({
+        events: [{tStartMs: 0, dDurationMs: 1200, segs: [{utf8: "Test cue."}]}]
+      }));
+      fetches.push({signal, complete});
+      signal.addEventListener("abort", complete, {once: true});
+    })
+  });
+  function cancel(id, currentVideoId = videoId) {
+    harness.document.dispatchEvent(new CustomEvent("online-subtitle-cancel-captions", {
+      detail: {id, videoId: currentVideoId}
+    }));
+  }
+  const responses = [];
+  harness.document.addEventListener("online-subtitle-captions", event => responses.push(event.detail.id));
+  harness.request(12);
+  cancel(99);
+  cancel(12, nextVideoId);
+  assert.equal(fetches[0].signal.aborted, false);
+  // The isolated script may observe a new watch URL before YouTube emits a navigation event.
+  harness.location.search = `?v=${nextVideoId}`;
+  cancel(12);
+  assert.equal(fetches[0].signal.aborted, true);
+  harness.location.search = `?v=${videoId}`;
+  harness.request(13);
+  cancel(12);
+  assert.equal(fetches[1].signal.aborted, false);
+  fetches[1].complete();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(responses, [13]);
 });

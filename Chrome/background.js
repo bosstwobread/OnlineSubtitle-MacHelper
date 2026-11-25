@@ -17,18 +17,21 @@ function isWatchPage(sender) {
   }
 }
 
+function boundedText(text, limit) {
+  return typeof text === "string" && text.trim().length > 0 && text.length <= limit &&
+    !text.includes("\0") && utf8.encode(text).length <= limit;
+}
+
 function isCue(cue, limit) {
-  return cue && Number.isSafeInteger(cue.id) && cue.id > 0 && typeof cue.text === "string" &&
-    cue.text.trim().length > 0 && cue.text.length <= limit && !cue.text.includes("\0") &&
-    utf8.encode(cue.text).length <= limit;
+  return cue && Number.isSafeInteger(cue.id) && cue.id > 0 && boundedText(cue.text, limit);
 }
 
 function validateRequest(message) {
-  if (message?.type !== "translate" || !Array.isArray(message.cues) ||
+  if (!["translate", "translateSentences"].includes(message?.type) || !Array.isArray(message.cues) ||
       message.cues.length < 1 || message.cues.length > 8 ||
       !message.cues.every(cue => isCue(cue, 1000))) return null;
   if (new Set(message.cues.map(cue => cue.id)).size !== message.cues.length) return null;
-  return { type: "translate", cues: message.cues.map(({ id, text }) => ({ id, text })) };
+  return { type: message.type, cues: message.cues.map(({ id, text }) => ({ id, text })) };
 }
 
 function sanitizeReply(reply, request) {
@@ -38,11 +41,66 @@ function sanitizeReply(reply, request) {
       !reply.translations.every((cue, index) => isCue(cue, 2000) && cue.id === request.cues[index].id)) {
     return { ok: false, error: "translation" };
   }
-  return { ok: true, translations: reply.translations.map(({ id, text }) => ({ id, text })) };
+  const translations = reply.translations.map(({ id, text, source }) => {
+    const row = { id, text };
+    if (request.type === "translateSentences" && boundedText(source, 1000) && !/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(source)) {
+      row.source = source;
+    }
+    return row;
+  });
+  return { ok: true, translations };
+}
+
+function connectStatus(port) {
+  let native = null;
+  let closed = false;
+
+  function disconnect() {
+    if (closed) return;
+    closed = true;
+    if (native) native.disconnect();
+    port.disconnect();
+  }
+
+  port.onDisconnect.addListener(disconnect);
+  port.onMessage.addListener(message => {
+    if (closed) return;
+    if (native || message?.type !== "watchStatus" || Object.keys(message).length !== 1) {
+      disconnect();
+      return;
+    }
+    try {
+      native = chrome.runtime.connectNative(host);
+      native.onDisconnect.addListener(() => {
+        void chrome.runtime.lastError;
+        native = null;
+        disconnect();
+      });
+      native.onMessage.addListener(update => {
+        if (closed) return;
+        if (update?.type !== "status" || typeof update.enabled !== "boolean" || Object.keys(update).length !== 2) {
+          disconnect();
+          return;
+        }
+        port.postMessage({ type: "status", enabled: update.enabled });
+      });
+      native.postMessage({ type: "watchStatus" });
+    } catch {
+      disconnect();
+    }
+  });
 }
 
 chrome.runtime.onConnect.addListener(port => {
-  if (port.name !== "online-subtitle-translate" || !isWatchPage(port.sender)) {
+  if (!isWatchPage(port.sender)) {
+    port.disconnect();
+    return;
+  }
+  if (port.name === "online-subtitle-status") {
+    connectStatus(port);
+    return;
+  }
+  if (port.name !== "online-subtitle-translate") {
     port.disconnect();
     return;
   }

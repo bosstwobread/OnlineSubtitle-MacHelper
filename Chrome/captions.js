@@ -3,6 +3,7 @@
 
   const origin = "https://www.youtube.com";
   const requestEvent = "online-subtitle-request-captions";
+  const cancelEvent = "online-subtitle-cancel-captions";
   const responseEvent = "online-subtitle-captions";
   const maximumResponseBytes = 4 * 1024 * 1024;
   const maximumCues = 10_000;
@@ -321,6 +322,10 @@
       const watchPage = document.querySelector("ytd-watch-flexy");
       const response = playerResponse(player, videoId);
       tracks = getTracks(player, response, videoId);
+      const initial = window.ytInitialPlayerResponse;
+      if (!tracks.length && initial !== response && initial?.videoDetails?.videoId === videoId) {
+        tracks = getTracks(undefined, initial, videoId);
+      }
       metadata = viewerTranscriptMetadata(watchPage, videoId);
       if (tracks.length && (metadata || attempt >= 4)) break;
       if (response?.playabilityStatus?.status === "OK" && !response.captions && attempt >= 8) break;
@@ -358,19 +363,25 @@
       || (typeof id === "string" && /^[a-zA-Z0-9_-]{1,120}$/.test(id));
   }
 
+  function cancelActiveRequest() {
+    const request = activeRequest;
+    activeRequest = undefined;
+    request?.controller.abort();
+  }
+
   document.addEventListener(requestEvent, async event => {
     const {id, videoId} = event.detail ?? {};
     if (!validID(id) || typeof videoId !== "string" || !videoIDPattern.test(videoId) || !isCurrentVideo(videoId)) return;
-    activeRequest?.abort();
-    const request = new AbortController();
+    cancelActiveRequest();
+    const request = {id, videoId, controller: new AbortController()};
     activeRequest = request;
     let result;
     try {
-      result = await extract(videoId, AbortSignal.any([request.signal, AbortSignal.timeout(15_000)]));
+      result = await extract(videoId, AbortSignal.any([request.controller.signal, AbortSignal.timeout(15_000)]));
     } catch {
       // YouTube's internal caption shapes are optional and can change independently.
     }
-    if (request.signal.aborted || activeRequest !== request || !isCurrentVideo(videoId)) return;
+    if (request.controller.signal.aborted || activeRequest !== request || !isCurrentVideo(videoId)) return;
     activeRequest = undefined;
     const captions = result
       ? {cues: result.cues, sourceLanguage: result.track.language}
@@ -380,5 +391,11 @@
     }));
   });
 
-  document.addEventListener("yt-navigate-start", () => activeRequest?.abort());
+  document.addEventListener(cancelEvent, event => {
+    const {id, videoId} = event.detail ?? {};
+    if (location.origin === origin && activeRequest && activeRequest.id === id && activeRequest.videoId === videoId) {
+      cancelActiveRequest();
+    }
+  });
+  document.addEventListener("yt-navigate-start", cancelActiveRequest);
 })();

@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "Sottotitoli bilingui su YouTube con IA locale in MacHelper."
+    "message": "Sottotitoli bilingui su YouTube tramite la connessione IA configurata in MacHelper."
   },
   "captionsUnavailable": {
     "message": "Sottotitoli non disponibili per questo video."
@@ -12,6 +12,6 @@
     "message": "OnlineSubtitle non è riuscito a connettersi a MacHelper."
   },
   "modelUnavailable": {
-    "message": "Avvia Ollama con un modello locale."
+    "message": "Controlla Connessione IA in MacHelper."
   }
 }

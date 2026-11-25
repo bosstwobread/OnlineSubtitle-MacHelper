@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "Bilingual YouTube captions with local AI in MacHelper."
+    "message": "Bilingual YouTube captions using the AI connection configured in MacHelper."
   },
   "captionsUnavailable": {
     "message": "Captions unavailable for this video."
@@ -12,6 +12,6 @@
     "message": "OnlineSubtitle could not connect to MacHelper."
   },
   "modelUnavailable": {
-    "message": "Start Ollama with a local model."
+    "message": "Check AI Connection in MacHelper."
   }
 }

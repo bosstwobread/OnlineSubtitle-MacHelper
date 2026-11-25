@@ -1,5 +1,7 @@
 # OnlineSubtitle for MacHelper
 
-Enable OnlineSubtitle to start the local subtitle translation worker. It accepts short caption batches from the OnlineSubtitle Chrome companion and translates them into Simplified Chinese with Ollama on this Mac. It requires the companion and its caption-only native messaging bridge, with an existing YouTube caption track and a local chat model in Ollama.
+Install this folder with **MacHelper → Extensions → Install Source**. Use MacHelper 6.8.0 or later. Review the native execution and local Chrome companion permissions before enabling it.
 
-This extension requires trusted native execution and uses a private Unix socket. It does not use selected text or Accessibility. It has no extension settings. The Chrome and native bridge sources and setup instructions are in the [OnlineSubtitle-MacHelper project](https://github.com/bosstwobread/OnlineSubtitle-MacHelper).
+The worker owns the caption request format, calls MacHelper’s saved **AI Connection**, and validates every translation. The editable prompts are `prompts/translate-sentences.txt` for correction and translation and `prompts/translate-captions.txt` for translation alone. MacHelper compiles the package using its shipped Swift SDK.
+
+The browser companion and native bridge are part of the [OnlineSubtitle project](https://github.com/bosstwobread/OnlineSubtitle-MacHelper).

@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "Двуязычные субтитры на YouTube с локальным ИИ в MacHelper."
+    "message": "Двуязычные субтитры YouTube через подключение ИИ, настроенное в MacHelper."
   },
   "captionsUnavailable": {
     "message": "Для этого видео субтитры недоступны."
@@ -12,6 +12,6 @@
     "message": "OnlineSubtitle не удалось подключиться к MacHelper."
   },
   "modelUnavailable": {
-    "message": "Запустите Ollama с локальной моделью."
+    "message": "Проверьте раздел «Подключение ИИ» в MacHelper."
   }
 }

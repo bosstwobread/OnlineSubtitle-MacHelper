@@ -3,10 +3,14 @@
   "runtime": "native",
   "identifier": "com.nelson007.online-subtitle",
   "displayName": "OnlineSubtitle",
-  "version": "0.1.0",
-  "summary": "Translate YouTube captions into Simplified Chinese with local Ollama and the OnlineSubtitle Chrome companion.",
+  "version": "0.3.0",
+  "summary": "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.",
   "entryPoint": "Main.swift",
-  "permissions": ["native.execute"],
-  "commands": [{ "identifier": "status", "title": "OnlineSubtitle status", "trigger": "manual" }],
+  "permissions": ["native.execute", "ai.transform", "companion.message"],
+  "companion": { "chromeExtensionID": "ndmbmmhddeibbojclldpaabmkcielfmj" },
+  "commands": [
+    { "identifier": "status", "title": "OnlineSubtitle status", "trigger": "manual" },
+    { "identifier": "translate-captions", "title": "Translate captions", "trigger": "companion" }
+  ],
   "localizations": "localizations.json"
 }

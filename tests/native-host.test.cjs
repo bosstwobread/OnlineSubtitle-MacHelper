@@ -6,9 +6,14 @@ const { createServer } = require('node:net');
 const { join, resolve } = require('node:path');
 const { after, before, test } = require('node:test');
 
-const origin = 'chrome-extension://ndmbmmhddeibbojclldpaabmkcielfmj/';
+const companion = 'ndmbmmhddeibbojclldpaabmkcielfmj';
+const extension = 'com.nelson007.online-subtitle';
+const origin = `chrome-extension://${companion}/`;
 const request = { type: 'translate', cues: [{ id: 12, text: 'A short example.' }] };
+const sentenceRequest = { ...request, type: 'translateSentences' };
 const response = { ok: true, translations: [{ id: 12, text: '一个简短的例子。' }] };
+const statusRequest = { type: 'watchStatus' };
+const statusSubscription = { ...statusRequest, extension, companion };
 let directory;
 let bridge;
 
@@ -34,6 +39,17 @@ function unframe(bytes) {
   assert.ok(bytes.length > 4);
   assert.equal(bytes.readUInt32LE(), bytes.length - 4);
   return JSON.parse(bytes.subarray(4));
+}
+
+function captionRequest(message) {
+  const { payload, ...envelope } = message;
+  assert.deepEqual(envelope, { type: 'invoke', extension, companion, command: 'translate-captions' });
+  assert.equal(typeof payload, 'string');
+  return JSON.parse(payload);
+}
+
+function commandReply(reply) {
+  return { ok: true, payload: JSON.stringify(reply) };
 }
 
 function launch(t, socketDirectory, browserOrigin = origin) {
@@ -85,6 +101,8 @@ test('native host serves only the registered Chrome extension', { timeout: 8000 
 test('native host rejects unrelated, oversized, and duplicate cue requests', { timeout: 8000 }, async (t) => {
   for (const bytes of [frame({ type: 'other', cues: request.cues }),
     frame({ ...request, settings: {} }), frame({ ...request, cues: [request.cues[0], request.cues[0]] }),
+    frame({ ...sentenceRequest, cues: [{ ...request.cues[0], source: 'Do not forward.' }] }),
+    frame({ ...statusRequest, cues: request.cues }),
     Buffer.from([1, 128, 0, 0])]) {
     const { host, result } = launch(t, directory);
     host.stdin.write(bytes);
@@ -92,7 +110,7 @@ test('native host rejects unrelated, oversized, and duplicate cue requests', { t
   }
 });
 
-test('native host reports an unavailable MacHelper worker', { timeout: 8000 }, async (t) => {
+test('native host reports an unavailable MacHelper companion service', { timeout: 8000 }, async (t) => {
   const { host, result } = launch(t, directory);
   host.stdin.write(frame(request));
   assert.deepEqual(unframe(await result), { ok: false, error: 'unavailable' });
@@ -100,8 +118,8 @@ test('native host reports an unavailable MacHelper worker', { timeout: 8000 }, a
 
 test('native host round trips a fragmented caption request and response', { timeout: 8000 }, async (t) => {
   const socketDirectory = await openWorker(t, (message, socket) => {
-    assert.deepEqual(message, request);
-    const bytes = frame(response);
+    assert.deepEqual(captionRequest(message), request);
+    const bytes = frame(commandReply(response));
     socket.write(bytes.subarray(0, 2));
     setTimeout(() => socket.end(bytes.subarray(2)), 10);
   });
@@ -112,12 +130,74 @@ test('native host round trips a fragmented caption request and response', { time
   assert.deepEqual(unframe(await result), response);
 });
 
-test('native host cancels worker transport when Chrome disconnects', { timeout: 8000 }, async (t) => {
+test('native host forwards sentence requests and only valid optional source text', { timeout: 8000 }, async (t) => {
+  const sources = ['字'.repeat(333) + 'a', '字'.repeat(334), 17, 'A\u0007B', undefined];
+  const request = { ...sentenceRequest, cues: sources.map((_, i) => ({ id: i + 1, text: 'A sentence.' })) };
+  const rows = sources.map((source, i) => ({ id: i + 1, text: '一句话。', source }));
+  const directory = await openWorker(t, (message, socket) => {
+    assert.deepEqual(captionRequest(message), request);
+    socket.end(frame(commandReply({ ok: true, translations: rows })));
+  });
+  const { host, result } = launch(t, directory);
+  host.stdin.write(frame(request));
+  assert.deepEqual(unframe(await result), {
+    ok: true, translations: [rows[0], ...rows.slice(1).map(({ id, text }) => ({ id, text }))],
+  });
+});
+
+test('native host preserves the legacy response shape and forwards unsupported sentence errors', { timeout: 8000 }, async (t) => {
+  const compatibilityError = { ok: false, error: 'invalid' };
+  const provided = { ok: true, translations: [{ ...response.translations[0], source: 'A cleaned example.' }] };
+  const directory = await openWorker(t, (message, socket) => {
+    socket.end(frame(captionRequest(message).type === 'translate' ? commandReply(provided) : compatibilityError));
+  });
+  for (const [input, expected] of [[request, response], [sentenceRequest, compatibilityError]]) {
+    const { host, result } = launch(t, directory);
+    host.stdin.write(frame(input));
+    assert.deepEqual(unframe(await result), expected);
+  }
+});
+
+test('native host allows broker escaping overhead while preserving the browser frame limit', { timeout: 8000 }, async (t) => {
+  const cues = Array.from({ length: 8 }, (_, index) => ({ id: index + 1, text: 'Original.' }));
+  const translations = cues.map(({ id }) => ({ id, text: '\\'.repeat(1_400) }));
+  const request = { type: 'translateSentences', cues };
+  const response = { ok: true, translations };
+  assert.ok(frame(response).length < 32 * 1024);
+  assert.ok(frame(commandReply(response)).length > 32 * 1024);
+  const directory = await openWorker(t, (message, socket) => {
+    assert.deepEqual(captionRequest(message), request);
+    socket.end(frame(commandReply(response)));
+  });
+  const { host, result } = launch(t, directory);
+  host.stdin.write(frame(request));
+  assert.deepEqual(unframe(await result), response);
+});
+
+test('native host maps broker failure and retains worker errors', { timeout: 8000 }, async (t) => {
+  const examples = [
+    [{ ok: false, error: 'failed' }, 'translation'],
+    [{ ok: false, error: 'busy' }, 'busy'],
+    [commandReply({ ok: false, error: 'model' }), 'model'],
+    [{ ok: true, payload: 'not JSON' }, 'unavailable'],
+  ];
+  for (const [reply, error] of examples) {
+    const directory = await openWorker(t, (message, socket) => {
+      assert.deepEqual(captionRequest(message), sentenceRequest);
+      socket.end(frame(reply));
+    });
+    const { host, result } = launch(t, directory);
+    host.stdin.write(frame(sentenceRequest));
+    assert.deepEqual(unframe(await result), { ok: false, error });
+  }
+});
+
+test('native host cancels companion transport when Chrome disconnects', { timeout: 8000 }, async (t) => {
   let browser;
   let cancelled;
   const cancellation = new Promise((resolve) => { cancelled = resolve; });
   const socketDirectory = await openWorker(t, (message, socket) => {
-    assert.deepEqual(message, request);
+    assert.deepEqual(captionRequest(message), request);
     socket.once('end', cancelled);
     browser.host.stdin.end();
   });
@@ -125,4 +205,42 @@ test('native host cancels worker transport when Chrome disconnects', { timeout: 
   browser.host.stdin.write(frame(request));
   const [result] = await Promise.all([browser.result, cancellation]);
   assert.equal(result.length, 0);
+});
+
+test('native host relays successive status frames and disconnects when Chrome closes', { timeout: 8000 }, async (t) => {
+  let macHelper;
+  let disconnected;
+  const connectionEnded = new Promise((resolve) => { disconnected = resolve; });
+  const enabled = frame({ type: 'status', enabled: true });
+  const disabled = frame({ type: 'status', enabled: false });
+  const socketDirectory = await openWorker(t, (message, socket) => {
+    assert.deepEqual(message, statusSubscription);
+    macHelper = socket;
+    socket.once('end', disconnected);
+    socket.write(enabled.subarray(0, 2));
+    setTimeout(() => socket.write(enabled.subarray(2)), 10);
+  });
+  const { host, result } = launch(t, socketDirectory);
+  host.stdin.write(frame(statusRequest));
+  await once(host.stdout, 'data');
+  const update = once(host.stdout, 'data');
+  macHelper.write(disabled);
+  await update;
+  host.stdin.end();
+  const [bytes] = await Promise.all([result, connectionEnded]);
+  assert.deepEqual(unframe(bytes.subarray(0, enabled.length)), { type: 'status', enabled: true });
+  assert.deepEqual(unframe(bytes.subarray(enabled.length)), { type: 'status', enabled: false });
+});
+
+test('native status relay closes without forwarding malformed or oversized updates', { timeout: 8000 }, async (t) => {
+  for (const payload of [frame({ type: 'status', enabled: 1 }),
+    frame({ type: 'status', enabled: true, unexpected: true }), Buffer.from([1, 4, 0, 0])]) {
+    const socketDirectory = await openWorker(t, (message, socket) => {
+      assert.deepEqual(message, statusSubscription);
+      socket.end(payload);
+    });
+    const { host, result } = launch(t, socketDirectory);
+    host.stdin.write(frame(statusRequest));
+    assert.equal((await result).length, 0);
+  }
 });

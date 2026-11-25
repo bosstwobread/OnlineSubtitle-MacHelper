@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "MacHelper のローカル AI で YouTube の二言語字幕を表示します。"
+    "message": "MacHelper で設定した AI 接続で YouTube の二言語字幕を表示します。"
   },
   "captionsUnavailable": {
     "message": "この動画の字幕は利用できません。"
@@ -12,6 +12,6 @@
     "message": "OnlineSubtitle は MacHelper に接続できませんでした。"
   },
   "modelUnavailable": {
-    "message": "ローカルモデルを用意して Ollama を起動してください。"
+    "message": "MacHelper の「AI 接続」を確認してください。"
   }
 }
