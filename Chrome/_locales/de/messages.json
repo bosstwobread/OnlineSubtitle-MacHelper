@@ -6,12 +6,33 @@
     "message": "Für dieses Video sind keine Untertitel verfügbar."
   },
   "translationUnavailable": {
-    "message": "Chinesische Übersetzung nicht verfügbar."
+    "message": "Untertitelübersetzung nicht verfügbar."
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle konnte keine Verbindung zu MacHelper herstellen."
   },
   "modelUnavailable": {
     "message": "Prüfe in MacHelper den Bereich „KI-Verbindung“."
+  },
+  "moveSubtitles": {
+    "message": "Untertitel verschieben"
+  },
+  "closeWordLookup": {
+    "message": "Worterklärung schließen"
+  },
+  "wordLookupLoading": {
+    "message": "Wort wird nachgeschlagen …"
+  },
+  "wordLookupUnavailable": {
+    "message": "Worterklärung nicht verfügbar."
+  },
+  "wordMeaning": {
+    "message": "Bedeutung in diesem Satz"
+  },
+  "sentenceMeaning": {
+    "message": "Satzbedeutung"
+  },
+  "wordLookupTitle": {
+    "message": "Worterklärung"
   }
 }

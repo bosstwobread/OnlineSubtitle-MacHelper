@@ -6,9 +6,11 @@ const vm = require("node:vm");
 
 const { content_scripts: scripts } = require("../Chrome/manifest.json");
 const script = scripts.find(({ js }) => js.includes("content.js")).js
+  .filter(name => name !== "subtitle-interactions.js")
   .map(name => readFileSync(path.join(__dirname, "../Chrome", name), "utf8")).join("\n");
 const videoId = "AbCdeFghI-1";
 const otherVideoId = "123456789ab";
+const defaultSettings = { ok: true, targetLanguage: "zh-CN", revision: "a".repeat(64) };
 
 class ClassList extends Set {
   contains(name) { return this.has(name); }
@@ -66,7 +68,8 @@ function signal() {
   };
 }
 
-function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true, adClass, timestamp = "" } = {}) {
+function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true, adClass, timestamp = "",
+  settings = defaultSettings } = {}) {
   const location = { origin: "https://www.youtube.com", pathname: "/watch", search: `?v=${id}${timestamp}` };
   const document = new EventTarget();
   const window = new EventTarget();
@@ -74,19 +77,25 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
   const cancelledRequests = [];
   const ports = [];
   const statusPorts = [];
+  const settingsPorts = [];
+  const lookupPorts = [];
   const observers = [];
   const microtasks = [];
   const timers = new Map();
   const intervals = new Map();
   let timerId = 0;
+  let now = Date.now();
   let player;
   let video;
+  let interaction;
+  let pauses = 0;
 
   function mount(time = currentTime) {
     if (player) player.isConnected = false;
     if (video) video.isConnected = false;
     player = new Element();
     video = Object.assign(new Element(), { isVideo: true, currentTime: time, HAVE_METADATA: 1, readyState: 1, seeking: false });
+    video.pause = () => { pauses++; video.dispatchEvent(new Event("pause")); };
     if (adClass) player.classList.add(adClass);
     player.append(video);
   }
@@ -114,10 +123,17 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
           },
           postMessage(message) {
             this.sent = structuredClone(message);
-            if (status && enabled !== null) this.onMessage.emit({ type: "status", enabled });
+            if (status) {
+              if (enabled !== null) this.onMessage.emit({ type: "status", enabled });
+            } else if (message.type === "getSettings") {
+              settingsPorts.push(this);
+              if (settings !== null) this.onMessage.emit(settings);
+            } else {
+              (message.type === "explainWord" ? lookupPorts : ports).push(this);
+            }
           }
         };
-        (status ? statusPorts : ports).push(port);
+        if (status) statusPorts.push(port);
         return port;
       }
     } },
@@ -128,6 +144,21 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
     URLSearchParams,
     CustomEvent,
     crypto,
+    Date: class extends Date { static now() { return now; } },
+    onlineSubtitleCreateInteractions({ original, translated, onWord, onDismiss }) {
+      interaction = {
+        onWord, onDismiss,
+        view: undefined,
+        renderSource(text) { original.textContent = text; },
+        renderTranslation(text) { translated.textContent = text; },
+        showLookup(word) { this.view = { word }; },
+        completeLookup(reply) { this.view = { ...this.view, ...structuredClone(reply) }; },
+        failLookup() { this.view = { ...this.view, failed: true }; },
+        closeLookup() { this.view = undefined; },
+        destroy() {}
+      };
+      return interaction;
+    },
     MutationObserver: class {
       constructor(callback) { this.callback = callback; }
       observe() { observers.push(this.callback); }
@@ -141,7 +172,9 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
   });
 
   return {
-    document, window, location, requests, cancelledRequests, ports, statusPorts, mount,
+    document, window, location, requests, cancelledRequests, ports, statusPorts, mount, settingsPorts, lookupPorts,
+    get lookup() { return interaction.view; },
+    get pauses() { return pauses; },
     get player() { return player; },
     get video() { return video; },
     get overlay() {
@@ -161,12 +194,19 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
       video.currentTime = time;
       video.dispatchEvent(new Event(event));
     },
+    clickWord(word, row = "original") { interaction.onWord(word, row); },
+    dismissLookup() { interaction.onDismiss(); },
+    focus(nextSettings = settings) {
+      settings = nextSettings;
+      window.dispatchEvent(new Event("focus"));
+    },
     ad(active, className = adClass ?? "ad-showing") {
       if (active) player.classList.add(className);
       else player.classList.delete(className);
       for (const observer of observers) observer();
     },
     refresh() { for (const interval of intervals.values()) interval(); },
+    advance(milliseconds) { now += milliseconds; this.refresh(); },
     runMicrotasks() { while (microtasks.length) microtasks.shift()(); },
     runTimers(delay) {
       for (const [id, timer] of [...timers]) {
@@ -198,6 +238,81 @@ function assertWaitingForPair(page) {
   assertNoOverlay(page);
   assert.equal(page.player.attributes.has("data-online-subtitle-visible"), true);
 }
+
+test("reads the target before translating and refreshes paired captions after a settings change", () => {
+  const page = browser({ currentTime: 1, settings: null });
+  page.captions([{ start: 0, end: 3, text: "Carry on." }]);
+  assert.deepEqual(page.settingsPorts[0].sent, { type: "getSettings" });
+  assert.equal(page.ports.length, 0);
+  assertWaitingForPair(page);
+  const french = { ok: true, targetLanguage: "fr", revision: "f".repeat(64) };
+  page.settingsPorts[0].onMessage.emit(french);
+  page.ports[0].onMessage.emit({ ...french, translations: [{ id: 1, text: "Continue." }] });
+  page.runMicrotasks();
+  assert.equal(page.overlay.translation.lang, "fr");
+  assert.equal(page.overlay.translation.textContent, "Continue.");
+
+  const german = { ok: true, targetLanguage: "de", revision: "d".repeat(64) };
+  page.focus(german);
+  assertWaitingForPair(page);
+  assert.equal(page.overlay.translation.lang, "de");
+  assert.equal(page.ports.length, 2);
+  page.ports[1].onMessage.emit({ ...german, translations: [{ id: 1, text: "Mach weiter." }] });
+  assert.equal(page.overlay.translation.textContent, "Mach weiter.");
+});
+
+test("a word click pauses playback and explains the word in the displayed complete sentence", () => {
+  const page = browser({ currentTime: 1 });
+  page.captions([{ start: 0, end: 5, text: "The bank groaned." }]);
+  page.ports[0].onMessage.emit({
+    ...defaultSettings, translations: [{ id: 1, source: "The bank closed.", text: "银行关门了。" }]
+  });
+  page.clickWord("groaned");
+  assert.equal(page.lookupPorts.length, 0);
+  page.clickWord("bank");
+  assert.equal(page.pauses, 1);
+  assert.deepEqual(page.lookupPorts[0].sent, { type: "explainWord", word: "bank", sentence: "The bank closed." });
+  assert.deepEqual(page.lookup, { word: "bank" });
+  page.lookupPorts[0].onMessage.emit({ ...defaultSettings, meaning: "银行", sentenceMeaning: "银行关门了。" });
+  assert.deepEqual(page.lookup, {
+    word: "bank", meaning: "银行", sentenceMeaning: "银行关门了。", targetLanguage: "zh-CN"
+  });
+  page.dismissLookup();
+  assert.equal(page.lookup, undefined);
+  page.clickWord("银行", "translation");
+  assert.deepEqual(page.lookupPorts[1].sent, { type: "explainWord", word: "银行", sentence: "银行关门了。" });
+});
+
+test("a visible tab picks up the next worker settings generation after a transient disconnect", () => {
+  const page = browser({ currentTime: 1 });
+  page.captions([{ start: 0, end: 5, text: "The bank closed." }]);
+  page.ports[0].onMessage.emit({ ok: false, error: "unavailable" });
+  assertNativeCaptionsAvailable(page);
+  const german = { ok: true, targetLanguage: "de", revision: "d".repeat(64) };
+  page.focus({ ok: false, error: "busy" });
+  assert.equal(page.ports.length, 1);
+  page.focus(null);
+  page.settingsPorts.at(-1).onMessage.emit({ ok: false, error: "busy" });
+  page.advance(8_000);
+  page.settingsPorts.at(-1).onMessage.emit(german);
+  assert.equal(page.ports.length, 2);
+  page.ports[1].onMessage.emit({ ...german, translations: [{ id: 1, text: "Die Bank schloss." }] });
+  assert.equal(page.overlay.translation.textContent, "Die Bank schloss.");
+  assert.equal(page.overlay.status.hidden, true);
+});
+
+test("a seek cancels an in-flight word lookup and ignores its late result", () => {
+  const page = browser({ currentTime: 1 });
+  page.captions([{ start: 0, end: 5, text: "The bank closed." }]);
+  translate([], page.ports[0]);
+  page.clickWord("bank");
+  const pending = page.lookupPorts[0];
+  assert.equal(pending.disconnected, false);
+  page.playAt(6, "seeking");
+  assert.equal(pending.disconnected, true);
+  pending.onMessage.emit({ ...defaultSettings, meaning: "银行", sentenceMeaning: "银行关门了。" });
+  assert.equal(page.lookup, undefined);
+});
 
 test("waits for MacHelper to confirm the watch session before loading captions", () => {
   const page = browser({ enabled: null });
@@ -525,7 +640,7 @@ test("keeps YouTube captions available and retries busy once with no repeated pr
   page.refresh();
   assert.equal(page.ports.length, 2);
   assertNativeCaptionsAvailable(page);
-  assert.equal(page.overlay.status.textContent, "Chinese translation unavailable.");
+  assert.equal(page.overlay.status.textContent, "Subtitle translation unavailable.");
 });
 
 test("falls back to native captions for an unfinished cue and keeps completed bilingual cues", () => {
@@ -537,7 +652,7 @@ test("falls back to native captions for an unfinished cue and keeps completed bi
   assertWaitingForPair(page);
   page.ports[1].onMessage.emit({ ok: false, error: "translation" });
   assertNativeCaptionsAvailable(page);
-  assert.equal(page.overlay.status.textContent, "Chinese translation unavailable.");
+  assert.equal(page.overlay.status.textContent, "Subtitle translation unavailable.");
   page.playAt(1);
   assert.equal(page.overlay.original.textContent, "Sentence 1");
   assert.equal(page.overlay.translation.textContent, "第1句");
@@ -571,7 +686,7 @@ test("rejects partial batches, duplicate IDs, and corrections without Chinese", 
     page.ports[0].onMessage.emit({ ok: true, translations });
     page.refresh();
     assertNativeCaptionsAvailable(page);
-    assert.equal(page.overlay.status.textContent, "Chinese translation unavailable.");
+    assert.equal(page.overlay.status.textContent, "Subtitle translation unavailable.");
     assert.equal(page.ports.length, 1);
   }
 });

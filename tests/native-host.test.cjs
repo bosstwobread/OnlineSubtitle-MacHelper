@@ -12,6 +12,10 @@ const origin = `chrome-extension://${companion}/`;
 const request = { type: 'translate', cues: [{ id: 12, text: 'A short example.' }] };
 const sentenceRequest = { ...request, type: 'translateSentences' };
 const response = { ok: true, translations: [{ id: 12, text: '一个简短的例子。' }] };
+const settingsRequest = { type: 'getSettings' };
+const wordRequest = { type: 'explainWord', word: 'café', sentence: 'The café is open.' };
+const configuration = { targetLanguage: 'fr', revision: 'ac'.repeat(32) };
+const explanation = { meaning: 'Un établissement de restauration.', sentenceMeaning: 'Le café est ouvert.' };
 const statusRequest = { type: 'watchStatus' };
 const statusSubscription = { ...statusRequest, extension, companion };
 let directory;
@@ -41,11 +45,15 @@ function unframe(bytes) {
   return JSON.parse(bytes.subarray(4));
 }
 
-function captionRequest(message) {
+function commandRequest(message, command) {
   const { payload, ...envelope } = message;
-  assert.deepEqual(envelope, { type: 'invoke', extension, companion, command: 'translate-captions' });
+  assert.deepEqual(envelope, { type: 'invoke', extension, companion, command });
   assert.equal(typeof payload, 'string');
   return JSON.parse(payload);
+}
+
+function captionRequest(message) {
+  return commandRequest(message, 'translate-captions');
 }
 
 function commandReply(reply) {
@@ -103,6 +111,12 @@ test('native host rejects unrelated, oversized, and duplicate cue requests', { t
     frame({ ...request, settings: {} }), frame({ ...request, cues: [request.cues[0], request.cues[0]] }),
     frame({ ...sentenceRequest, cues: [{ ...request.cues[0], source: 'Do not forward.' }] }),
     frame({ ...statusRequest, cues: request.cues }),
+    frame({ ...settingsRequest, command: 'invoke' }),
+    frame({ ...wordRequest, targetLanguage: 'en' }),
+    frame({ ...wordRequest, word: 'cafe\u0301' }),
+    frame({ ...wordRequest, word: '茶'.repeat(86), sentence: '茶'.repeat(86) }),
+    frame({ ...wordRequest, sentence: 'café' + '茶'.repeat(666) }),
+    frame({ ...wordRequest, word: 'café\u0007', sentence: 'café\u0007' }),
     Buffer.from([1, 128, 0, 0])]) {
     const { host, result } = launch(t, directory);
     host.stdin.write(bytes);
@@ -158,6 +172,56 @@ test('native host preserves the legacy response shape and forwards unsupported s
   }
 });
 
+test('native host invokes only the matching approved settings or word command', { timeout: 8000 }, async (t) => {
+  const longLookup = {...wordRequest, sentence: 'café' + '茶'.repeat(665)};
+  for (const [request, command, result] of [
+    [settingsRequest, 'caption-settings', configuration],
+    [longLookup, 'explain-word', { ...configuration, ...explanation }],
+  ]) {
+    const reply = { ok: true, ...result };
+    const socketDirectory = await openWorker(t, (message, socket) => {
+      assert.deepEqual(commandRequest(message, command), request);
+      socket.end(frame(commandReply(reply)));
+    });
+    const { host, result: bytes } = launch(t, socketDirectory);
+    host.stdin.write(frame(request));
+    assert.deepEqual(unframe(await bytes), reply);
+  }
+});
+
+test('native host validates reply metadata and both parts of each word explanation', { timeout: 8000 }, async (t) => {
+  const settings = { ok: true, ...configuration };
+  const lookup = { ...settings, ...explanation };
+  for (const [request, command, reply] of [
+    [settingsRequest, 'caption-settings', { ...settings, prompt: 'Sensitive user prompt.' }],
+    [settingsRequest, 'caption-settings', { ...settings, targetLanguage: 'en-US' }],
+    [settingsRequest, 'caption-settings', { ...settings, revision: 'a'.repeat(64) + '\n' }],
+    [wordRequest, 'explain-word', { ...lookup, sentenceMeaning: null }],
+    [wordRequest, 'explain-word', { ...lookup, meaning: '茶'.repeat(667) }],
+    [wordRequest, 'explain-word', { ...lookup, sentenceMeaning: 'a\u007f' }],
+    [sentenceRequest, 'translate-captions', { ...response, targetLanguage: 'fr' }],
+  ]) {
+    const socketDirectory = await openWorker(t, (message, socket) => {
+      assert.deepEqual(commandRequest(message, command), request);
+      socket.end(frame(commandReply(reply)));
+    });
+    const { host, result } = launch(t, socketDirectory);
+    host.stdin.write(frame(request));
+    assert.deepEqual(unframe(await result), { ok: false, error: 'unavailable' });
+  }
+});
+
+test('native host passes validated settings metadata with caption batches', { timeout: 8000 }, async (t) => {
+  const reply = { ...response, ...configuration };
+  const directory = await openWorker(t, (message, socket) => {
+    assert.deepEqual(captionRequest(message), sentenceRequest);
+    socket.end(frame(commandReply(reply)));
+  });
+  const { host, result } = launch(t, directory);
+  host.stdin.write(frame(sentenceRequest));
+  assert.deepEqual(unframe(await result), reply);
+});
+
 test('native host allows broker escaping overhead while preserving the browser frame limit', { timeout: 8000 }, async (t) => {
   const cues = Array.from({ length: 8 }, (_, index) => ({ id: index + 1, text: 'Original.' }));
   const translations = cues.map(({ id }) => ({ id, text: '\\'.repeat(1_400) }));
@@ -192,17 +256,17 @@ test('native host maps broker failure and retains worker errors', { timeout: 800
   }
 });
 
-test('native host cancels companion transport when Chrome disconnects', { timeout: 8000 }, async (t) => {
+test('native host cancels word lookup transport when Chrome disconnects', { timeout: 8000 }, async (t) => {
   let browser;
   let cancelled;
   const cancellation = new Promise((resolve) => { cancelled = resolve; });
   const socketDirectory = await openWorker(t, (message, socket) => {
-    assert.deepEqual(captionRequest(message), request);
+    assert.deepEqual(commandRequest(message, 'explain-word'), wordRequest);
     socket.once('end', cancelled);
     browser.host.stdin.end();
   });
   browser = launch(t, socketDirectory);
-  browser.host.stdin.write(frame(request));
+  browser.host.stdin.write(frame(wordRequest));
   const [result] = await Promise.all([browser.result, cancellation]);
   assert.equal(result.length, 0);
 });

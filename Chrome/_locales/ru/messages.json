@@ -6,12 +6,33 @@
     "message": "Для этого видео субтитры недоступны."
   },
   "translationUnavailable": {
-    "message": "Перевод на китайский недоступен."
+    "message": "Перевод субтитров недоступен."
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle не удалось подключиться к MacHelper."
   },
   "modelUnavailable": {
     "message": "Проверьте раздел «Подключение ИИ» в MacHelper."
+  },
+  "moveSubtitles": {
+    "message": "Переместить субтитры"
+  },
+  "closeWordLookup": {
+    "message": "Закрыть объяснение слова"
+  },
+  "wordLookupLoading": {
+    "message": "Ищем значение слова…"
+  },
+  "wordLookupUnavailable": {
+    "message": "Объяснение слова недоступно."
+  },
+  "wordMeaning": {
+    "message": "Значение в этом предложении"
+  },
+  "sentenceMeaning": {
+    "message": "Смысл предложения"
+  },
+  "wordLookupTitle": {
+    "message": "Объяснение слова"
   }
 }

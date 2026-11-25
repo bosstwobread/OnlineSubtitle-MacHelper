@@ -4,7 +4,7 @@ import Foundation
 private let chromeExtensionID = "ndmbmmhddeibbojclldpaabmkcielfmj"
 private let allowedOrigin = "chrome-extension://\(chromeExtensionID)/"
 private let extensionID = "com.nelson007.online-subtitle"
-private let translationCommand = "translate-captions"
+private let supportedLanguages: Set<String> = ["zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "pt", "it"]
 private let maximumFrameBytes = 32 * 1024
 private let maximumBrokerFrameBytes = 128 * 1024
 private let maximumStatusFrameBytes = 1_024
@@ -16,8 +16,15 @@ private enum BridgeError: Error {
     case disconnected, invalid, unavailable
 }
 
-private enum TranslationError: String, Codable {
+private enum CommandError: String, Codable {
     case unavailable, busy, model, translation, invalid
+}
+
+private func isBoundedText(_ text: String, bytes: Int) -> Bool {
+    text.utf8.count <= bytes && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !text.unicodeScalars.contains { scalar in
+            scalar.value == 127 || (scalar.value < 32 && ![9, 10, 13].contains(scalar.value))
+        }
 }
 
 private struct Cue: Codable {
@@ -35,59 +42,106 @@ private struct Cue: Codable {
     }
 
     func isValid(textLimit: Int) -> Bool {
-        (1...9_007_199_254_740_991).contains(id) && !text.contains("\0") &&
-            !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && text.utf8.count <= textLimit
+        (1...9_007_199_254_740_991).contains(id) && isBoundedText(text, bytes: textLimit)
     }
 
     mutating func filterSource(allowed: Bool) {
-        guard allowed, let source, source.utf8.count <= 1_000,
-              !source.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !source.unicodeScalars.contains(where: { scalar in
-                  scalar.value == 127 || (scalar.value < 32 && ![9, 10, 13].contains(scalar.value))
-              }) else { self.source = nil; return }
+        if !allowed || source.map({ isBoundedText($0, bytes: 1_000) }) == false { source = nil }
     }
 }
 
-private struct TranslationRequest: Codable {
-    enum Kind: String, Codable { case translate, translateSentences }
+private struct CommandRequest: Codable {
+    enum Kind: String, Codable {
+        case translate, translateSentences, getSettings, explainWord
+
+        var command: String {
+            switch self {
+            case .translate, .translateSentences: return "translate-captions"
+            case .getSettings: return "caption-settings"
+            case .explainWord: return "explain-word"
+            }
+        }
+    }
 
     let type: Kind
-    let cues: [Cue]
+    let cues: [Cue]?
+    let word: String?
+    let sentence: String?
 
     static func decode(_ data: Data) throws -> Self {
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              Set(object.keys) == ["type", "cues"], let rawCues = object["cues"] as? [[String: Any]],
-              rawCues.allSatisfy({ Set($0.keys) == ["id", "text"] }),
-              let request = try? JSONDecoder().decode(Self.self, from: data),
-              (1...8).contains(request.cues.count), request.cues.allSatisfy({ $0.isValid(textLimit: 1000) }),
-              Set(request.cues.map(\.id)).count == request.cues.count else { throw BridgeError.invalid }
+              let request = try? JSONDecoder().decode(Self.self, from: data) else { throw BridgeError.invalid }
+        let keys = Set(object.keys)
+        switch request.type {
+        case .translate, .translateSentences:
+            guard keys == ["type", "cues"], let rawCues = object["cues"] as? [[String: Any]],
+                  rawCues.allSatisfy({ Set($0.keys) == ["id", "text"] }),
+                  let cues = request.cues, (1...8).contains(cues.count),
+                  cues.allSatisfy({ $0.isValid(textLimit: 1_000) }),
+                  Set(cues.map(\.id)).count == cues.count else { throw BridgeError.invalid }
+        case .getSettings:
+            guard keys == ["type"] else { throw BridgeError.invalid }
+        case .explainWord:
+            guard keys == ["type", "word", "sentence"],
+                  let word = request.word, isBoundedText(word, bytes: 256),
+                  let sentence = request.sentence, isBoundedText(sentence, bytes: 2_000),
+                  sentence.range(of: word, options: .literal) != nil else { throw BridgeError.invalid }
+        }
         return request
     }
 }
 
-private struct TranslationResponse: Codable {
+private struct CommandResponse: Codable {
     let ok: Bool
     private(set) var translations: [Cue]?
-    let error: TranslationError?
+    let error: CommandError?
+    let targetLanguage: String?
+    let revision: String?
+    let meaning: String?
+    let sentenceMeaning: String?
 
-    init(error: TranslationError) {
+    init(error: CommandError) {
         ok = false
         translations = nil
         self.error = error
+        targetLanguage = nil
+        revision = nil
+        meaning = nil
+        sentenceMeaning = nil
     }
 
-    static func decode(_ data: Data, for request: TranslationRequest) throws -> Self {
-        guard var response = try? JSONDecoder().decode(Self.self, from: data) else { throw BridgeError.unavailable }
-        if response.ok {
-            guard response.error == nil, var translations = response.translations,
-                  translations.count == request.cues.count, translations.allSatisfy({ $0.isValid(textLimit: 2000) }),
-                  Set(translations.map(\.id)) == Set(request.cues.map(\.id)) else { throw BridgeError.unavailable }
+    private var hasSettings: Bool {
+        guard let targetLanguage, supportedLanguages.contains(targetLanguage),
+              let revision, revision.utf8.count == 64 else { return false }
+        return revision.utf8.allSatisfy { (48...57).contains($0) || (97...102).contains($0) }
+    }
+
+    static func decode(_ data: Data, for request: CommandRequest) throws -> Self {
+        guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              var response = try? JSONDecoder().decode(Self.self, from: data) else { throw BridgeError.unavailable }
+        let keys = Set(object.keys)
+        guard response.ok else {
+            guard keys == ["ok", "error"], response.error != nil else { throw BridgeError.unavailable }
+            return response
+        }
+        let settingsKeys: Set<String> = ["ok", "targetLanguage", "revision"]
+        switch request.type {
+        case .translate, .translateSentences:
+            guard keys == ["ok", "translations"] || (keys == settingsKeys.union(["translations"]) && response.hasSettings),
+                  let cues = request.cues, var translations = response.translations,
+                  translations.count == cues.count, translations.allSatisfy({ $0.isValid(textLimit: 2_000) }),
+                  translations.map(\.id) == cues.map(\.id) else { throw BridgeError.unavailable }
             for index in translations.indices {
                 translations[index].filterSource(allowed: request.type == .translateSentences)
             }
             response.translations = translations
-        } else {
-            guard response.error != nil, response.translations == nil else { throw BridgeError.unavailable }
+        case .getSettings:
+            guard keys == settingsKeys, response.hasSettings else { throw BridgeError.unavailable }
+        case .explainWord:
+            guard keys == settingsKeys.union(["meaning", "sentenceMeaning"]), response.hasSettings,
+                  let meaning = response.meaning, isBoundedText(meaning, bytes: 2_000),
+                  let sentenceMeaning = response.sentenceMeaning,
+                  isBoundedText(sentenceMeaning, bytes: 2_000) else { throw BridgeError.unavailable }
         }
         return response
     }
@@ -111,7 +165,7 @@ private struct BrokerResponse: Decodable {
     enum Failure: String, Decodable {
         case invalid, unavailable, busy, failed
 
-        var translationError: TranslationError {
+        var commandError: CommandError {
             switch self {
             case .invalid: return .invalid
             case .unavailable: return .unavailable
@@ -125,16 +179,16 @@ private struct BrokerResponse: Decodable {
     let payload: String?
     let error: Failure?
 
-    static func decode(_ data: Data, for request: TranslationRequest) throws -> TranslationResponse {
+    static func decode(_ data: Data, for request: CommandRequest) throws -> CommandResponse {
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let reply = try? JSONDecoder().decode(Self.self, from: data) else { throw BridgeError.unavailable }
         if reply.ok {
             guard Set(object.keys) == ["ok", "payload"], let payload = reply.payload,
                   payload.utf8.count <= maximumFrameBytes else { throw BridgeError.unavailable }
-            return try TranslationResponse.decode(Data(payload.utf8), for: request)
+            return try CommandResponse.decode(Data(payload.utf8), for: request)
         }
         guard Set(object.keys) == ["ok", "error"], let error = reply.error else { throw BridgeError.unavailable }
-        return TranslationResponse(error: error.translationError)
+        return CommandResponse(error: error.commandError)
     }
 }
 
@@ -281,16 +335,17 @@ private func connectToMacHelper(until deadline: DispatchTime) throws -> Int32 {
     }
 }
 
-private func translate(_ request: TranslationRequest) throws -> TranslationResponse {
+private func invoke(_ request: CommandRequest) throws -> CommandResponse {
     let connectionDeadline = DispatchTime.now() + .seconds(3)
     let macHelper = try connectToMacHelper(until: connectionDeadline)
     defer { close(macHelper) }
     let payload = try JSONEncoder().encode(request)
     guard payload.count <= maximumFrameBytes else { throw BridgeError.invalid }
     let invocation = ["type": "invoke", "extension": extensionID, "companion": chromeExtensionID,
-                      "command": translationCommand, "payload": String(decoding: payload, as: UTF8.self)]
+                      "command": request.type.command, "payload": String(decoding: payload, as: UTF8.self)]
     try writeFrame(invocation, to: macHelper, until: connectionDeadline, limit: maximumBrokerFrameBytes)
-    let response = try readFrame(from: macHelper, until: .now() + .seconds(65), monitorBrowser: true,
+    let timeout = request.type == .getSettings ? 5 : 65
+    let response = try readFrame(from: macHelper, until: .now() + .seconds(timeout), monitorBrowser: true,
                                  limit: maximumBrokerFrameBytes)
     return try BrokerResponse.decode(response, for: request)
 }
@@ -319,7 +374,7 @@ private func run() {
     do {
         try setNonblocking(standardInput)
         try setNonblocking(standardOutput)
-        let response: TranslationResponse
+        let response: CommandResponse
         do {
             let bytes = try readFrame(from: standardInput, until: .now() + .seconds(10), monitorBrowser: false)
             if bytes.count <= maximumStatusFrameBytes,
@@ -328,16 +383,16 @@ private func run() {
                 try? watchStatus()
                 return
             }
-            let request = try TranslationRequest.decode(bytes)
+            let request = try CommandRequest.decode(bytes)
             do {
-                response = try translate(request)
+                response = try invoke(request)
             } catch BridgeError.disconnected {
                 return
             } catch {
-                response = TranslationResponse(error: .unavailable)
+                response = CommandResponse(error: .unavailable)
             }
         } catch BridgeError.invalid {
-            response = TranslationResponse(error: .invalid)
+            response = CommandResponse(error: .invalid)
         }
         try writeFrame(response, to: standardOutput, until: .now() + .seconds(2))
     } catch {

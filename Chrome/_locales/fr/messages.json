@@ -6,12 +6,33 @@
     "message": "Sous-titres indisponibles pour cette vidéo."
   },
   "translationUnavailable": {
-    "message": "Traduction chinoise indisponible."
+    "message": "La traduction des sous-titres est indisponible."
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle n’a pas pu se connecter à MacHelper."
   },
   "modelUnavailable": {
     "message": "Vérifiez la rubrique Connexion IA dans MacHelper."
+  },
+  "moveSubtitles": {
+    "message": "Déplacer les sous-titres"
+  },
+  "closeWordLookup": {
+    "message": "Fermer l’explication du mot"
+  },
+  "wordLookupLoading": {
+    "message": "Recherche du mot…"
+  },
+  "wordLookupUnavailable": {
+    "message": "L’explication du mot est indisponible."
+  },
+  "wordMeaning": {
+    "message": "Sens dans cette phrase"
+  },
+  "sentenceMeaning": {
+    "message": "Sens de la phrase"
+  },
+  "wordLookupTitle": {
+    "message": "Explication du mot"
   }
 }

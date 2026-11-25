@@ -10,6 +10,10 @@ const extensionID = 'ndmbmmhddeibbojclldpaabmkcielfmj';
 const sender = { id: extensionID, frameId: 0, origin, tab: { id: 1 }, url: origin + '/watch?v=abcdefghijk' };
 const request = { type: 'watchStatus' };
 const enabled = { type: 'status', enabled: true };
+const settingsRequest = { type: 'getSettings' };
+const wordRequest = { type: 'explainWord', word: 'café', sentence: 'The café is open.' };
+const configuration = { targetLanguage: 'fr', revision: 'ac'.repeat(32) };
+const explanation = { meaning: 'Un établissement de restauration.', sentenceMeaning: 'Le café est ouvert.' };
 
 function event() {
   const listeners = [];
@@ -78,6 +82,80 @@ test('translation bridge passes an explicit invalid sentence response to the cal
   native.onMessage.emit({ ok: false, error: 'invalid' });
   assert.deepEqual(browser.messages, [{ ok: false, error: 'invalid' }]);
   assert.equal(browser.disconnected, true);
+});
+
+test('command bridge forwards settings and word lookups on a single connection each', () => {
+  const background = loadBackground();
+  const longLookup = {...wordRequest, sentence: 'café' + '茶'.repeat(665)};
+  for (const [request, result] of [[settingsRequest, configuration], [longLookup, { ...configuration, ...explanation }]]) {
+    const browser = background.connect(sender, 'online-subtitle-translate');
+    browser.onMessage.emit(request);
+    const native = background.nativePorts.at(-1);
+    assert.deepEqual(native.messages, [request]);
+    native.onMessage.emit({ ok: true, ...result });
+    assert.deepEqual(browser.messages, [{ ok: true, ...result }]);
+    assert.equal(browser.disconnected, true);
+    assert.equal(native.disconnected, true);
+  }
+  assert.equal(background.nativePorts.length, 2);
+});
+
+test('command bridge rejects out-of-scope word, settings and command data before opening any native connection', () => {
+  const background = loadBackground();
+  const invalid = [
+    { ...settingsRequest, command: 'invoke' },
+    { ...wordRequest, model: 'other' },
+    { ...wordRequest, word: 'cafe\u0301' },
+    { ...wordRequest, sentence: '茶'.repeat(666) + 'café' },
+    { ...wordRequest, word: '茶'.repeat(86), sentence: '茶'.repeat(86) },
+    { ...wordRequest, word: '\u0007' },
+    { ...wordRequest, sentence: 'café\u007f' },
+    { type: 'invoke', command: 'caption-settings' },
+  ];
+  for (const input of invalid) {
+    const browser = background.connect(sender, 'online-subtitle-translate');
+    browser.onMessage.emit(input);
+    assert.deepEqual(browser.messages, [{ ok: false, error: 'invalid' }]);
+    assert.equal(browser.disconnected, true);
+  }
+  assert.equal(background.nativePorts.length, 0);
+});
+
+test('command bridge rejects malformed reply metadata or an incomplete word explanation', () => {
+  const response = { ok: true, ...configuration };
+  const translated = [{ id: 1, text: 'Une phrase.' }];
+  const translation = { type: 'translate', cues: [{ id: 1, text: 'A sentence.' }] };
+  const background = loadBackground();
+  for (const [request, reply] of [
+    [settingsRequest, { ...response, targetLanguage: 'en-US' }],
+    [settingsRequest, { ...response, revision: response.revision.toUpperCase() }],
+    [settingsRequest, { ...response, revision: response.revision + '\n' }],
+    [settingsRequest, { ...response, prompt: 'Do not expose prompt data.' }],
+    [wordRequest, { ...response, meaning: explanation.meaning }],
+    [wordRequest, { ...response, ...explanation, meaning: '\u0007bad' }],
+    [wordRequest, { ...response, ...explanation, sentenceMeaning: '茶'.repeat(667) }],
+    [translation, { ok: true, translations: translated, targetLanguage: 'fr' }],
+  ]) {
+    const browser = background.connect(sender, 'online-subtitle-translate');
+    browser.onMessage.emit(request);
+    background.nativePorts.at(-1).onMessage.emit(reply);
+    assert.deepEqual(browser.messages, [{ ok: false, error: 'translation' }]);
+  }
+  const browser = background.connect(sender, 'online-subtitle-translate');
+  browser.onMessage.emit(translation);
+  background.nativePorts.at(-1).onMessage.emit({ ...response, translations: translated });
+  assert.deepEqual(browser.messages, [{ ...response, translations: translated }]);
+});
+
+test('command bridge cancels a word lookup if its content connection closes', () => {
+  const background = loadBackground();
+  const browser = background.connect(sender, 'online-subtitle-translate');
+  browser.onMessage.emit(wordRequest);
+  const [native] = background.nativePorts;
+  browser.onDisconnect.emit();
+  assert.equal(native.disconnected, true);
+  native.onMessage.emit({ ok: true, ...configuration, ...explanation });
+  assert.deepEqual(browser.messages, []);
 });
 
 test('status bridge accepts only the current extension on a top-frame YouTube watch page', () => {

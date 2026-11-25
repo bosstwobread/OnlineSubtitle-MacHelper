@@ -6,12 +6,33 @@
     "message": "Legendas indisponíveis neste vídeo."
   },
   "translationUnavailable": {
-    "message": "Tradução para chinês indisponível."
+    "message": "A tradução das legendas está indisponível."
   },
   "macHelperUnavailable": {
     "message": "O OnlineSubtitle não conseguiu se conectar ao MacHelper."
   },
   "modelUnavailable": {
     "message": "Verifique a opção Ligação de IA no MacHelper."
+  },
+  "moveSubtitles": {
+    "message": "Mover legendas"
+  },
+  "closeWordLookup": {
+    "message": "Fechar a explicação da palavra"
+  },
+  "wordLookupLoading": {
+    "message": "Buscando a palavra…"
+  },
+  "wordLookupUnavailable": {
+    "message": "A explicação da palavra está indisponível."
+  },
+  "wordMeaning": {
+    "message": "Significado nesta frase"
+  },
+  "sentenceMeaning": {
+    "message": "Significado da frase"
+  },
+  "wordLookupTitle": {
+    "message": "Explicação da palavra"
   }
 }

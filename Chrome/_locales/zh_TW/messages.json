@@ -6,12 +6,33 @@
     "message": "此影片暫無可用字幕。"
   },
   "translationUnavailable": {
-    "message": "目前無法提供中文字幕。"
+    "message": "暫時無法翻譯字幕。"
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle 無法連線至 MacHelper。"
   },
   "modelUnavailable": {
     "message": "請檢查 MacHelper 中的「AI 連線」。"
+  },
+  "moveSubtitles": {
+    "message": "移動字幕"
+  },
+  "closeWordLookup": {
+    "message": "關閉單字釋義"
+  },
+  "wordLookupLoading": {
+    "message": "正在查詢單字…"
+  },
+  "wordLookupUnavailable": {
+    "message": "暫時無法解釋這個單字。"
+  },
+  "wordMeaning": {
+    "message": "在這句話中的含義"
+  },
+  "sentenceMeaning": {
+    "message": "整句含義"
+  },
+  "wordLookupTitle": {
+    "message": "單字釋義"
   }
 }

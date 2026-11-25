@@ -6,12 +6,33 @@
     "message": "이 동영상에는 사용할 수 있는 자막이 없습니다."
   },
   "translationUnavailable": {
-    "message": "중국어 번역을 사용할 수 없습니다."
+    "message": "자막 번역을 사용할 수 없습니다."
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle이 MacHelper에 연결하지 못했습니다."
   },
   "modelUnavailable": {
     "message": "MacHelper의 ‘AI 연결’을 확인하세요."
+  },
+  "moveSubtitles": {
+    "message": "자막 이동"
+  },
+  "closeWordLookup": {
+    "message": "단어 설명 닫기"
+  },
+  "wordLookupLoading": {
+    "message": "단어를 찾는 중…"
+  },
+  "wordLookupUnavailable": {
+    "message": "단어 설명을 사용할 수 없습니다."
+  },
+  "wordMeaning": {
+    "message": "이 문장에서의 뜻"
+  },
+  "sentenceMeaning": {
+    "message": "문장 전체의 뜻"
+  },
+  "wordLookupTitle": {
+    "message": "단어 설명"
   }
 }

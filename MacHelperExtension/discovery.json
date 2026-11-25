@@ -1,8 +1,10 @@
 {
   "schemaVersion": 1,
-  "description": "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.",
+  "description": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
   "capabilities": [
-    "Show source captions and Simplified Chinese together over the YouTube player."
+    "Show original captions with translations in the chosen language over the YouTube player.",
+    "Drag the bilingual subtitles vertically.",
+    "Click a subtitle word to see its meaning in context and the meaning of the whole sentence."
   ],
   "exampleQueries": [
     "Watch YouTube in English with Chinese subtitles."
@@ -14,7 +16,9 @@
     "bilingual",
     "Chinese",
     "English",
-    "MacHelper"
+    "MacHelper",
+    "vocabulary",
+    "word lookup"
   ],
   "limitations": [
     "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection."
@@ -25,82 +29,108 @@
   ],
   "translations": {
     "en": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "Show source captions and Simplified Chinese together over the YouTube player.",
       "Watch YouTube in English with Chinese subtitles.": "Watch YouTube in English with Chinese subtitles.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "Show original captions with translations in the chosen language over the YouTube player.",
+      "Drag the bilingual subtitles vertically.": "Drag the bilingual subtitles vertically.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Click a subtitle word to see its meaning in context and the meaning of the whole sentence."
     },
     "zh-Hans": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "使用 MacHelper 中配置的 AI 连接，将 YouTube 字幕翻译为简体中文。",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "在 YouTube 播放器上同时显示原文字幕和简体中文字幕。",
       "Watch YouTube in English with Chinese subtitles.": "看 YouTube 英语视频时显示中文字幕。",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "需要观看者可用的 YouTube 字幕、OnlineSubtitle Chrome 扩展和可用的 MacHelper AI 连接。"
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "需要观看者可用的 YouTube 字幕、OnlineSubtitle Chrome 扩展和可用的 MacHelper AI 连接。",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 连接翻译 YouTube 字幕，并解释点击的词语。",
+      "Show original captions with translations in the chosen language over the YouTube player.": "在 YouTube 播放器上同时显示原文字幕和所选语言的译文。",
+      "Drag the bilingual subtitles vertically.": "上下拖动双语字幕。",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "点击字幕中的词语，查看它在句中的含义以及整句话的意思。"
     },
     "zh-Hant": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "使用 MacHelper 中設定的 AI 連線，將 YouTube 字幕翻譯為簡體中文。",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "在 YouTube 播放器上同時顯示原文字幕和簡體中文字幕。",
       "Watch YouTube in English with Chinese subtitles.": "觀看 YouTube 英語影片時顯示中文字幕。",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "需要觀眾可使用的 YouTube 字幕、OnlineSubtitle Chrome 擴充功能和可用的 MacHelper AI 連線。"
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "需要觀眾可使用的 YouTube 字幕、OnlineSubtitle Chrome 擴充功能和可用的 MacHelper AI 連線。",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 連線翻譯 YouTube 字幕，並解釋點選的詞語。",
+      "Show original captions with translations in the chosen language over the YouTube player.": "在 YouTube 播放器上同時顯示原文字幕和所選語言的譯文。",
+      "Drag the bilingual subtitles vertically.": "上下拖曳雙語字幕。",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "點選字幕中的詞語，查看它在句中的含義以及整句話的意思。"
     },
     "es": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduce los subtítulos de YouTube al chino simplificado con la conexión de IA configurada en MacHelper.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "Muestra los subtítulos originales y en chino simplificado sobre el reproductor de YouTube.",
       "Watch YouTube in English with Chinese subtitles.": "Ver vídeos de YouTube en inglés con subtítulos en chino.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Requiere subtítulos de YouTube disponibles para el usuario, la extensión OnlineSubtitle para Chrome y una conexión de IA activa en MacHelper."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Requiere subtítulos de YouTube disponibles para el usuario, la extensión OnlineSubtitle para Chrome y una conexión de IA activa en MacHelper.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce los subtítulos de YouTube y explica las palabras seleccionadas mediante la conexión de IA de MacHelper.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "Muestra los subtítulos originales y su traducción al idioma elegido en el reproductor de YouTube.",
+      "Drag the bilingual subtitles vertically.": "Arrastra los subtítulos bilingües en sentido vertical.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Haz clic en una palabra de los subtítulos para ver su significado en contexto y el de la frase completa."
     },
     "fr": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduit les sous-titres YouTube en chinois simplifié à l’aide de la connexion IA configurée dans MacHelper.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "Affiche les sous-titres d’origine et en chinois simplifié sur le lecteur YouTube.",
       "Watch YouTube in English with Chinese subtitles.": "Regarder des vidéos YouTube en anglais avec des sous-titres chinois.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Nécessite des sous-titres YouTube accessibles au spectateur, l’extension Chrome OnlineSubtitle et une connexion IA fonctionnelle dans MacHelper."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Nécessite des sous-titres YouTube accessibles au spectateur, l’extension Chrome OnlineSubtitle et une connexion IA fonctionnelle dans MacHelper.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduit les sous-titres YouTube et explique les mots sélectionnés avec la connexion IA de MacHelper.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "Affiche le texte original et sa traduction dans la langue choisie sur le lecteur YouTube.",
+      "Drag the bilingual subtitles vertically.": "Déplacez les sous-titres bilingues verticalement en les faisant glisser.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Cliquez sur un mot des sous-titres pour voir son sens en contexte et celui de la phrase entière."
     },
     "de": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Übersetzt YouTube-Untertitel mit der in MacHelper eingerichteten KI-Verbindung ins vereinfachte Chinesisch.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "Zeigt Originaltext und vereinfachtes Chinesisch gemeinsam über dem YouTube-Player an.",
       "Watch YouTube in English with Chinese subtitles.": "Englische YouTube-Videos mit chinesischen Untertiteln ansehen.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Erfordert für Zuschauer verfügbare YouTube-Untertitel, die Chrome-Erweiterung OnlineSubtitle und eine funktionierende KI-Verbindung in MacHelper."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Erfordert für Zuschauer verfügbare YouTube-Untertitel, die Chrome-Erweiterung OnlineSubtitle und eine funktionierende KI-Verbindung in MacHelper.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Übersetzt YouTube-Untertitel und erklärt angeklickte Wörter mit der KI-Verbindung von MacHelper.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "Zeigt die Originaluntertitel und die Übersetzung in der gewählten Sprache im YouTube-Player an.",
+      "Drag the bilingual subtitles vertically.": "Verschiebe die zweisprachigen Untertitel nach oben oder unten.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Klicke auf ein Wort im Untertitel, um seine Bedeutung im Kontext und die Bedeutung des ganzen Satzes zu sehen."
     },
     "ja": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper で設定した AI 接続を使い、YouTube の字幕を簡体字中国語に翻訳します。",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "YouTube プレーヤー上に原文と簡体字中国語の字幕を同時に表示します。",
       "Watch YouTube in English with Chinese subtitles.": "YouTube の英語動画を中国語字幕で視聴したい。",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "視聴可能な YouTube 字幕、Chrome 拡張機能 OnlineSubtitle、および利用可能な MacHelper の AI 接続が必要です。"
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "視聴可能な YouTube 字幕、Chrome 拡張機能 OnlineSubtitle、および利用可能な MacHelper の AI 接続が必要です。",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper の AI 接続を使って YouTube の字幕を翻訳し、クリックした単語の意味を説明します。",
+      "Show original captions with translations in the chosen language over the YouTube player.": "YouTube プレーヤーに原文の字幕と選択した言語の翻訳を同時に表示します。",
+      "Drag the bilingual subtitles vertically.": "二言語字幕を上下にドラッグできます。",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "字幕の単語をクリックすると、その文脈での単語の意味と文全体の意味を確認できます。"
     },
     "ko": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper에 설정된 AI 연결로 YouTube 자막을 중국어 간체로 번역합니다.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "YouTube 플레이어에 원본 자막과 중국어 간체 자막을 함께 표시합니다.",
       "Watch YouTube in English with Chinese subtitles.": "영어 YouTube 영상을 중국어 자막과 함께 보기.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "시청자가 이용할 수 있는 YouTube 자막, OnlineSubtitle Chrome 확장 프로그램, 정상 작동하는 MacHelper AI 연결이 필요합니다."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "시청자가 이용할 수 있는 YouTube 자막, OnlineSubtitle Chrome 확장 프로그램, 정상 작동하는 MacHelper AI 연결이 필요합니다.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper의 AI 연결로 YouTube 자막을 번역하고 클릭한 단어의 뜻을 설명합니다.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "YouTube 플레이어에서 원본 자막과 선택한 언어의 번역을 함께 표시합니다.",
+      "Drag the bilingual subtitles vertically.": "이중 언어 자막을 위아래로 드래그할 수 있습니다.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "자막의 단어를 클릭하면 문맥 속 단어의 뜻과 문장 전체의 의미를 볼 수 있습니다."
     },
     "pt": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduz legendas do YouTube para chinês simplificado com a ligação de IA configurada no MacHelper.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "Exibe legendas originais e em chinês simplificado juntas sobre o player do YouTube.",
       "Watch YouTube in English with Chinese subtitles.": "Assistir a vídeos do YouTube em inglês com legendas em chinês.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Requer legendas do YouTube disponíveis para o espectador, a extensão OnlineSubtitle para Chrome e uma ligação de IA funcional no MacHelper."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Requer legendas do YouTube disponíveis para o espectador, a extensão OnlineSubtitle para Chrome e uma ligação de IA funcional no MacHelper.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduz legendas do YouTube e explica as palavras selecionadas usando a conexão de IA do MacHelper.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "Exibe as legendas originais e a tradução no idioma escolhido sobre o player do YouTube.",
+      "Drag the bilingual subtitles vertically.": "Arraste as legendas bilíngues para cima ou para baixo.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Clique em uma palavra da legenda para ver o significado no contexto e o sentido da frase inteira."
     },
     "ar": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "يترجم ترجمات YouTube النصية إلى الصينية المبسطة باستخدام اتصال الذكاء الاصطناعي المضبوط في MacHelper.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "يعرض النص الأصلي والترجمة الصينية المبسطة معًا فوق مشغّل YouTube.",
       "Watch YouTube in English with Chinese subtitles.": "مشاهدة فيديوهات YouTube بالإنجليزية مع ترجمة صينية.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "يتطلب ترجمات YouTube النصية المتاحة للمشاهد، وإضافة OnlineSubtitle لمتصفح Chrome، واتصال ذكاء اصطناعي يعمل في MacHelper."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "يتطلب ترجمات YouTube النصية المتاحة للمشاهد، وإضافة OnlineSubtitle لمتصفح Chrome، واتصال ذكاء اصطناعي يعمل في MacHelper.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "يترجم ترجمات YouTube النصية ويشرح الكلمات التي تنقر عليها باستخدام اتصال الذكاء الاصطناعي في MacHelper.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "يعرض النص الأصلي وترجمته باللغة المختارة معًا على مشغل YouTube.",
+      "Drag the bilingual subtitles vertically.": "اسحب الترجمة ثنائية اللغة إلى أعلى أو أسفل.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "انقر على كلمة في الترجمة لعرض معناها في السياق ومعنى الجملة كاملة."
     },
     "hi": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper में कॉन्फ़िगर किए गए AI कनेक्शन से YouTube उपशीर्षकों का सरलीकृत चीनी में अनुवाद करें।",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "YouTube प्लेयर पर मूल उपशीर्षक और सरल चीनी साथ दिखाएँ।",
       "Watch YouTube in English with Chinese subtitles.": "अंग्रेज़ी YouTube वीडियो चीनी उपशीर्षकों के साथ देखें।",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "दर्शक के लिए उपलब्ध YouTube उपशीर्षक, OnlineSubtitle Chrome एक्सटेंशन और MacHelper में चालू AI कनेक्शन ज़रूरी हैं।"
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "दर्शक के लिए उपलब्ध YouTube उपशीर्षक, OnlineSubtitle Chrome एक्सटेंशन और MacHelper में चालू AI कनेक्शन ज़रूरी हैं।",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper के AI कनेक्शन से YouTube उपशीर्षकों का अनुवाद करें और क्लिक किए गए शब्दों का अर्थ जानें।",
+      "Show original captions with translations in the chosen language over the YouTube player.": "YouTube प्लेयर पर मूल उपशीर्षक और चुनी हुई भाषा में उनका अनुवाद साथ दिखाएँ।",
+      "Drag the bilingual subtitles vertically.": "द्विभाषी उपशीर्षकों को ऊपर या नीचे खींचें।",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "संदर्भ में शब्द का अर्थ और पूरे वाक्य का मतलब देखने के लिए उपशीर्षक में किसी शब्द पर क्लिक करें।"
     },
     "ru": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Переводит субтитры YouTube на упрощённый китайский через подключение ИИ, настроенное в MacHelper.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "Показывает исходные и китайские субтитры вместе поверх проигрывателя YouTube.",
       "Watch YouTube in English with Chinese subtitles.": "Смотреть YouTube на английском с китайскими субтитрами.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Нужны доступные зрителю субтитры YouTube, расширение OnlineSubtitle для Chrome и работающее подключение ИИ в MacHelper."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Нужны доступные зрителю субтитры YouTube, расширение OnlineSubtitle для Chrome и работающее подключение ИИ в MacHelper.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Переводит субтитры YouTube и объясняет выбранные слова через подключение ИИ в MacHelper.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "Показывает оригинальные субтитры и перевод на выбранный язык поверх проигрывателя YouTube.",
+      "Drag the bilingual subtitles vertically.": "Перетаскивайте двуязычные субтитры вверх или вниз.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Нажмите на слово в субтитрах, чтобы узнать его значение в контексте и смысл всего предложения."
     },
     "it": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduce i sottotitoli di YouTube in cinese semplificato tramite la connessione IA configurata in MacHelper.",
-      "Show source captions and Simplified Chinese together over the YouTube player.": "Mostra insieme i sottotitoli originali e in cinese semplificato sul player di YouTube.",
       "Watch YouTube in English with Chinese subtitles.": "Guardare video di YouTube in inglese con sottotitoli in cinese.",
-      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Richiede sottotitoli YouTube disponibili per lo spettatore, l’estensione OnlineSubtitle per Chrome e una connessione IA funzionante in MacHelper."
+      "Requires captions available to the YouTube viewer, the OnlineSubtitle Chrome companion, and a working MacHelper AI connection.": "Richiede sottotitoli YouTube disponibili per lo spettatore, l’estensione OnlineSubtitle per Chrome e una connessione IA funzionante in MacHelper.",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce i sottotitoli di YouTube e spiega le parole selezionate con la connessione IA di MacHelper.",
+      "Show original captions with translations in the chosen language over the YouTube player.": "Mostra i sottotitoli originali e la traduzione nella lingua scelta sul player di YouTube.",
+      "Drag the bilingual subtitles vertically.": "Trascina i sottotitoli bilingui verso l’alto o verso il basso.",
+      "Click a subtitle word to see its meaning in context and the meaning of the whole sentence.": "Fai clic su una parola nei sottotitoli per vederne il significato nel contesto e quello dell’intera frase."
     }
   }
 }

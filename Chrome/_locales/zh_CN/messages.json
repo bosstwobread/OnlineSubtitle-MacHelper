@@ -6,12 +6,33 @@
     "message": "此视频暂无可用字幕。"
   },
   "translationUnavailable": {
-    "message": "暂时无法提供中文字幕。"
+    "message": "暂时无法翻译字幕。"
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle 无法连接到 MacHelper。"
   },
   "modelUnavailable": {
     "message": "请检查 MacHelper 中的「AI 连接」。"
+  },
+  "moveSubtitles": {
+    "message": "移动字幕"
+  },
+  "closeWordLookup": {
+    "message": "关闭单词释义"
+  },
+  "wordLookupLoading": {
+    "message": "正在查询单词…"
+  },
+  "wordLookupUnavailable": {
+    "message": "暂时无法解释该单词。"
+  },
+  "wordMeaning": {
+    "message": "在这句话中的含义"
+  },
+  "sentenceMeaning": {
+    "message": "整句含义"
+  },
+  "wordLookupTitle": {
+    "message": "单词释义"
   }
 }

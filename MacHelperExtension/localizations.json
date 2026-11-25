@@ -2,56 +2,147 @@
   "schemaVersion": 1,
   "translations": {
     "en": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.",
-      "OnlineSubtitle status": "OnlineSubtitle status"
+      "OnlineSubtitle status": "OnlineSubtitle status",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
+      "Caption translation prompt": "Caption translation prompt",
+      "Caption correction and translation prompt": "Caption correction and translation prompt",
+      "Translate captions": "Translate captions",
+      "Read caption preferences": "Read caption preferences",
+      "Explain clicked word": "Explain clicked word",
+      "Translate to": "Translate to",
+      "Word lookup prompt": "Word lookup prompt"
     },
     "zh-Hans": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "使用 MacHelper 中配置的 AI 连接，将 YouTube 字幕翻译为简体中文。",
-      "OnlineSubtitle status": "OnlineSubtitle 状态"
+      "OnlineSubtitle status": "OnlineSubtitle 状态",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 连接翻译 YouTube 字幕，并解释点击的词语。",
+      "Caption translation prompt": "字幕翻译提示词",
+      "Caption correction and translation prompt": "字幕纠错和翻译提示词",
+      "Translate captions": "翻译字幕",
+      "Read caption preferences": "读取字幕偏好设置",
+      "Explain clicked word": "解释点击的词语",
+      "Translate to": "翻译为",
+      "Word lookup prompt": "单词释义提示词"
     },
     "zh-Hant": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "使用 MacHelper 中設定的 AI 連線，將 YouTube 字幕翻譯為簡體中文。",
-      "OnlineSubtitle status": "OnlineSubtitle 狀態"
+      "OnlineSubtitle status": "OnlineSubtitle 狀態",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 連線翻譯 YouTube 字幕，並解釋點選的詞語。",
+      "Caption translation prompt": "字幕翻譯提示詞",
+      "Caption correction and translation prompt": "字幕校正與翻譯提示詞",
+      "Translate captions": "翻譯字幕",
+      "Read caption preferences": "讀取字幕偏好設定",
+      "Explain clicked word": "解釋點選的詞語",
+      "Translate to": "翻譯為",
+      "Word lookup prompt": "單字釋義提示詞"
     },
     "es": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduce los subtítulos de YouTube al chino simplificado con la conexión de IA configurada en MacHelper.",
-      "OnlineSubtitle status": "Estado de OnlineSubtitle"
+      "OnlineSubtitle status": "Estado de OnlineSubtitle",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce los subtítulos de YouTube y explica las palabras seleccionadas mediante la conexión de IA de MacHelper.",
+      "Caption translation prompt": "Instrucciones de traducción de subtítulos",
+      "Caption correction and translation prompt": "Instrucciones de corrección y traducción de subtítulos",
+      "Translate captions": "Traducir subtítulos",
+      "Read caption preferences": "Leer las preferencias de subtítulos",
+      "Explain clicked word": "Explicar la palabra seleccionada",
+      "Translate to": "Traducir a",
+      "Word lookup prompt": "Instrucciones de consulta de palabras"
     },
     "fr": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduit les sous-titres YouTube en chinois simplifié à l’aide de la connexion IA configurée dans MacHelper.",
-      "OnlineSubtitle status": "État d’OnlineSubtitle"
+      "OnlineSubtitle status": "État d’OnlineSubtitle",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduit les sous-titres YouTube et explique les mots sélectionnés avec la connexion IA de MacHelper.",
+      "Caption translation prompt": "Consigne de traduction des sous-titres",
+      "Caption correction and translation prompt": "Consigne de correction et de traduction des sous-titres",
+      "Translate captions": "Traduire les sous-titres",
+      "Read caption preferences": "Lire les préférences des sous-titres",
+      "Explain clicked word": "Expliquer le mot sélectionné",
+      "Translate to": "Traduire en",
+      "Word lookup prompt": "Consigne de recherche de mots"
     },
     "de": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Übersetzt YouTube-Untertitel mit der in MacHelper eingerichteten KI-Verbindung ins vereinfachte Chinesisch.",
-      "OnlineSubtitle status": "OnlineSubtitle-Status"
+      "OnlineSubtitle status": "OnlineSubtitle-Status",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Übersetzt YouTube-Untertitel und erklärt angeklickte Wörter mit der KI-Verbindung von MacHelper.",
+      "Caption translation prompt": "Anweisung zur Untertitelübersetzung",
+      "Caption correction and translation prompt": "Anweisung zur Korrektur und Übersetzung von Untertiteln",
+      "Translate captions": "Untertitel übersetzen",
+      "Read caption preferences": "Untertiteleinstellungen lesen",
+      "Explain clicked word": "Angeklicktes Wort erklären",
+      "Translate to": "Übersetzen in",
+      "Word lookup prompt": "Anweisung für Wortbedeutungen"
     },
     "ja": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper で設定した AI 接続を使い、YouTube の字幕を簡体字中国語に翻訳します。",
-      "OnlineSubtitle status": "OnlineSubtitle の状態"
+      "OnlineSubtitle status": "OnlineSubtitle の状態",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper の AI 接続を使って YouTube の字幕を翻訳し、クリックした単語の意味を説明します。",
+      "Caption translation prompt": "字幕翻訳プロンプト",
+      "Caption correction and translation prompt": "字幕校正と翻訳のプロンプト",
+      "Translate captions": "字幕を翻訳",
+      "Read caption preferences": "字幕設定を読み取る",
+      "Explain clicked word": "クリックした単語を解説",
+      "Translate to": "翻訳先",
+      "Word lookup prompt": "単語の意味を調べるプロンプト"
     },
     "ko": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper에 설정된 AI 연결로 YouTube 자막을 중국어 간체로 번역합니다.",
-      "OnlineSubtitle status": "OnlineSubtitle 상태"
+      "OnlineSubtitle status": "OnlineSubtitle 상태",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper의 AI 연결로 YouTube 자막을 번역하고 클릭한 단어의 뜻을 설명합니다.",
+      "Caption translation prompt": "자막 번역 프롬프트",
+      "Caption correction and translation prompt": "자막 교정 및 번역 프롬프트",
+      "Translate captions": "자막 번역",
+      "Read caption preferences": "자막 설정 읽기",
+      "Explain clicked word": "클릭한 단어 설명",
+      "Translate to": "번역 언어",
+      "Word lookup prompt": "단어 뜻 프롬프트"
     },
     "pt": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduz legendas do YouTube para chinês simplificado com a ligação de IA configurada no MacHelper.",
-      "OnlineSubtitle status": "Status do OnlineSubtitle"
+      "OnlineSubtitle status": "Status do OnlineSubtitle",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduz legendas do YouTube e explica as palavras selecionadas usando a conexão de IA do MacHelper.",
+      "Caption translation prompt": "Instrução de tradução de legendas",
+      "Caption correction and translation prompt": "Instrução de correção e tradução de legendas",
+      "Translate captions": "Traduzir legendas",
+      "Read caption preferences": "Ler as preferências de legendas",
+      "Explain clicked word": "Explicar a palavra selecionada",
+      "Translate to": "Traduzir para",
+      "Word lookup prompt": "Instrução de consulta de palavras"
     },
     "ar": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "يترجم ترجمات YouTube النصية إلى الصينية المبسطة باستخدام اتصال الذكاء الاصطناعي المضبوط في MacHelper.",
-      "OnlineSubtitle status": "حالة OnlineSubtitle"
+      "OnlineSubtitle status": "حالة OnlineSubtitle",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "يترجم ترجمات YouTube النصية ويشرح الكلمات التي تنقر عليها باستخدام اتصال الذكاء الاصطناعي في MacHelper.",
+      "Caption translation prompt": "تعليمات ترجمة النصوص المصاحبة للفيديو",
+      "Caption correction and translation prompt": "تعليمات تصحيح النصوص المصاحبة للفيديو وترجمتها",
+      "Translate captions": "ترجمة النصوص المصاحبة للفيديو",
+      "Read caption preferences": "قراءة تفضيلات النصوص المصاحبة للفيديو",
+      "Explain clicked word": "شرح الكلمة التي نقرت عليها",
+      "Translate to": "الترجمة إلى",
+      "Word lookup prompt": "تعليمات البحث عن معنى الكلمة"
     },
     "hi": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "MacHelper में कॉन्फ़िगर किए गए AI कनेक्शन से YouTube उपशीर्षकों का सरलीकृत चीनी में अनुवाद करें।",
-      "OnlineSubtitle status": "OnlineSubtitle की स्थिति"
+      "OnlineSubtitle status": "OnlineSubtitle की स्थिति",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper के AI कनेक्शन से YouTube उपशीर्षकों का अनुवाद करें और क्लिक किए गए शब्दों का अर्थ जानें।",
+      "Caption translation prompt": "उपशीर्षक अनुवाद का प्रॉम्प्ट",
+      "Caption correction and translation prompt": "उपशीर्षक सुधार और अनुवाद का प्रॉम्प्ट",
+      "Translate captions": "उपशीर्षकों का अनुवाद करें",
+      "Read caption preferences": "उपशीर्षकों की प्राथमिकताएँ पढ़ें",
+      "Explain clicked word": "क्लिक किए गए शब्द को समझाएँ",
+      "Translate to": "इस भाषा में अनुवाद करें",
+      "Word lookup prompt": "शब्द के अर्थ का प्रॉम्प्ट"
     },
     "ru": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Переводит субтитры YouTube на упрощённый китайский через подключение ИИ, настроенное в MacHelper.",
-      "OnlineSubtitle status": "Статус OnlineSubtitle"
+      "OnlineSubtitle status": "Статус OnlineSubtitle",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Переводит субтитры YouTube и объясняет выбранные слова через подключение ИИ в MacHelper.",
+      "Caption translation prompt": "Инструкция для перевода субтитров",
+      "Caption correction and translation prompt": "Инструкция для исправления и перевода субтитров",
+      "Translate captions": "Перевести субтитры",
+      "Read caption preferences": "Прочитать настройки субтитров",
+      "Explain clicked word": "Объяснить выбранное слово",
+      "Translate to": "Язык перевода",
+      "Word lookup prompt": "Инструкция для значения слова"
     },
     "it": {
-      "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.": "Traduce i sottotitoli di YouTube in cinese semplificato tramite la connessione IA configurata in MacHelper.",
-      "OnlineSubtitle status": "Stato di OnlineSubtitle"
+      "OnlineSubtitle status": "Stato di OnlineSubtitle",
+      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce i sottotitoli di YouTube e spiega le parole selezionate con la connessione IA di MacHelper.",
+      "Caption translation prompt": "Istruzioni per la traduzione dei sottotitoli",
+      "Caption correction and translation prompt": "Istruzioni per la correzione e la traduzione dei sottotitoli",
+      "Translate captions": "Traduci i sottotitoli",
+      "Read caption preferences": "Leggi le preferenze dei sottotitoli",
+      "Explain clicked word": "Spiega la parola selezionata",
+      "Translate to": "Traduci in",
+      "Word lookup prompt": "Istruzione per il significato delle parole"
     }
   }
 }

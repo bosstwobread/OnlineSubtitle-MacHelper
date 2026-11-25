@@ -3,14 +3,17 @@
   "runtime": "native",
   "identifier": "com.nelson007.online-subtitle",
   "displayName": "OnlineSubtitle",
-  "version": "0.3.0",
-  "summary": "Translate YouTube captions into Simplified Chinese using the AI connection configured in MacHelper.",
+  "version": "0.4.0",
+  "summary": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
   "entryPoint": "Main.swift",
   "permissions": ["native.execute", "ai.transform", "companion.message"],
   "companion": { "chromeExtensionID": "ndmbmmhddeibbojclldpaabmkcielfmj" },
   "commands": [
     { "identifier": "status", "title": "OnlineSubtitle status", "trigger": "manual" },
-    { "identifier": "translate-captions", "title": "Translate captions", "trigger": "companion" }
+    { "identifier": "translate-captions", "title": "Translate captions", "trigger": "companion" },
+    { "identifier": "caption-settings", "title": "Read caption preferences", "trigger": "companion" },
+    { "identifier": "explain-word", "title": "Explain clicked word", "trigger": "companion" }
   ],
+  "settingsSchema": "settings.schema.json",
   "localizations": "localizations.json"
 }

@@ -6,12 +6,33 @@
     "message": "الترجمة النصية غير متاحة لهذا الفيديو."
   },
   "translationUnavailable": {
-    "message": "الترجمة الصينية غير متاحة."
+    "message": "ترجمة الترجمة النصية غير متاحة."
   },
   "macHelperUnavailable": {
     "message": "تعذّر على OnlineSubtitle الاتصال بـ MacHelper."
   },
   "modelUnavailable": {
     "message": "تحقّق من خيار «اتصال الذكاء الاصطناعي» في MacHelper."
+  },
+  "moveSubtitles": {
+    "message": "حرّك الترجمة النصية"
+  },
+  "closeWordLookup": {
+    "message": "أغلق شرح الكلمة"
+  },
+  "wordLookupLoading": {
+    "message": "جارٍ البحث عن الكلمة…"
+  },
+  "wordLookupUnavailable": {
+    "message": "شرح الكلمة غير متاح."
+  },
+  "wordMeaning": {
+    "message": "المعنى في هذه الجملة"
+  },
+  "sentenceMeaning": {
+    "message": "معنى الجملة"
+  },
+  "wordLookupTitle": {
+    "message": "شرح الكلمة"
   }
 }

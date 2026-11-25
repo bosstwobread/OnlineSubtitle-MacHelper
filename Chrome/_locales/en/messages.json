@@ -6,12 +6,33 @@
     "message": "Captions unavailable for this video."
   },
   "translationUnavailable": {
-    "message": "Chinese translation unavailable."
+    "message": "Subtitle translation unavailable."
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle could not connect to MacHelper."
   },
   "modelUnavailable": {
     "message": "Check AI Connection in MacHelper."
+  },
+  "moveSubtitles": {
+    "message": "Move subtitles"
+  },
+  "closeWordLookup": {
+    "message": "Close word explanation"
+  },
+  "wordLookupLoading": {
+    "message": "Looking up the word…"
+  },
+  "wordLookupUnavailable": {
+    "message": "Word explanation unavailable."
+  },
+  "wordMeaning": {
+    "message": "Meaning in this sentence"
+  },
+  "sentenceMeaning": {
+    "message": "Sentence meaning"
+  },
+  "wordLookupTitle": {
+    "message": "Word explanation"
   }
 }

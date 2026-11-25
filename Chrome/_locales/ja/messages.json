@@ -6,12 +6,33 @@
     "message": "この動画の字幕は利用できません。"
   },
   "translationUnavailable": {
-    "message": "中国語の翻訳は利用できません。"
+    "message": "字幕の翻訳を利用できません。"
   },
   "macHelperUnavailable": {
     "message": "OnlineSubtitle は MacHelper に接続できませんでした。"
   },
   "modelUnavailable": {
     "message": "MacHelper の「AI 接続」を確認してください。"
+  },
+  "moveSubtitles": {
+    "message": "字幕を移動"
+  },
+  "closeWordLookup": {
+    "message": "単語の解説を閉じる"
+  },
+  "wordLookupLoading": {
+    "message": "単語を調べています…"
+  },
+  "wordLookupUnavailable": {
+    "message": "単語の解説を利用できません。"
+  },
+  "wordMeaning": {
+    "message": "この文での意味"
+  },
+  "sentenceMeaning": {
+    "message": "文全体の意味"
+  },
+  "wordLookupTitle": {
+    "message": "単語の解説"
   }
 }

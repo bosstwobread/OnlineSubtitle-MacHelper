@@ -19,7 +19,7 @@
   position: absolute;
   inset-inline: 0;
   margin-inline: auto;
-  inset-block-end: clamp(66px, 10.5%, 96px);
+  inset-block-end: var(--online-subtitle-bottom, clamp(66px, 10.5%, 96px));
   inline-size: max-content;
   max-inline-size: min(88%, 52em);
   box-sizing: border-box;
@@ -45,10 +45,159 @@
   font-weight: 600;
 }
 
+.online-subtitle-word,
+.online-subtitle-grab,
+.online-subtitle-lookup-close {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-shadow: inherit;
+  pointer-events: auto;
+}
+
+.online-subtitle-word {
+  display: inline;
+  max-inline-size: 100%;
+  border-radius: 0.14em;
+  overflow-wrap: inherit;
+  cursor: pointer;
+}
+
+.online-subtitle-word-group {
+  white-space: nowrap;
+}
+
+.online-subtitle-word:hover,
+.online-subtitle-word:focus-visible {
+  background: rgb(255 255 255 / 17%);
+  text-decoration: underline;
+  text-underline-offset: 0.13em;
+}
+
+.online-subtitle-grab {
+  position: absolute;
+  inset-block-start: -18px;
+  inset-inline: 0;
+  display: grid;
+  place-items: center;
+  inline-size: 74px;
+  min-block-size: 26px;
+  margin-inline: auto;
+  border-radius: 8px;
+  background: rgb(20 21 24 / 86%);
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.online-subtitle-grab::after {
+  display: block;
+  inline-size: 24px;
+  block-size: 2px;
+  border-radius: 2px;
+  background: #c9cdd2;
+  content: "";
+}
+
+.online-subtitle-grab:hover,
+.online-subtitle-grab[data-online-subtitle-dragging] {
+  background: #394048;
+}
+
+.online-subtitle-word:focus-visible,
+.online-subtitle-grab:focus-visible,
+.online-subtitle-lookup-close:focus-visible {
+  outline: 2px solid #b9dcfa;
+  outline-offset: 2px;
+}
+
 .online-subtitle-translated {
   color: #e2e8ee;
   font-size: max(13px, 0.9em);
   font-weight: 500;
+}
+
+.online-subtitle-lookup {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 50%;
+  inset-inline: 0;
+  box-sizing: border-box;
+  inline-size: min(88%, 34rem);
+  max-block-size: 68%;
+  margin-inline: auto;
+  padding: 0.7em 0.85em 0.8em;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid rgb(255 255 255 / 23%);
+  border-radius: 10px;
+  background: #1c2028;
+  color: #f8f9fa;
+  box-shadow: 0 6px 30px rgb(0 0 0 / 38%);
+  transform: translateY(-50%);
+  font-size: clamp(13px, 1.4cqw, 18px);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  pointer-events: auto;
+}
+
+.online-subtitle-lookup[data-online-subtitle-placement] {
+  max-block-size: min(300px, var(--online-subtitle-lookup-space));
+  transform: none;
+}
+
+.online-subtitle-lookup[data-online-subtitle-placement="above"] {
+  inset-block-start: auto;
+  inset-block-end: var(--online-subtitle-lookup-inset);
+}
+
+.online-subtitle-lookup[data-online-subtitle-placement="below"] {
+  inset-block-start: var(--online-subtitle-lookup-inset);
+}
+
+.online-subtitle-lookup-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.85em;
+}
+
+.online-subtitle-lookup-word {
+  margin: 0;
+  color: #fff;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.online-subtitle-lookup-close {
+  flex: 0 0 auto;
+  min-inline-size: 30px;
+  min-block-size: 28px;
+  border-radius: 6px;
+  font-size: 1.3em;
+  cursor: pointer;
+}
+
+.online-subtitle-lookup-close:hover {
+  background: rgb(255 255 255 / 14%);
+}
+
+.online-subtitle-lookup-status,
+.online-subtitle-lookup-result {
+  margin: 0.5em 0 0;
+  color: #e2e8ee;
+}
+
+.online-subtitle-lookup-result dt {
+  margin-block-start: 0.65em;
+  color: #b9dcfa;
+  font-weight: 600;
+}
+
+.online-subtitle-lookup-result dd {
+  margin: 0.12em 0 0;
+  white-space: pre-wrap;
 }
 
 .online-subtitle-status {

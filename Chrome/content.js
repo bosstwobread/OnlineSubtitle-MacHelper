@@ -10,6 +10,11 @@
   const maximumVideoSeconds = 24 * 60 * 60;
   const captionsTimeout = 20_000;
   const translationTimeout = 90_000;
+  const settingsTimeout = 5_000;
+  const settingsRefreshInterval = 8_000;
+  const wordLookupTimeout = 30_000;
+  const defaultLanguage = "zh-CN";
+  const targetLanguages = new Set(["zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "pt", "it"]);
   const playerCheckInterval = 400;
   const statusTimeout = 5_000;
   const firstStatusRetryDelay = 500;
@@ -23,7 +28,7 @@
   const encoder = new TextEncoder();
   const statuses = {
     captionsUnavailable: "Captions unavailable for this video.",
-    translationUnavailable: "Chinese translation unavailable.",
+    translationUnavailable: "Subtitle translation unavailable.",
     macHelperUnavailable: "OnlineSubtitle could not connect to MacHelper.",
     modelUnavailable: "Check AI Connection in MacHelper."
   };
@@ -115,7 +120,12 @@
     return -1;
   }
 
-  function makeOverlay(player) {
+  function message(key) {
+    return chrome.i18n?.getMessage(key) || statuses[key] || "";
+  }
+
+  function makeOverlay(state) {
+    const { player } = state;
     const root = document.createElement("div");
     root.className = "online-subtitle-overlay";
     const stack = document.createElement("div");
@@ -126,7 +136,7 @@
     original.dir = "auto";
     const translated = document.createElement("div");
     translated.className = "online-subtitle-line online-subtitle-translated";
-    translated.lang = "zh-Hans";
+    translated.lang = state.configuration?.targetLanguage ?? defaultLanguage;
     translated.dir = "auto";
     const status = document.createElement("div");
     status.className = "online-subtitle-status";
@@ -136,7 +146,15 @@
     stack.append(original, translated);
     root.append(stack, status);
     player.append(root);
-    return { root, stack, original, translated, status };
+    const interactions = globalThis.onlineSubtitleCreateInteractions({
+      player, root, stack, original, translated, message,
+      onWord: (word, row) => startLookup(state, word, row),
+      onDismiss: () => {
+        dismissLookup(state);
+        translateNext(state);
+      }
+    });
+    return { root, stack, original, translated, status, interactions };
   }
 
   function setText(element, text) {
@@ -146,7 +164,7 @@
   function render(state) {
     const { player, video, overlay } = state;
     const active = isCurrent(state) && state.lastAdTime === undefined && !showingAd(player);
-    const status = active && state.status ? chrome.i18n?.getMessage(state.status) || statuses[state.status] : "";
+    const status = active && state.status ? message(state.status) : "";
     setText(overlay.status, status);
     overlay.status.hidden = !status;
     const time = video.currentTime;
@@ -154,8 +172,10 @@
     const index = canShow ? activeCueIndex(state.cues, time) : -1;
     const cue = state.cues[index];
     const bilingual = cue?.bilingual;
-    setText(overlay.original, bilingual?.original ?? "");
-    setText(overlay.translated, bilingual?.translation ?? "");
+    if (state.lookup && (!canShow || state.lookup.cue !== cue)) dismissLookup(state);
+    state.presentedCue = bilingual ? cue : undefined;
+    overlay.interactions.renderSource(bilingual?.original ?? "", state.sourceLanguage);
+    overlay.interactions.renderTranslation(bilingual?.translation ?? "", overlay.translated.lang);
     overlay.stack.hidden = !bilingual;
     // Keep native CC enabled in YouTube. Mask it only while this cue is
     // waiting for both languages or being replaced by the bilingual overlay.
@@ -166,10 +186,147 @@
 
   function cancelBatch(state) {
     const batch = state.batch;
-    if (!batch) return;
     state.batch = undefined;
-    clearTimeout(batch.timeout);
-    batch.port?.disconnect();
+    closeRequest(batch);
+  }
+
+  function closeRequest(request) {
+    if (!request) return;
+    clearTimeout(request.timeout);
+    const port = request.port;
+    request.port = undefined;
+    port?.disconnect();
+  }
+
+  function sendRequest(request, payload, timeout, receive) {
+    function finish(reply) {
+      if (!request.port) return;
+      closeRequest(request);
+      receive(reply);
+    }
+    try {
+      const port = chrome.runtime.connect({ name: "online-subtitle-translate" });
+      request.port = port;
+      port.onMessage.addListener(finish);
+      port.onDisconnect.addListener(() => {
+        void chrome.runtime.lastError;
+        finish({ ok: false, error: "unavailable" });
+      });
+      request.timeout = setTimeout(() => finish({ ok: false, error: "translation" }), timeout);
+      port.postMessage(payload);
+    } catch {
+      closeRequest(request);
+      receive({ ok: false, error: "unavailable" });
+    }
+  }
+
+  function readConfiguration(reply) {
+    if (!targetLanguages.has(reply?.targetLanguage) || typeof reply.revision !== "string" ||
+        !/^[a-f0-9]{64}$/.test(reply.revision)) return null;
+    return { targetLanguage: reply.targetLanguage, revision: reply.revision };
+  }
+
+  function applyConfiguration(state, configuration) {
+    if (state.configuration?.revision === configuration.revision &&
+        state.configuration?.targetLanguage === configuration.targetLanguage) return;
+    state.configuration = configuration;
+    state.overlay.translated.lang = configuration.targetLanguage;
+    cancelBatch(state);
+    dismissLookup(state);
+    clearTimeout(state.retryTimer);
+    state.retryTimer = undefined;
+    state.retriedBusy = false;
+    if (state.status !== "captionsUnavailable") state.status = undefined;
+    if (state.translatedCount) {
+      for (const cue of state.cues) delete cue.bilingual;
+      state.translatedCount = 0;
+      state.firstUntranslated = 0;
+    }
+  }
+
+  function requestSettings(state) {
+    state.refreshSettings = false;
+    state.nextSettingsCheck = Date.now() + settingsRefreshInterval;
+    const request = {};
+    state.settingsRequest = request;
+    render(state);
+    sendRequest(request, { type: "getSettings" }, settingsTimeout, reply => {
+      if (state.settingsRequest !== request || !isCurrent(state)) return;
+      state.settingsRequest = undefined;
+      const configuration = reply?.ok === true ? readConfiguration(reply) : null;
+      if (configuration) {
+        applyConfiguration(state, configuration);
+        if (state.status === "macHelperUnavailable") state.status = undefined;
+      } else if (reply?.error === "invalid" && !state.configuration) {
+        // The 0.3.x companion bridge does not implement settings.
+        state.legacySettings = true;
+        applyConfiguration(state, { targetLanguage: defaultLanguage, revision: null });
+      } else if (!state.configuration) {
+        state.status = "macHelperUnavailable";
+      }
+      render(state);
+      translateNext(state);
+    });
+  }
+
+  function dismissLookup(state) {
+    const lookup = state.lookup;
+    if (!lookup) return;
+    state.lookup = undefined;
+    clearTimeout(lookup.retry);
+    closeRequest(lookup.request);
+    state.overlay?.interactions.closeLookup();
+  }
+
+  function requestLookup(state, lookup) {
+    const request = {};
+    lookup.request = request;
+    sendRequest(request, { type: "explainWord", word: lookup.word, sentence: lookup.sentence }, wordLookupTimeout, reply => {
+      if (state.lookup !== lookup || !isCurrent(state)) return;
+      lookup.request = undefined;
+      if (reply?.error === "busy" && !lookup.retried) {
+        lookup.retried = true;
+        lookup.retry = setTimeout(() => {
+          lookup.retry = undefined;
+          if (state.lookup === lookup && isCurrent(state)) requestLookup(state, lookup);
+        }, 250);
+        return;
+      }
+      const configuration = reply?.ok === true ? readConfiguration(reply) : null;
+      if (configuration && (configuration.revision !== state.configuration?.revision ||
+          configuration.targetLanguage !== state.configuration?.targetLanguage)) {
+        applyConfiguration(state, configuration);
+        render(state);
+      } else {
+        const meaning = captionText(reply?.meaning, maximumTranslationBytes);
+        const sentenceMeaning = captionText(reply?.sentenceMeaning, maximumTranslationBytes);
+        if (configuration && meaning && sentenceMeaning) {
+          state.overlay.interactions.completeLookup({ meaning, sentenceMeaning, targetLanguage: configuration.targetLanguage });
+        } else {
+          state.overlay.interactions.failLookup();
+        }
+      }
+      translateNext(state);
+    });
+  }
+
+  function startLookup(state, word, row) {
+    const cue = state.presentedCue;
+    const sentence = row === "translation" ? cue?.bilingual?.translation : cue?.bilingual?.original;
+    if (!isCurrent(state) || state.video.seeking || state.video.ended || showingAd(state.player) ||
+        !captionText(sentence, maximumTranslationBytes) || !captionText(word, 256) || !sentence.includes(word)) return;
+    dismissLookup(state);
+    cancelBatch(state);
+    if (state.settingsRequest) {
+      closeRequest(state.settingsRequest);
+      state.settingsRequest = undefined;
+      state.refreshSettings = true;
+    }
+    const lookup = { cue, word, sentence };
+    state.lookup = lookup;
+    state.video.pause();
+    state.overlay.interactions.showLookup(word);
+    requestLookup(state, lookup);
   }
 
   function nextTranslationBatch(state) {
@@ -190,6 +347,7 @@
 
   function validTranslations(response, { indexes, kind }) {
     if (response?.ok !== true || !Array.isArray(response.translations) || response.translations.length !== indexes.length) return null;
+    if (("revision" in response || "targetLanguage" in response) && !readConfiguration(response)) return null;
     const remaining = new Set(indexes.map(index => index + 1));
     const translated = new Map();
     for (const entry of response.translations) {
@@ -209,11 +367,15 @@
 
     const translations = validTranslations(response, batch);
     if (translations) {
+      const configuration = readConfiguration(response);
+      if (configuration) applyConfiguration(state, configuration);
+      let added = 0;
       for (const [index, { text, source }] of translations) {
         const cue = state.cues[index];
+        if (!cue.bilingual) added++;
         cue.bilingual = { original: source || cue.text, translation: text };
       }
-      state.translatedCount += translations.size;
+      state.translatedCount += added;
       while (state.cues[state.firstUntranslated]?.bilingual) state.firstUntranslated++;
       render(state);
       queueMicrotask(() => translateNext(state));
@@ -237,30 +399,26 @@
     state.status = response?.error === "unavailable" ? "macHelperUnavailable" :
       response?.error === "model" ? "modelUnavailable" : "translationUnavailable";
     render(state);
+    translateNext(state);
   }
 
   function translateNext(state) {
-    if (!isCurrent(state) || (state.video.seeking && !showingAd(state.player)) || state.batch || state.retryTimer || state.status ||
+    if (!isCurrent(state) || state.batch || state.settingsRequest || state.lookup?.request || state.lookup?.retry) return;
+    if (!state.legacySettings && (state.refreshSettings || Date.now() >= state.nextSettingsCheck)) {
+      requestSettings(state);
+      return;
+    }
+    if (!state.configuration || (state.video.seeking && !showingAd(state.player)) || state.retryTimer || state.status ||
         !state.cues.length || state.translatedCount === state.cues.length) return;
     const indexes = nextTranslationBatch(state);
-    const batch = { indexes, kind: state.translationKind, port: undefined, timeout: undefined };
+    const batch = { indexes, kind: state.translationKind };
     state.batch = batch;
-    try {
-      const port = chrome.runtime.connect({ name: "online-subtitle-translate" });
-      batch.port = port;
-      port.onMessage.addListener(response => finishBatch(state, batch, response));
-      port.onDisconnect.addListener(() => {
-        void chrome.runtime.lastError;
-        finishBatch(state, batch, { ok: false, error: "unavailable" });
-      });
-      batch.timeout = setTimeout(() => finishBatch(state, batch, { ok: false, error: "translation" }), translationTimeout);
-      port.postMessage({ type: batch.kind, cues: indexes.map(index => ({ id: index + 1, text: state.cues[index].text })) });
-    } catch {
-      finishBatch(state, batch, { ok: false, error: "unavailable" });
-    }
+    const cues = indexes.map(index => ({ id: index + 1, text: state.cues[index].text }));
+    sendRequest(batch, { type: batch.kind, cues }, translationTimeout, reply => finishBatch(state, batch, reply));
   }
 
   function updatePlayback(state, mediaEvent) {
+    if (mediaEvent === "play" || mediaEvent === "seeking") dismissLookup(state);
     const { player, video } = state;
     const time = video.currentTime;
     if (showingAd(player)) {
@@ -356,7 +514,8 @@
   function showSession(state) {
     if (state.overlay) return;
     const { player, video } = state;
-    state.overlay = makeOverlay(player);
+    state.overlay = makeOverlay(state);
+    state.refreshSettings = true;
     if (state.sourceLanguage) state.overlay.original.lang = state.sourceLanguage;
     for (const name of mediaEvents) video.addEventListener(name, state.onMediaEvent);
     state.observer = new MutationObserver(() => {
@@ -373,12 +532,16 @@
     const state = session;
     if (!state?.overlay) return;
     cancelCaptionRequest(state);
+    dismissLookup(state);
+    closeRequest(state.settingsRequest);
+    state.settingsRequest = undefined;
     clearTimeout(state.retryTimer);
     state.retryTimer = undefined;
     cancelBatch(state);
     state.observer.disconnect();
     for (const name of mediaEvents) state.video.removeEventListener(name, state.onMediaEvent);
     state.player.removeAttribute(overlayAttribute);
+    state.overlay.interactions.destroy();
     state.overlay.root.remove();
     state.overlay = undefined;
   }
@@ -499,6 +662,11 @@
   });
   document.addEventListener("visibilitychange", refresh);
   document.addEventListener("fullscreenchange", refresh);
+  window.addEventListener("focus", () => {
+    if (!session?.overlay) { refresh(); return; }
+    session.refreshSettings = true;
+    translateNext(session);
+  });
   window.addEventListener("popstate", refresh);
   window.addEventListener("pageshow", startPolling);
   window.addEventListener("pagehide", () => {
