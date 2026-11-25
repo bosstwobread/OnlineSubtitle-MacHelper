@@ -9,76 +9,97 @@
     "word": "hit",
     "after": " the road before it gets dark."
   },
-  "targetCaption": {
-    "language": "zh-Hans",
-    "text": "我们得在天黑前出发。",
-    "meaning": "hit the road 是一个口语短语，意思是“出发”或“上路”。"
-  },
   "strings": {
     "en": {
       "description": "Try these sample captions. Click hit for its meaning. Drag the caption by its background, or focus it and press ↑ or ↓.",
       "close": "Close word explanation",
-      "moveCaption": "Move subtitles up or down"
+      "moveCaption": "Move subtitles up or down",
+      "translatedCaption": "We should leave before dark.",
+      "meaning": "“Hit the road” means to leave or start a journey."
     },
     "zh-Hans": {
       "description": "试用这组示例字幕。点击 hit 查看词义。拖动字幕背景，或将焦点移到字幕上并按 ↑ 或 ↓。",
       "close": "关闭词义解释",
-      "moveCaption": "向上或向下移动字幕"
+      "moveCaption": "向上或向下移动字幕",
+      "translatedCaption": "我们得在天黑前出发。",
+      "meaning": "hit the road 是一个口语短语，意思是“出发”或“上路”。"
     },
     "zh-Hant": {
       "description": "試用這組範例字幕。點擊 hit 查看詞義。拖曳字幕背景，或將焦點移到字幕上並按 ↑ 或 ↓。",
       "close": "關閉詞義解釋",
-      "moveCaption": "向上或向下移動字幕"
+      "moveCaption": "向上或向下移動字幕",
+      "translatedCaption": "我們得在天黑前出發。",
+      "meaning": "hit the road 是個口語片語，意思是「出發」或「上路」。"
     },
     "es": {
       "description": "Prueba estos subtítulos de ejemplo. Pulsa «hit» para ver su significado. Arrastra el fondo del subtítulo o selecciónalo con Tab y pulsa ↑ o ↓.",
       "close": "Cerrar la explicación de la palabra",
-      "moveCaption": "Mover los subtítulos hacia arriba o abajo"
+      "moveCaption": "Mover los subtítulos hacia arriba o abajo",
+      "translatedCaption": "Deberíamos ponernos en camino antes de que oscurezca.",
+      "meaning": "«Hit the road» es una expresión informal que significa ponerse en camino o salir de viaje."
     },
     "fr": {
       "description": "Essayez ces sous-titres d’exemple. Cliquez sur « hit » pour lire sa définition. Faites glisser le fond du sous-titre ou placez-y le focus et appuyez sur ↑ ou ↓.",
       "close": "Fermer l’explication du mot",
-      "moveCaption": "Déplacer les sous-titres vers le haut ou le bas"
+      "moveCaption": "Déplacer les sous-titres vers le haut ou le bas",
+      "translatedCaption": "On devrait prendre la route avant la tombée de la nuit.",
+      "meaning": "« Hit the road » est une expression familière qui veut dire « prendre la route » ou « partir »."
     },
     "de": {
       "description": "Probiere diese Beispieluntertitel aus. Klicke auf „hit“, um die Bedeutung zu sehen. Ziehe am Untertitelhintergrund oder fokussiere ihn und drücke ↑ oder ↓.",
       "close": "Worterklärung schließen",
-      "moveCaption": "Untertitel nach oben oder unten bewegen"
+      "moveCaption": "Untertitel nach oben oder unten bewegen",
+      "translatedCaption": "Wir sollten losfahren, bevor es dunkel wird.",
+      "meaning": "„Hit the road“ bedeutet umgangssprachlich „aufbrechen“ oder „sich auf den Weg machen“."
     },
     "ja": {
       "description": "サンプル字幕をお試しください。hit をクリックすると意味が表示されます。字幕の背景をドラッグするか、フォーカスして ↑ または ↓ を押すと移動できます。",
       "close": "単語の説明を閉じる",
-      "moveCaption": "字幕を上下に移動"
+      "moveCaption": "字幕を上下に移動",
+      "translatedCaption": "暗くなる前に出発しよう。",
+      "meaning": "「hit the road」は「出発する」「旅に出る」という意味の口語表現です。"
     },
     "ko": {
       "description": "예시 자막을 체험해 보세요. hit를 클릭하면 뜻이 표시됩니다. 자막 배경을 드래그하거나 포커스를 옮긴 뒤 ↑ 또는 ↓ 키를 누르세요.",
       "close": "단어 설명 닫기",
-      "moveCaption": "자막을 위아래로 이동"
+      "moveCaption": "자막을 위아래로 이동",
+      "translatedCaption": "어두워지기 전에 출발하는 게 좋겠어요.",
+      "meaning": "‘hit the road’는 ‘길을 떠나다’ 또는 ‘출발하다’라는 뜻의 일상 표현이에요."
     },
     "pt": {
       "description": "Experimente estas legendas de exemplo. Clique em «hit» para ver o seu significado. Arraste o fundo da legenda ou coloque o foco nela e prima ↑ ou ↓.",
       "close": "Fechar a explicação da palavra",
-      "moveCaption": "Mover as legendas para cima ou para baixo"
+      "moveCaption": "Mover as legendas para cima ou para baixo",
+      "translatedCaption": "Devemos sair antes de escurecer.",
+      "meaning": "«Hit the road» é uma expressão informal que significa sair ou pôr-se a caminho."
     },
     "ar": {
       "description": "جرّب هذه الترجمة التوضيحية. انقر على كلمة hit لمعرفة معناها. اسحب خلفية الترجمة، أو انتقل إليها بلوحة المفاتيح واضغط ↑ أو ↓.",
       "close": "إغلاق شرح الكلمة",
-      "moveCaption": "تحريك الترجمة لأعلى أو لأسفل"
+      "moveCaption": "تحريك الترجمة لأعلى أو لأسفل",
+      "translatedCaption": "ينبغي أن ننطلق قبل حلول الظلام.",
+      "meaning": "عبارة «hit the road» تعبير دارج يعني الانطلاق أو بدء الرحلة."
     },
     "hi": {
       "description": "ये नमूना उपशीर्षक आज़माएँ। अर्थ देखने के लिए hit पर क्लिक करें। उपशीर्षक की पृष्ठभूमि खींचें या उस पर फ़ोकस करके ↑ या ↓ दबाएँ।",
       "close": "शब्द की व्याख्या बंद करें",
-      "moveCaption": "उपशीर्षक ऊपर या नीचे ले जाएँ"
+      "moveCaption": "उपशीर्षक ऊपर या नीचे ले जाएँ",
+      "translatedCaption": "हमें अँधेरा होने से पहले निकल जाना चाहिए।",
+      "meaning": "“hit the road” बोलचाल का मुहावरा है, जिसका मतलब है निकल पड़ना या सफ़र शुरू करना।"
     },
     "ru": {
       "description": "Попробуйте эти демонстрационные субтитры. Нажмите на «hit», чтобы узнать значение. Перетащите фон субтитров или установите на него фокус и нажмите ↑ или ↓.",
       "close": "Закрыть объяснение слова",
-      "moveCaption": "Переместить субтитры вверх или вниз"
+      "moveCaption": "Переместить субтитры вверх или вниз",
+      "translatedCaption": "Нам стоит выехать до темноты.",
+      "meaning": "«Hit the road» — разговорное выражение, которое значит «отправиться в путь» или «выехать»."
     },
     "it": {
       "description": "Prova questi sottotitoli di esempio. Fai clic su «hit» per leggerne il significato. Trascina lo sfondo del sottotitolo oppure selezionalo con Tab e premi ↑ o ↓.",
       "close": "Chiudi la spiegazione della parola",
-      "moveCaption": "Sposta i sottotitoli verso l’alto o verso il basso"
+      "moveCaption": "Sposta i sottotitoli verso l’alto o verso il basso",
+      "translatedCaption": "Dovremmo metterci in viaggio prima che faccia buio.",
+      "meaning": "«Hit the road» è un’espressione colloquiale che significa «mettersi in viaggio» o «partire»."
     }
   }
 }
