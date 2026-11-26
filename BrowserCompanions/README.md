@@ -2,7 +2,9 @@
 
 OnlineSubtitle shares one YouTube-only caption reader, overlay, and permission boundary across Chrome, Edge, Firefox, and Safari. MacHelper detects a supported browser and owns setup of the managed connection. Each browser still controls its own approval and YouTube access. OnlineSubtitle sends the active video’s captions and clicked source word to MacHelper for translation or explanation through the configured AI connection. There is no telemetry.
 
-## Build
+## Build for development or publication
+
+The OnlineSubtitle extension in MacHelper uses its bundled JavaScript worker starting in 0.6.0. The tools below are for developing or publishing browser packages. End users install the browser package through the browser’s own setup flow.
 
 From the repository root, run the following command with Python 3.10 or newer. Choose a new or empty output directory outside the source tree.
 
@@ -23,7 +25,7 @@ Use MacHelper’s OnlineSubtitle setup controls to prepare the browser’s nativ
 
 ## Safari
 
-On a Mac with Xcode, generate the project in a new or empty directory. Use the App Group registered for your signing team. The generator uses Apple’s Safari packager and embeds the shared web resources, sandboxed native-message handler, and containing app’s relay.
+Use the OnlineSubtitle extension release commit from its Marketplace listing to generate a matching Safari version. On a Mac with Xcode, generate the project in a new or empty directory. Use the App Group registered for your signing team. The generator uses Apple’s Safari packager and embeds the shared web resources, sandboxed native-message handler, and containing app’s relay.
 
 ```sh
 python3 scripts/build-safari-companion.py \
