@@ -13,6 +13,8 @@
   const translationTimeout = 90_000;
   const settingsTimeout = 5_000;
   const settingsRefreshInterval = 8_000;
+  const firstBusyRetryDelay = 800;
+  const maximumBusyRetryDelay = 5_000;
   const wordLookupTimeout = 30_000;
   const defaultLanguage = "zh-CN";
   const targetLanguages = new Set(["zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "pt", "it"]);
@@ -180,7 +182,7 @@
     overlay.stack.hidden = !bilingual;
     // Keep native CC enabled in YouTube. Mask it only while this cue is
     // waiting for both languages or being replaced by the bilingual overlay.
-    const awaitingTranslation = cue && !bilingual && !state.status;
+    const awaitingTranslation = cue && !bilingual && !state.status && state.busyRetryDelay === undefined;
     player.toggleAttribute(overlayAttribute,
       Boolean(bilingual || awaitingTranslation) || (canShow && !cue && activeCueIndex(state.soundOnly, time) !== -1));
   }
@@ -227,6 +229,17 @@
     return { targetLanguage: reply.targetLanguage, revision: reply.revision };
   }
 
+  function retryBusy(state) {
+    const delay = state.busyRetryDelay ?? firstBusyRetryDelay;
+    state.busyRetryDelay = Math.min(delay * 2, maximumBusyRetryDelay);
+    // A busy reply means the worker never started this request.
+    state.retryTimer = setTimeout(() => {
+      state.retryTimer = undefined;
+      translateNext(state);
+    }, delay);
+    render(state);
+  }
+
   function applyConfiguration(state, configuration) {
     if (state.configuration?.revision === configuration.revision &&
         state.configuration?.targetLanguage === configuration.targetLanguage) return;
@@ -236,7 +249,7 @@
     dismissLookup(state);
     clearTimeout(state.retryTimer);
     state.retryTimer = undefined;
-    state.retriedBusy = false;
+    state.busyRetryDelay = undefined;
     if (state.status !== "captionsUnavailable") state.status = undefined;
     if (state.translatedCount) {
       for (const cue of state.cues) delete cue.bilingual;
@@ -254,6 +267,12 @@
     sendRequest(request, { type: "getSettings" }, settingsTimeout, reply => {
       if (state.settingsRequest !== request || !isCurrent(state)) return;
       state.settingsRequest = undefined;
+      if (reply?.error === "busy") {
+        state.refreshSettings = true;
+        retryBusy(state);
+        return;
+      }
+      state.busyRetryDelay = undefined;
       const configuration = reply?.ok === true ? readConfiguration(reply) : null;
       if (configuration) {
         applyConfiguration(state, configuration);
@@ -367,6 +386,7 @@
 
     const translations = validTranslations(response, batch);
     if (translations) {
+      state.busyRetryDelay = undefined;
       const configuration = readConfiguration(response);
       if (configuration) applyConfiguration(state, configuration);
       let added = 0;
@@ -388,14 +408,11 @@
       queueMicrotask(() => translateNext(state));
       return;
     }
-    if (response?.ok === false && response.error === "busy" && !state.retriedBusy) {
-      state.retriedBusy = true;
-      state.retryTimer = setTimeout(() => {
-        state.retryTimer = undefined;
-        translateNext(state);
-      }, 800);
+    if (response?.ok === false && response.error === "busy") {
+      retryBusy(state);
       return;
     }
+    state.busyRetryDelay = undefined;
     state.status = response?.error === "unavailable" ? "macHelperUnavailable" :
       response?.error === "model" ? "modelUnavailable" : "translationUnavailable";
     render(state);
@@ -403,12 +420,13 @@
   }
 
   function translateNext(state) {
-    if (!isCurrent(state) || state.batch || state.settingsRequest || state.lookup?.request || state.lookup?.retry) return;
+    if (!isCurrent(state) || state.batch || state.settingsRequest || state.retryTimer !== undefined ||
+        state.lookup?.request || state.lookup?.retry) return;
     if (!state.legacySettings && (state.refreshSettings || Date.now() >= state.nextSettingsCheck)) {
       requestSettings(state);
       return;
     }
-    if (!state.configuration || (state.video.seeking && !showingAd(state.player)) || state.retryTimer || state.status ||
+    if (!state.configuration || (state.video.seeking && !showingAd(state.player)) || state.status ||
         !state.cues.length || state.translatedCount === state.cues.length) return;
     const indexes = nextTranslationBatch(state);
     const batch = { indexes, kind: state.translationKind };
@@ -541,6 +559,7 @@
     state.settingsRequest = undefined;
     clearTimeout(state.retryTimer);
     state.retryTimer = undefined;
+    state.busyRetryDelay = undefined;
     cancelBatch(state);
     state.observer.disconnect();
     for (const name of mediaEvents) state.video.removeEventListener(name, state.onMediaEvent);

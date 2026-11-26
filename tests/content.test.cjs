@@ -313,13 +313,37 @@ test("a visible tab picks up the next worker settings generation after a transie
   page.focus({ ok: false, error: "busy" });
   assert.equal(page.ports.length, 1);
   page.focus(null);
+  page.runTimers(800);
   page.settingsPorts.at(-1).onMessage.emit({ ok: false, error: "busy" });
   page.advance(8_000);
+  assert.equal(page.ports.length, 1);
+  page.runTimers(1_600);
   page.settingsPorts.at(-1).onMessage.emit(german);
   assert.equal(page.ports.length, 2);
   page.ports[1].onMessage.emit({ ...german, translations: [{ id: 1, text: "Die Bank schloss." }] });
   assert.equal(page.overlay.translation.textContent, "Die Bank schloss.");
   assert.equal(page.overlay.status.hidden, true);
+});
+
+test("a busy worker on a new watch page keeps native captions visible and retries settings without a connection error", () => {
+  const page = browser({ currentTime: 1, settings: null });
+  page.captions([{ start: 0, end: 5, text: "The bank closed." }]);
+  page.settingsPorts[0].onMessage.emit({ ok: false, error: "busy" });
+  page.focus();
+  page.advance(8_000);
+  assert.equal(page.settingsPorts.length, 1);
+  assert.equal(page.ports.length, 0);
+  assert.equal(page.overlay.status.hidden, true);
+  assertNativeCaptionsAvailable(page);
+
+  page.runTimers(800);
+  assert.equal(page.settingsPorts.length, 2);
+  assert.equal(page.ports.length, 0);
+  assertNativeCaptionsAvailable(page);
+  page.settingsPorts[1].onMessage.emit(defaultSettings);
+  assert.equal(page.ports.length, 1);
+  translate([], page.ports[0]);
+  assert.equal(page.overlay.translation.textContent, "第1句");
 });
 
 test("a seek cancels an in-flight word lookup and ignores its late result", () => {
@@ -648,20 +672,48 @@ test("discards stale track and translation results when a video or player change
   assert.equal(page.overlay.lines.hidden, true);
 });
 
-test("keeps YouTube captions available and retries busy once with no repeated provider calls on failure", () => {
+test("keeps YouTube captions available and recovers from repeated busy replies without a settings change", () => {
   const page = browser();
   page.captions(cues);
-  page.ports[0].onMessage.emit({ ok: false, error: "busy" });
-  page.refresh();
-  assert.equal(page.ports.length, 1);
+  for (const [index, delay] of [800, 1_600, 3_200, 5_000, 5_000].entries()) {
+    page.ports[index].onMessage.emit({ ok: false, error: "busy" });
+    page.refresh();
+    assert.equal(page.ports.length, index + 1);
+    assert.equal(page.overlay.status.hidden, true);
+    assertNativeCaptionsAvailable(page);
+    page.runTimers(delay);
+    assert.equal(page.ports.length, index + 2);
+  }
+  translate([], page.ports[5]);
+  assert.equal(page.overlay.translation.textContent, "第1句");
+  page.runMicrotasks();
+  page.playAt(16);
+  page.ports[6].onMessage.emit({ ok: false, error: "busy" });
   page.runTimers(800);
-  assert.equal(page.ports.length, 2);
-  page.ports[1].onMessage.emit({ ok: false, error: "busy" });
-  page.runTimers(800);
-  page.refresh();
-  assert.equal(page.ports.length, 2);
+  assert.equal(page.ports.length, 8);
+  page.ports[7].onMessage.emit({ ok: false, error: "translation" });
+  page.advance(8_000);
+  assert.equal(page.ports.length, 8);
   assertNativeCaptionsAvailable(page);
   assert.equal(page.overlay.status.textContent, "Subtitle translation unavailable.");
+});
+
+test("hiding the tab or disabling OnlineSubtitle cancels pending busy work", () => {
+  const hidden = browser();
+  hidden.captions(cues);
+  hidden.ports[0].onMessage.emit({ ok: false, error: "busy" });
+  hidden.document.hidden = true;
+  hidden.document.dispatchEvent(new Event("visibilitychange"));
+  hidden.runTimers(800);
+  assert.equal(hidden.ports.length, 1);
+  assert.equal(hidden.overlay.root, undefined);
+
+  const disabled = browser({ settings: null });
+  disabled.settingsPorts[0].onMessage.emit({ ok: false, error: "busy" });
+  disabled.status(false);
+  disabled.runTimers(800);
+  assert.equal(disabled.settingsPorts.length, 1);
+  assert.equal(disabled.overlay.root, undefined);
 });
 
 test("falls back to native captions for an unfinished cue and keeps completed bilingual cues", () => {
