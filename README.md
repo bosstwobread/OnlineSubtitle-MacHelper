@@ -4,7 +4,7 @@ A MacHelper source extension and browser companions that display bilingual capti
 
 ## Set up in MacHelper
 
-OnlineSubtitle 0.6.0 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
+OnlineSubtitle 0.6.1 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
 
 1. Open **MacHelper → Extensions → Install Source…** and choose [MacHelperExtension](MacHelperExtension/). Review the listed browser companion identities and shared AI access before enabling the tool.
 2. Choose your provider and model under **AI Connection**. Captions go to that provider, including its online service if you select ChatGPT.
