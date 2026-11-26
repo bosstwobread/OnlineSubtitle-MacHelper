@@ -16,7 +16,8 @@ test('all four browser packages share the YouTube-only implementation and exact 
   const output = mkdtempSync(join(tmpdir(), 'online-subtitle-browser-tests-'));
   try {
     execFileSync('python3', [join(root, 'scripts/build-browser-companions.py'), '--output', output]);
-    const version = JSON.parse(readFileSync(join(root, 'MacHelperExtension/extension.json'), 'utf8')).version;
+    const tool = JSON.parse(readFileSync(join(root, 'MacHelperExtension/extension.json'), 'utf8'));
+    const version = tool.version;
     const chrome = manifest(join(output, 'chrome'));
     assert.deepEqual(manifest(join(output, 'edge')), chrome);
     assert.deepEqual(chrome.background, { service_worker: 'managed-background.js' });
@@ -45,7 +46,13 @@ test('all four browser packages share the YouTube-only implementation and exact 
       assert.equal(entry.content_scripts[0].world, 'MAIN');
     }
     for (const [browser, filename] of [['chrome', 'chromium-companion.json'], ['firefox', 'firefox-companion.json']]) {
-      const inventory = JSON.parse(readFileSync(join(output, filename)));
+      const bytes = readFileSync(join(output, filename));
+      const publishedPath = `BrowserCompanions/releases/${version}/${filename}`;
+      const descriptor = tool.companion.browsers.find(item => item.browser === browser);
+      assert.ok(descriptor.packageURL.endsWith('/' + publishedPath));
+      assert.deepEqual(readFileSync(join(root, publishedPath)), bytes);
+      assert.equal(descriptor.packageSHA256, createHash('sha256').update(bytes).digest('hex'));
+      const inventory = JSON.parse(bytes);
       assert.equal(inventory.schemaVersion, 1);
       for (const [file, base64] of Object.entries(inventory.files)) {
         assert.deepEqual(Buffer.from(base64, 'base64'), readFileSync(join(output, browser, file)));

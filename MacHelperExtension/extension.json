@@ -1,14 +1,13 @@
 {
   "schemaVersion": 2,
-  "runtime": "native",
+  "runtime": "javascript",
   "identifier": "com.nelson007.online-subtitle",
   "displayName": "OnlineSubtitle",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "summary": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
-  "entryPoint": "Main.swift",
+  "entryPoint": "main.js",
   "icon": "assets/icon.png",
   "permissions": [
-    "native.execute",
     "ai.transform",
     "companion.message"
   ],
@@ -17,25 +16,25 @@
       {
         "browser": "chrome",
         "identifier": "ndmbmmhddeibbojclldpaabmkcielfmj",
-        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/releases/0.5.0/chromium-companion.json",
-        "packageSHA256": "50452519eb13aeeae7dfdc16db678e3de95f913144b59ca6c1d6b60596ed24c4"
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/d45bfac5288deedbe26862410d2178c32b054164/BrowserCompanions/releases/0.6.0/chromium-companion.json",
+        "packageSHA256": "0a05438777856ec9f0fefd26b4c93bc85aeb7ef6208d9203b84eca6a46b3af53"
       },
       {
         "browser": "edge",
         "identifier": "ndmbmmhddeibbojclldpaabmkcielfmj",
-        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/releases/0.5.0/chromium-companion.json",
-        "packageSHA256": "50452519eb13aeeae7dfdc16db678e3de95f913144b59ca6c1d6b60596ed24c4"
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/d45bfac5288deedbe26862410d2178c32b054164/BrowserCompanions/releases/0.6.0/chromium-companion.json",
+        "packageSHA256": "0a05438777856ec9f0fefd26b4c93bc85aeb7ef6208d9203b84eca6a46b3af53"
       },
       {
         "browser": "firefox",
         "identifier": "online-subtitle@nelson007.com",
-        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/releases/0.5.0/firefox-companion.json",
-        "packageSHA256": "006fd63bba875d8779b2710d32a78313339e99e69e884909c3928638da45e347"
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/d45bfac5288deedbe26862410d2178c32b054164/BrowserCompanions/releases/0.6.0/firefox-companion.json",
+        "packageSHA256": "faa423c2f7fd118bd6bbab74eb29a51599e5486efbc2d142377977c750a5a5d3"
       },
       {
         "browser": "safari",
         "identifier": "com.nelson007.online-subtitle.safari",
-        "sourceURL": "https://github.com/bosstwobread/OnlineSubtitle-MacHelper/blob/134f7b5be1a2d3c87e65c4a90f47336a553b19f0/BrowserCompanions/README.md"
+        "sourceURL": "https://github.com/bosstwobread/OnlineSubtitle-MacHelper/blob/d45bfac5288deedbe26862410d2178c32b054164/BrowserCompanions/README.md"
       }
     ]
   },
