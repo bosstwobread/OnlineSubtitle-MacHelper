@@ -7,6 +7,9 @@
   const replaced = "data-online-subtitle-netflix-replaced";
   const captionSelector = ".player-timedtext";
   const pollInterval = 300;
+  const lookaheadSeconds = 32;
+  const trackRequestEvent = "online-subtitle:netflix-request";
+  const trackResultEvent = "online-subtitle:netflix-track";
   const retryDelays = [500, 1_000, 2_000];
   const targetLanguages = new Set(["zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "pt", "it"]);
   const mediaEvents = ["seeking", "seeked", "emptied", "loadedmetadata", "ended"];
@@ -29,15 +32,29 @@
     return encoder.encode(text).length <= maximum ? text : "";
   }
 
+  function captionText(value) {
+    return globalThis.onlineSubtitleRemoveSoundLabels(cleanText(value, 1_000));
+  }
+
+  // Netflix may add a line break at a speaker dash or a directional mark in its DOM.
+  function comparableText(text) {
+    return text.normalize("NFC").replace(/[\u200B\u200E\u200F\u202A-\u202E\u2066-\u2069]/gu, "")
+      .replace(/\s*([-–—])\s*/gu, "$1").trim();
+  }
+
+  function cacheKey(text, language) {
+    return `${language}\0${comparableText(text)}`;
+  }
+
   function readCue(node) {
     if (!node?.isConnected || node.hidden || !node.getClientRects().length) return;
     const style = getComputedStyle(node);
     if (style.display === "none" || style.visibility === "hidden" || style.visibility === "collapse") return;
-    const text = globalThis.onlineSubtitleRemoveSoundLabels(cleanText(node.innerText ?? node.textContent, 1_000));
+    const text = captionText(node.innerText ?? node.textContent);
     if (!text) return;
     const lang = node.getAttribute("lang");
     const language = lang && lang.length <= 40 && /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/u.test(lang) ? lang : "";
-    return { node, text, language, key: `${language}\0${text}` };
+    return { node, text, language, key: cacheKey(text, language) };
   }
 
   function sameCue(first, second) {
@@ -135,9 +152,14 @@
     replaceNativeCaption(state, translation ? cue.node : undefined);
   }
 
+  function cancelBatch(state) {
+    closeRequest(state.batch);
+    state.batch = undefined;
+    state.busy = undefined;
+  }
+
   function setCue(state, cue) {
     if (sameCue(state.cue, cue)) return;
-    closeRequest(state.cue?.request);
     dismissLookup(state);
     state.cue = cue;
   }
@@ -155,11 +177,8 @@
     if (!sameConfiguration(state.configuration, configuration)) {
       state.cache.clear();
       state.configuration = configuration;
-      if (state.cue) {
-        state.cue.finished = false;
-        state.cue.failures = 0;
-        state.cue.retryAt = 0;
-      }
+      state.failed.clear();
+      state.busy = undefined;
       dismissLookup(state);
     }
     state.settingsReady = true;
@@ -188,29 +207,114 @@
     return !!readConfiguration(reply);
   }
 
-  function requestTranslation(state, cue) {
-    const request = {};
-    cue.request = request;
-    sendRequest(request, { type: "translate", cues: [{ id: 1, text: cue.text }] }, 90_000, reply => {
-      if (state.cue !== cue || cue.request !== request || !isCurrent(state)) return;
-      cue.request = undefined;
-      if (!sameCue(cue, sampleCue(state))) { update(state); return; }
-      if (reply?.error === "busy" && (cue.failures ?? 0) < retryDelays.length) {
-        cue.failures = (cue.failures ?? 0) + 1;
-        cue.retryAt = Date.now() + retryDelays[cue.failures - 1];
-        return;
+  function readTrack(event) {
+    const state = watch;
+    if (!state?.overlay || !isCurrent(state) || typeof event.detail !== "string" ||
+        event.detail.length > 2 * 1024 * 1024) return;
+    let track;
+    try { track = JSON.parse(event.detail); } catch { return; }
+    if (track?.videoId !== state.id || !Array.isArray(track.cues) ||
+        track.cues.length === 0 || track.cues.length > 4_000) return;
+    const cues = [];
+    let lastStart = -1;
+    for (const item of track.cues) {
+      if (!Number.isFinite(item?.start) || !Number.isFinite(item.end) || item.start < 0 ||
+          item.start < lastStart || item.end <= item.start || item.end > 86_400) return;
+      lastStart = item.start;
+      const text = captionText(item.text);
+      if (text) cues.push({ start: item.start, end: item.end, text, comparable: comparableText(text) });
+    }
+    if (!cues.length) return;
+    const language = typeof track.language === "string" && /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/u.test(track.language) ?
+      track.language.toLowerCase() : "";
+    state.tracks.unshift({ cues, language });
+    if (state.tracks.length > 4) state.tracks.pop();
+    update(state);
+  }
+
+  function upcomingCues(track, time, currentText) {
+    let lower = 0;
+    let upper = track.length;
+    // The player updates the DOM and video clock on different frames.
+    while (lower < upper) {
+      const mid = (lower + upper) >>> 1;
+      if (track[mid].start <= time + 0.25) lower = mid + 1;
+      else upper = mid;
+    }
+    for (let i = lower - 1; i >= Math.max(0, lower - 8); i--) {
+      if (track[i].end < time - 0.25 || track[i].comparable !== currentText) continue;
+      const upcoming = [];
+      for (let j = i + 1; j < track.length && track[j].start <= time + lookaheadSeconds && upcoming.length < 64; j++) {
+        upcoming.push(track[j].text);
       }
-      cue.finished = true;
+      return upcoming;
+    }
+  }
+
+  function nextBatch(state, cue) {
+    const current = comparableText(cue.text);
+    let ahead;
+    for (const track of state.tracks) {
+      if (cue.language && track.language && cue.language.toLowerCase().split("-")[0] !== track.language.split("-")[0]) continue;
+      const upcoming = upcomingCues(track.cues, state.video.currentTime, current);
+      if (!upcoming) continue;
+      if (!ahead) ahead = upcoming;
+      else {
+        // Two available tracks can share one line. Only prepare their common prefix.
+        let shared = 0;
+        while (shared < ahead.length && shared < upcoming.length &&
+            comparableText(ahead[shared]) === comparableText(upcoming[shared])) shared++;
+        ahead.length = shared;
+      }
+    }
+    const texts = [cue.text, ...(ahead ?? [])];
+    const limit = state.cache.size ? 8 : 3;
+    const rows = [];
+    for (const text of new Set(texts)) {
+      const key = cacheKey(text, cue.language);
+      if (state.cache.has(key) || state.failed.has(key)) continue;
+      rows.push({ key, text });
+      if (rows.length === limit) break;
+    }
+    return rows;
+  }
+
+  function remember(map, key, value) {
+    map.set(key, value);
+    if (map.size > 256) map.delete(map.keys().next().value);
+  }
+
+  function requestTranslation(state, rows) {
+    const first = rows[0].key;
+    if (state.busy?.key === first && Date.now() < state.busy.retryAt) return;
+    const request = { language: state.cue.language };
+    state.batch = request;
+    const cues = rows.map(({ text }, index) => ({ id: index + 1, text }));
+    sendRequest(request, { type: "translate", cues }, 90_000, reply => {
+      if (state.batch !== request || !isCurrent(state)) return;
+      state.batch = undefined;
+      if (reply?.error === "busy") {
+        const count = state.busy?.key === first ? state.busy.count : 0;
+        if (count < retryDelays.length) {
+          state.busy = { key: first, count: count + 1, retryAt: Date.now() + retryDelays[count] };
+          return;
+        }
+      }
+      state.busy = undefined;
       const translations = reply?.translations;
-      if (reply?.ok !== true || !validReplyConfiguration(reply) || !Array.isArray(translations) ||
-          translations.length !== 1 || translations[0]?.id !== 1) return;
-      const translation = onlineSubtitleRemoveSoundLabels(cleanText(translations[0].text, 2_000));
-      if (!translation) return;
-      const configuration = readConfiguration(reply);
-      if (configuration) applyConfiguration(state, configuration);
-      state.cache.set(cue.key, translation);
-      if (state.cache.size > 128) state.cache.delete(state.cache.keys().next().value);
-      render(state);
+      const valid = reply?.ok === true && validReplyConfiguration(reply) &&
+        Array.isArray(translations) && translations.length === rows.length;
+      const output = valid ? translations.map((row, index) => row?.id === index + 1 &&
+        onlineSubtitleRemoveSoundLabels(cleanText(row.text, 2_000))) : [];
+      if (output.length === rows.length && output.every(Boolean)) {
+        const configuration = readConfiguration(reply);
+        if (configuration) applyConfiguration(state, configuration);
+        rows.forEach(({ key }, index) => remember(state.cache, key, output[index]));
+      } else {
+        for (const { key } of rows) remember(state.failed, key, true);
+      }
+      // The native caption may already have advanced while the AI was working.
+      update(state);
     });
   }
 
@@ -220,6 +324,7 @@
     if (!isCurrent(state) || !state.settingsReady || !cue || !state.cache.has(cue.key) ||
         !sameCue(cue, sampleCue(state)) || !word || !cue.text.includes(word)) return;
     dismissLookup(state);
+    cancelBatch(state);
     if (state.settingsRequest) {
       closeRequest(state.settingsRequest);
       state.settingsRequest = undefined;
@@ -260,20 +365,26 @@
     setCue(state, sampleCue(state));
     render(state);
     const { cue } = state;
-    if (state.settingsRequest || cue?.request || state.lookup?.request) return;
+    if (state.batch && cue && cue.language !== state.batch.language) cancelBatch(state);
+    if (state.settingsRequest || state.batch || state.lookup?.request) return;
     if (Date.now() >= state.settingsAt) requestSettings(state);
-    else if (state.settingsReady && cue && !cue.finished && !state.cache.has(cue.key) &&
-        Date.now() >= (cue.retryAt ?? 0)) requestTranslation(state, cue);
+    else if (state.settingsReady && cue) {
+      const rows = nextBatch(state, cue);
+      if (rows.length) requestTranslation(state, rows);
+    }
   }
 
   function startSession(state) {
     if (state.overlay) return;
     state.overlay = makeOverlay(state);
+    state.tracks = [];
+    state.failed = new Map();
     state.settingsAt = 0;
     state.settingsReady = false;
     state.observer = new MutationObserver(() => update(state));
     state.onMediaEvent = event => {
       if (event.type === "seeking" || event.type === "emptied") {
+        cancelBatch(state);
         state.preSeekCue = state.cue ?? state.preSeekCue;
         setCue(state, undefined);
         render(state);
@@ -281,11 +392,14 @@
       update(state);
     };
     for (const event of mediaEvents) state.video.addEventListener(event, state.onMediaEvent);
+    document.dispatchEvent(new CustomEvent(trackRequestEvent, { detail: JSON.stringify({ videoId: state.id }) }));
     update(state);
   }
 
   function stopSession(state) {
     if (!state.overlay) return;
+    cancelBatch(state);
+    state.tracks = [];
     closeRequest(state.settingsRequest);
     state.settingsRequest = undefined;
     setCue(state, undefined);
@@ -363,6 +477,7 @@
     refresh();
   }
 
+  document.addEventListener(trackResultEvent, readTrack);
   document.addEventListener("visibilitychange", refresh);
   window.addEventListener("popstate", refresh);
   window.addEventListener("focus", () => {

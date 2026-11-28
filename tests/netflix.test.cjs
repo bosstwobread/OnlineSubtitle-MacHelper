@@ -10,6 +10,13 @@ const title = "81234567";
 const replacement = "data-online-subtitle-netflix-replaced";
 const defaultSettings = { ok: true, targetLanguage: "zh-CN", revision: "1".repeat(64) };
 
+class CustomEvent extends Event {
+  constructor(type, { detail }) {
+    super(type);
+    this.detail = detail;
+  }
+}
+
 class Element extends EventTarget {
   isConnected = true;
   style = {};
@@ -43,7 +50,7 @@ function signal() {
   };
 }
 
-function browser({ route = `/watch/${title}`, playerId = title, initialText = "", topFrame = true } = {}) {
+function browser({ route = `/watch/${title}`, playerId = title, initialText = "", topFrame = true, track } = {}) {
   const location = { origin: "https://www.netflix.com", pathname: route };
   const window = new EventTarget();
   window.top = topFrame ? window : undefined;
@@ -59,6 +66,15 @@ function browser({ route = `/watch/${title}`, playerId = title, initialText = ""
   native.textContent = initialText;
   native.setAttribute("lang", "en");
   video.HAVE_METADATA = video.readyState = 1;
+  video.currentTime = 5;
+  function deliverTrack(cues, videoId = title, language) {
+    document.dispatchEvent(new CustomEvent("online-subtitle:netflix-track", {
+      detail: JSON.stringify({ videoId, cues, language })
+    }));
+  }
+  document.addEventListener("online-subtitle:netflix-request", () => {
+    if (track) deliverTrack(track);
+  });
   video.pause = () => { video.paused = true; };
   host.querySelector = selector => selector === `div[data-uia="player"][data-videoid="${player.getAttribute("data-videoid")}"]` ? player : null;
   player.querySelector = selector => ({ video, ".player-timedtext": native })[selector];
@@ -73,7 +89,7 @@ function browser({ route = `/watch/${title}`, playerId = title, initialText = ""
   let now = 0;
   let timerId = 0;
   vm.runInNewContext(source, {
-    location, window, document, TextEncoder,
+    location, window, document, TextEncoder, CustomEvent,
     Date: class extends Date { static now() { return now; } },
     getComputedStyle: node => node.style,
     MutationObserver: class {
@@ -120,7 +136,7 @@ function browser({ route = `/watch/${title}`, playerId = title, initialText = ""
 
   const statusPorts = () => ports.filter(port => port.sent.type === "watchStatus");
   return {
-    document, window, location, native, player, video, ports,
+    document, window, location, native, player, video, ports, deliverTrack,
     get statusPort() { return statusPorts().at(-1); },
     get translationPorts() { return ports.filter(port => port.sent.type === "translate"); },
     get overlay() { return player.children.find(child => child.className === "online-subtitle-overlay"); },
@@ -176,7 +192,7 @@ test("renders only the current Netflix cue, preserves gaps and invalidates cache
   page.status(true);
   const first = page.translationPorts[0];
   page.setCue("Second line.");
-  assert.equal(first.disconnected, true);
+  assert.equal(first.disconnected, false);
   complete(first, "第一句。");
   assert.equal(page.masked, false);
   const second = page.translationPorts[1];
@@ -277,4 +293,70 @@ test("sends only the visible cue for contextual word lookup", () => {
   assert.equal(page.lookup.meaning, "与上下文相关的");
   page.setCue("The next line.");
   assert.equal(page.lookup, undefined);
+});
+
+test("prepares upcoming Netflix captions before playback reaches them", () => {
+  const track = Array.from({ length: 18 }, (_, index) => ({
+    start: 5 + 2 * index, end: 7 + 2 * index, text: `Spoken line ${index}.`
+  }));
+  const page = browser({ initialText: track[0].text, track });
+  page.status(true);
+  const first = page.translationPorts[0];
+  assert.deepEqual(first.sent.cues.map(cue => cue.text), track.slice(0, 3).map(cue => cue.text));
+  page.video.currentTime = 7.1;
+  page.setCue(track[1].text);
+  assert.equal(first.disconnected, false);
+  first.onMessage.emit({ ...defaultSettings, translations: first.sent.cues.map(({ id }) => ({ id, text: `Translation ${id}` })) });
+  assert.equal(page.translation, "Translation 2");
+  assert.equal(page.translationPorts[1].sent.cues.length, 8);
+  page.video.currentTime = 9.1;
+  page.setCue(track[2].text);
+  assert.equal(page.translation, "Translation 3");
+  assert.equal(page.translationPorts.length, 2);
+});
+
+test("prefetch uses a track only after matching the displayed dialogue and episode at the current time", () => {
+  const page = browser({ initialText: "English dialogue." });
+  page.status(true);
+  const track = [
+    { start: 4, end: 6, text: "English dialogue." },
+    { start: 6, end: 8, text: "Next phrase." },
+    { start: 300, end: 302, text: "Much later." }
+  ];
+  page.deliverTrack(track, "123");
+  page.deliverTrack(track.map(row => ({ ...row, start: row.start + 300, end: row.end + 300 })));
+  page.deliverTrack(track.map(row => ({ ...row, text: "Unrelated." })));
+  complete(page.translationPorts[0], "英语。");
+  assert.equal(page.translationPorts.length, 1);
+  page.deliverTrack(track);
+  assert.deepEqual(page.translationPorts[1].sent.cues, [{ id: 1, text: "Next phrase." }]);
+  const batch = page.translationPorts[1];
+  page.video.seeking = true;
+  page.video.dispatchEvent(new Event("seeking"));
+  assert.equal(batch.disconnected, true);
+  complete(batch, "陈旧。");
+  page.video.seeking = false;
+  page.video.currentTime = 95;
+  page.setCue("New position.");
+  assert.equal(page.masked, false);
+  assert.deepEqual(page.translationPorts[2].sent.cues, [{ id: 1, text: "New position." }]);
+});
+
+test("matches Netflix line layout and ignores a lookalike cue from another subtitle language", () => {
+  const track = [
+    { start: 4, end: 6, text: "- Hi.\n- Hello." },
+    { start: 6, end: 8, text: "- Next line." }
+  ];
+  const page = browser({ initialText: "\u200E-Hi.-Hello." });
+  page.status(true);
+  page.deliverTrack(track.map(row => ({ ...row, text: row.text === "- Next line." ? "Otra frase." : row.text })), title, "es");
+  complete(page.translationPorts[0], "你好。");
+  assert.equal(page.translationPorts.length, 1);
+  page.deliverTrack(track, title, "en-US");
+  const next = page.translationPorts[1];
+  assert.deepEqual(next.sent.cues, [{ id: 1, text: "- Next line." }]);
+  complete(next, "下一句。");
+  page.video.currentTime = 6.3;
+  page.setCue("-Next line.");
+  assert.equal(page.translation, "下一句。");
 });

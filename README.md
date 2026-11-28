@@ -4,7 +4,7 @@ A MacHelper source extension and browser companions that display bilingual capti
 
 ## Set up in MacHelper
 
-OnlineSubtitle 0.7.0 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
+OnlineSubtitle 0.7.1 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
 
 1. Open **MacHelper → Extensions → Install Source…** and choose [MacHelperExtension](MacHelperExtension/). Review the listed browser companion identities and shared AI access before enabling the tool.
 2. Choose your provider and model under **AI Connection**. Captions go to that provider, including its online service if you select ChatGPT.
@@ -27,7 +27,7 @@ Use **Check for Updates** for a marketplace installation. MacHelper reviews a ch
 
 ## Netflix in Chrome and Edge
 
-Open a title and choose the source language under Netflix’s **Audio & Subtitles**. OnlineSubtitle reads the captions Netflix displays for that track. The original caption stays visible while its translation is pending. Translations are requested as the captions appear, so a short caption can end before the AI responds. Once both lines are ready for the current caption, OnlineSubtitle displays them together and lets you look up words in the source line.
+Open a title and choose the source language under Netflix’s **Audio & Subtitles**. When the player provides timed subtitles that match the selected track, OnlineSubtitle translates upcoming lines in batches so they can appear as the dialogue starts. If the player exposes only the current line, OnlineSubtitle translates it as it appears. Netflix’s original caption stays visible while a translation is pending. Click a word in the bilingual panel to look it up in context.
 
 ## How it works on YouTube
 

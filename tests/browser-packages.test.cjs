@@ -41,15 +41,18 @@ test('browser packages scope Netflix to Chromium and retain the approved bridge 
       assert.equal(entry.version, version);
       assert.deepEqual(entry.permissions, ['nativeMessaging']);
       assert.deepEqual(entry.content_scripts.map(block => block.matches),
-        chromium ? [[youtube], [youtube], [netflix]] : [[youtube], [youtube]]);
+        chromium ? [[youtube], [youtube], [netflix], [netflix]] : [[youtube], [youtube]]);
       if (chromium) {
         assert.deepEqual(entry.content_scripts[2], {
+          matches: [netflix], js: ['netflix-timedtext.js'], run_at: 'document_start', world: 'MAIN',
+        });
+        assert.deepEqual(entry.content_scripts[3], {
           matches: [netflix], js: ['sound-labels.js', 'subtitle-interactions.js', 'netflix.js'],
           css: ['subtitles.css', 'netflix.css'], run_at: 'document_start',
         });
       } else {
         assert.deepEqual(entry.host_permissions, [youtube]);
-        for (const asset of ['netflix.js', 'netflix.css']) {
+        for (const asset of ['netflix-timedtext.js', 'netflix.js', 'netflix.css']) {
           assert.equal(existsSync(join(folder, asset)), false);
         }
       }
