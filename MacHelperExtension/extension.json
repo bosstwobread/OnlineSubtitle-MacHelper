@@ -16,25 +16,25 @@
       {
         "browser": "chrome",
         "identifier": "ndmbmmhddeibbojclldpaabmkcielfmj",
-        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/1314f1aabd18b47d774cf85f4c1bcddf0858e263/BrowserCompanions/releases/0.7.1/chromium-companion.json",
-        "packageSHA256": "32b2155a5afaac5068b4eb121154e359ba0651afa37dd53efaf56655e2a0bf14"
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/a227b50703ee8796325e7f6a24bf3244e27a3234/BrowserCompanions/releases/0.7.2/chromium-companion.json",
+        "packageSHA256": "dc23177856bb92ef7a59d4f03aa34adc4d5e5084607f009ce5fa7bee201a7cb1"
       },
       {
         "browser": "edge",
         "identifier": "ndmbmmhddeibbojclldpaabmkcielfmj",
-        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/1314f1aabd18b47d774cf85f4c1bcddf0858e263/BrowserCompanions/releases/0.7.1/chromium-companion.json",
-        "packageSHA256": "32b2155a5afaac5068b4eb121154e359ba0651afa37dd53efaf56655e2a0bf14"
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/a227b50703ee8796325e7f6a24bf3244e27a3234/BrowserCompanions/releases/0.7.2/chromium-companion.json",
+        "packageSHA256": "dc23177856bb92ef7a59d4f03aa34adc4d5e5084607f009ce5fa7bee201a7cb1"
       },
       {
         "browser": "firefox",
         "identifier": "online-subtitle@nelson007.com",
-        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/1314f1aabd18b47d774cf85f4c1bcddf0858e263/BrowserCompanions/releases/0.7.1/firefox-companion.json",
-        "packageSHA256": "172a1f4a2ddbf3db3bff2c5943748048ec8d87c6a7cceebe2d1a0a4bed7a834c"
+        "packageURL": "https://raw.githubusercontent.com/bosstwobread/OnlineSubtitle-MacHelper/a227b50703ee8796325e7f6a24bf3244e27a3234/BrowserCompanions/releases/0.7.2/firefox-companion.json",
+        "packageSHA256": "8307f32abb57708402f388ffd1004925e8265b87797b5914b43c520e36377914"
       },
       {
         "browser": "safari",
         "identifier": "com.nelson007.online-subtitle.safari",
-        "sourceURL": "https://github.com/bosstwobread/OnlineSubtitle-MacHelper/blob/1314f1aabd18b47d774cf85f4c1bcddf0858e263/BrowserCompanions/README.md"
+        "sourceURL": "https://github.com/bosstwobread/OnlineSubtitle-MacHelper/blob/a227b50703ee8796325e7f6a24bf3244e27a3234/BrowserCompanions/README.md"
       }
     ]
   },
