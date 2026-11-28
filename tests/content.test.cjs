@@ -178,9 +178,10 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
     get video() { return video; },
     get overlay() {
       const root = player.children.find(child => child.className === "online-subtitle-overlay");
+      const statusRow = root?.children[1];
       return {
         root, lines: root?.children[0], original: root?.children[0]?.children[0],
-        translation: root?.children[0]?.children[1], status: root?.children[1]
+        translation: root?.children[0]?.children[1], status: statusRow?.children[0], retry: statusRow?.children[1]
       };
     },
     captions(cues, { request = requests.at(-1), sourceLanguage = "en", error } = {}) {
@@ -194,6 +195,11 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
       video.dispatchEvent(new Event(event));
     },
     clickWord(word) { interaction.onWord(word); },
+    clickRetry(trusted = true) {
+      const event = new Event("click");
+      if (trusted) Object.defineProperty(event, "isTrusted", { value: true });
+      this.overlay.retry.dispatchEvent(event);
+    },
     dismissLookup() { interaction.onDismiss(); },
     focus(nextSettings = settings) {
       settings = nextSettings;
@@ -582,6 +588,23 @@ test("keeps the opening batch when the ad class clears before the video clock re
   assert.equal(page.overlay.translation.textContent, "第1句");
 });
 
+test("a completed seek or pause shows cached captions when the ad and content playheads match", () => {
+  for (const event of ["seeked", "pause"]) {
+    const page = browser({ currentTime: 3, adClass: "ad-showing" });
+    page.captions(cues);
+    translate([], page.ports[0]);
+    page.playAt(3, event);
+    assertNativeCaptionsAvailable(page);
+    page.ad(false);
+    page.refresh();
+    assertNativeCaptionsAvailable(page);
+
+    page.playAt(3, event);
+    assert.equal(page.overlay.original.textContent, "Sentence 1", event);
+    assert.equal(page.overlay.translation.textContent, "第1句", event);
+  }
+});
+
 test("preserves a translation across a midroll and keeps the main playhead as the priority", () => {
   const page = browser({ currentTime: 31 });
   page.captions(cues);
@@ -599,7 +622,7 @@ test("preserves a translation across a midroll and keeps the main playhead as th
   assert.equal(page.overlay.translation.textContent, "第7句");
 });
 
-test("retries once after a preroll where the main captions were unavailable", () => {
+test("retries immediately after a failed preroll read and backs off after the first content read", () => {
   const page = browser({ adClass: "ad-showing" });
   const first = page.requests[0];
   page.captions([], { error: "captions-unavailable" });
@@ -616,6 +639,82 @@ test("retries once after a preroll where the main captions were unavailable", ()
   assertNativeCaptionsAvailable(page);
   page.refresh();
   assert.equal(page.requests.length, 2);
+  page.advance(1_999);
+  assert.equal(page.requests.length, 2);
+  page.advance(1);
+  assert.equal(page.requests.length, 3);
+});
+
+test("recovers a foreground watch after a temporary caption extraction failure", () => {
+  const page = browser({ currentTime: 3 });
+  const initial = page.requests[0];
+  page.captions([], { error: "captions-unavailable" });
+  assertNativeCaptionsAvailable(page);
+  assert.equal(page.ports.length, 0);
+
+  page.advance(1_999);
+  assert.equal(page.requests.length, 1);
+  page.advance(1);
+  assert.equal(page.requests.length, 2);
+  assert.notEqual(page.requests[1].id, initial.id);
+  page.captions(cues, { request: initial });
+  assert.equal(page.ports.length, 0);
+  page.captions(cues);
+  assert.equal(page.overlay.status.hidden, true);
+  translate([], page.ports[0]);
+  assert.equal(page.overlay.original.textContent, "Sentence 1");
+  assert.equal(page.overlay.translation.textContent, "第1句");
+  page.advance(12_000);
+  assert.equal(page.requests.length, 2);
+});
+
+test("bounds automatic caption extraction retries and allows an explicit retry", () => {
+  const page = browser();
+  for (const [index, delay] of [2_000, 5_000, 12_000].entries()) {
+    page.captions([], { error: "captions-unavailable" });
+    assertNativeCaptionsAvailable(page);
+    page.advance(delay - 1);
+    assert.equal(page.requests.length, index + 1);
+    page.advance(1);
+    assert.equal(page.requests.length, index + 2);
+  }
+  page.captions([], { error: "captions-unavailable" });
+  page.advance(60_000);
+  assert.equal(page.requests.length, 4);
+  assert.equal(page.ports.length, 0);
+  assert.equal(page.overlay.status.textContent, "Captions unavailable for this video.");
+  assertNativeCaptionsAvailable(page);
+  assert.equal(page.overlay.retry.hidden, false);
+  page.clickRetry(false);
+  assert.equal(page.requests.length, 4);
+  page.clickRetry();
+  assert.equal(page.requests.length, 5);
+  page.clickRetry();
+  assert.equal(page.requests.length, 5);
+  page.captions(cues);
+  assert.equal(page.overlay.status.hidden, true);
+  assert.equal(page.overlay.retry.hidden, true);
+});
+
+test("hiding a watch prevents scheduled caption extraction until it is visible and enabled", () => {
+  const page = browser({ enabled: null });
+  page.status(true);
+  page.captions([], { error: "captions-unavailable" });
+  page.document.hidden = true;
+  page.document.dispatchEvent(new Event("visibilitychange"));
+  page.advance(2_000);
+  assert.equal(page.requests.length, 1);
+
+  page.document.hidden = false;
+  page.document.dispatchEvent(new Event("visibilitychange"));
+  assert.equal(page.requests.length, 1);
+  page.status(true);
+  assert.equal(page.requests.length, 2);
+  page.captions([], { error: "captions-unavailable" });
+  page.status(false);
+  page.advance(12_000);
+  assert.equal(page.requests.length, 2);
+  assert.equal(page.overlay.root, undefined);
 });
 
 test("restores the cached track only after fresh visible status", () => {
@@ -729,6 +828,28 @@ test("falls back to native captions for an unfinished cue and keeps completed bi
   page.playAt(1);
   assert.equal(page.overlay.original.textContent, "Sentence 1");
   assert.equal(page.overlay.translation.textContent, "第1句");
+});
+
+test("retries a failed translation only on an explicit trusted click", () => {
+  const page = browser({ currentTime: 3 });
+  page.captions(cues);
+  page.ports[0].onMessage.emit({ ok: false, error: "translation" });
+  assertNativeCaptionsAvailable(page);
+  assert.equal(page.overlay.retry.hidden, false);
+  page.advance(8_000);
+  page.clickRetry(false);
+  assert.equal(page.ports.length, 1);
+
+  page.clickRetry();
+  assert.equal(page.ports.length, 2);
+  assertNativeCaptionsAvailable(page);
+  assert.deepEqual(page.ports[1].sent.cues, page.ports[0].sent.cues);
+  page.clickRetry();
+  assert.equal(page.ports.length, 2);
+  translate([], page.ports[1]);
+  assert.equal(page.overlay.translation.textContent, "第1句");
+  assert.equal(page.overlay.status.hidden, true);
+  assert.equal(page.overlay.retry.hidden, true);
 });
 
 test("keeps bilingual captions as plain text", () => {

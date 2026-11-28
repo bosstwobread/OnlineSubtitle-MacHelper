@@ -4,7 +4,7 @@ A MacHelper source extension and browser companions that display bilingual capti
 
 ## Set up in MacHelper
 
-OnlineSubtitle 0.6.1 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
+OnlineSubtitle 0.6.2 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
 
 1. Open **MacHelper → Extensions → Install Source…** and choose [MacHelperExtension](MacHelperExtension/). Review the listed browser companion identities and shared AI access before enabling the tool.
 2. Choose your provider and model under **AI Connection**. Captions go to that provider, including its online service if you select ChatGPT.
@@ -20,6 +20,8 @@ The browser source and package tooling are in this repository. Regular distribut
 - Click a word in the source line to pause playback and look up the word in that exact sentence. The player panel shows the word's contextual meaning in your target language. Close it with Escape or the close button.
 
 The browser asks for a one-time installation or permission approval. MacHelper must be running with OnlineSubtitle enabled for the bilingual overlay. Disabling it in MacHelper, pausing MacHelper, or losing the connection returns the page to YouTube’s normal captions immediately, using the player’s existing CC setting. Re-enabling restores the overlay on the open watch page.
+
+If YouTube’s caption track is late or a read fails, OnlineSubtitle makes up to three delayed reads in the visible tab. YouTube captions remain available during recovery. Use **Retry** in the subtitle error message to try again on the same page, including after an AI translation fails.
 
 Use **Check for Updates** for a marketplace installation. MacHelper reviews a changed browser declaration and preserves your settings. Use **Set Up…** again when loading a new developer package. In Chrome or Edge, use **Load unpacked** and select the newly prepared folder. If the browser reports that the old unpacked edition has the same ID, remove its old card first. Refresh the watch tab after the new edition is enabled.
 

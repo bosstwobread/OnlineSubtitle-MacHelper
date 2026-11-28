@@ -14,6 +14,9 @@
   "modelUnavailable": {
     "message": "Verifique a opção Ligação de IA no MacHelper."
   },
+  "retrySubtitles": {
+    "message": "Tentar novamente"
+  },
   "moveSubtitles": {
     "message": "Mover legendas"
   },

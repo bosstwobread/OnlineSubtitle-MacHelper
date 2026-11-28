@@ -192,6 +192,27 @@
   line-height: 1.35;
 }
 
+.online-subtitle-retry {
+  margin-inline-start: 0.65em;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 0.3em;
+  padding: 0.18em 0.45em;
+  background: rgb(255 255 255 / 12%);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.online-subtitle-retry:hover {
+  background: rgb(255 255 255 / 22%);
+}
+
+.online-subtitle-retry:focus-visible {
+  outline: 2px solid #b9dcfa;
+  outline-offset: 2px;
+}
+
 #movie_player[data-online-subtitle-visible] .ytp-caption-window-container,
 #movie_player[data-online-subtitle-visible] #ytp-caption-window-container {
   visibility: hidden;

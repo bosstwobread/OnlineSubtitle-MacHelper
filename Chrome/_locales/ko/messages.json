@@ -14,6 +14,9 @@
   "modelUnavailable": {
     "message": "MacHelper의 ‘AI 연결’을 확인하세요."
   },
+  "retrySubtitles": {
+    "message": "다시 시도"
+  },
   "moveSubtitles": {
     "message": "자막 이동"
   },

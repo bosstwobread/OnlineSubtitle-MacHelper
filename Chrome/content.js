@@ -10,6 +10,7 @@
   const maximumVideoSeconds = 24 * 60 * 60;
   const maximumCaptionEventLength = 24 * 1024 * 1024;
   const captionsTimeout = 20_000;
+  const captionRetryDelays = [2_000, 5_000, 12_000];
   const translationTimeout = 90_000;
   const settingsTimeout = 5_000;
   const settingsRefreshInterval = 8_000;
@@ -33,7 +34,8 @@
     captionsUnavailable: "Captions unavailable for this video.",
     translationUnavailable: "Subtitle translation unavailable.",
     macHelperUnavailable: "OnlineSubtitle could not connect to MacHelper.",
-    modelUnavailable: "Check AI Connection in MacHelper."
+    modelUnavailable: "Check AI Connection in MacHelper.",
+    retrySubtitles: "Retry"
   };
 
   let watch;
@@ -144,8 +146,22 @@
     const status = document.createElement("div");
     status.className = "online-subtitle-status";
     status.dir = "auto";
-    status.setAttribute("role", "status");
     status.hidden = true;
+    const statusLabel = document.createElement("span");
+    statusLabel.setAttribute("role", "status");
+    const retry = document.createElement("button");
+    retry.className = "online-subtitle-retry";
+    retry.type = "button";
+    retry.textContent = message("retrySubtitles");
+    retry.hidden = true;
+    for (const type of ["pointerdown", "mousedown", "mouseup", "keydown", "keyup"]) {
+      retry.addEventListener(type, event => event.stopPropagation());
+    }
+    retry.addEventListener("click", event => {
+      event.stopPropagation();
+      if (event.isTrusted && !retry.hidden && isCurrent(state) && !showingAd(player)) retrySubtitles(state);
+    });
+    status.append(statusLabel, retry);
     stack.append(original, translated);
     root.append(stack, status);
     player.append(root);
@@ -157,7 +173,7 @@
         translateNext(state);
       }
     });
-    return { root, stack, original, translated, status, interactions };
+    return { root, stack, original, translated, status, statusLabel, retry, interactions };
   }
 
   function setText(element, text) {
@@ -167,9 +183,12 @@
   function render(state) {
     const { player, video, overlay } = state;
     const active = isCurrent(state) && state.lastAdTime === undefined && !showingAd(player);
-    const status = active && state.status ? message(state.status) : "";
-    setText(overlay.status, status);
+    const error = active && (state.status ?? (state.captionsUnavailable ? "captionsUnavailable" : ""));
+    const status = error ? message(error) : "";
+    setText(overlay.statusLabel, status);
     overlay.status.hidden = !status;
+    overlay.statusLabel.hidden = !status;
+    overlay.retry.hidden = error !== "translationUnavailable" && (error !== "captionsUnavailable" || !!state.requestId);
     const time = video.currentTime;
     const canShow = active && !video.seeking && !video.ended && Number.isFinite(time) && time >= 0;
     const index = canShow ? activeCueIndex(state.cues, time) : -1;
@@ -182,7 +201,7 @@
     overlay.stack.hidden = !bilingual;
     // Keep native CC enabled in YouTube. Mask it only while this cue is
     // waiting for both languages or being replaced by the bilingual overlay.
-    const awaitingTranslation = cue && !bilingual && !state.status && state.busyRetryDelay === undefined;
+    const awaitingTranslation = cue && !bilingual && !state.status && !state.retryingTranslation && state.busyRetryDelay === undefined;
     player.toggleAttribute(overlayAttribute,
       Boolean(bilingual || awaitingTranslation) || (canShow && !cue && activeCueIndex(state.soundOnly, time) !== -1));
   }
@@ -250,7 +269,7 @@
     clearTimeout(state.retryTimer);
     state.retryTimer = undefined;
     state.busyRetryDelay = undefined;
-    if (state.status !== "captionsUnavailable") state.status = undefined;
+    state.status = undefined;
     if (state.translatedCount) {
       for (const cue of state.cues) delete cue.bilingual;
       state.translatedCount = 0;
@@ -386,6 +405,7 @@
 
     const translations = validTranslations(response, batch);
     if (translations) {
+      state.retryingTranslation = false;
       state.busyRetryDelay = undefined;
       const configuration = readConfiguration(response);
       if (configuration) applyConfiguration(state, configuration);
@@ -412,6 +432,7 @@
       retryBusy(state);
       return;
     }
+    state.retryingTranslation = false;
     state.busyRetryDelay = undefined;
     state.status = response?.error === "unavailable" ? "macHelperUnavailable" :
       response?.error === "model" ? "modelUnavailable" : "translationUnavailable";
@@ -442,8 +463,10 @@
     if (showingAd(player)) {
       state.lastAdTime = time;
     } else if (!video.seeking && video.readyState >= video.HAVE_METADATA && Number.isFinite(time) && time >= 0) {
-      // The ad class can disappear before the shared video element leaves the ad's playhead.
-      if (time !== state.lastAdTime || mediaEvent === "loadedmetadata" || mediaEvent === "playing") {
+      // An ad-class change alone can arrive before the main video takes over.
+      // A media event can confirm the new state even at the same playhead.
+      if (time !== state.lastAdTime || mediaEvent === "loadedmetadata" || mediaEvent === "playing" ||
+          mediaEvent === "seeked" || mediaEvent === "pause") {
         const resumed = state.lastAdTime !== undefined;
         state.lastAdTime = undefined;
         state.contentTime = time;
@@ -465,14 +488,17 @@
   }
 
   function requestCaptions(state) {
-    if (!isCurrent(state) || state.requestId || state.cues.length || state.soundOnly.length || state.status) return;
+    if (!isCurrent(state) || state.requestId || state.cues.length || state.soundOnly.length ||
+        Date.now() < state.nextCaptionAttempt) return;
     const ad = showingAd(state.player);
+    if (ad && state.captionsUnavailable) return;
     if (state.captionRetry === "afterAd") {
       if (ad) return;
       state.captionRetry = "used";
     }
     state.requestStartedInAd = ad;
     state.requestId = crypto.randomUUID();
+    if (state.captionsUnavailable) render(state);
     state.captionTimer = setTimeout(() => {
       if (!isCurrent(state)) return;
       cancelCaptionRequest(state);
@@ -487,8 +513,23 @@
       requestCaptions(state);
       return;
     }
-    state.status = "captionsUnavailable";
+    const delay = captionRetryDelays[state.captionFailures++];
+    state.nextCaptionAttempt = delay === undefined ? Infinity : Date.now() + delay;
+    state.captionsUnavailable = true;
     render(state);
+  }
+
+  function retrySubtitles(state) {
+    if (state.status === "translationUnavailable") {
+      state.status = undefined;
+      state.retryingTranslation = true;
+      render(state);
+      translateNext(state);
+    } else if (state.captionsUnavailable && !state.requestId) {
+      state.captionFailures = 0;
+      state.nextCaptionAttempt = 0;
+      requestCaptions(state);
+    }
   }
 
   function receiveCaptions(event) {
@@ -513,6 +554,7 @@
       captionsUnavailable(state);
       return;
     }
+    state.captionsUnavailable = false;
     state.cues = cues;
     state.soundOnly = soundOnly;
     state.sourceLanguage = sourceLanguage;
@@ -524,7 +566,7 @@
     const { videoId, player, video } = context;
     const state = {
       watch: context, videoId, player, video, cues: [], soundOnly: [], translatedCount: 0, firstUntranslated: 0,
-      contentTime: watchStartTime(), translationKind: "translateSentences",
+      contentTime: watchStartTime(), translationKind: "translateSentences", captionFailures: 0, nextCaptionAttempt: 0,
       onMediaEvent(event) {
         if (isCurrent(state)) updatePlayback(state, event.type);
       }

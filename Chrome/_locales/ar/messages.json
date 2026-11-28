@@ -14,6 +14,9 @@
   "modelUnavailable": {
     "message": "تحقّق من خيار «اتصال الذكاء الاصطناعي» في MacHelper."
   },
+  "retrySubtitles": {
+    "message": "إعادة المحاولة"
+  },
   "moveSubtitles": {
     "message": "حرّك الترجمة النصية"
   },

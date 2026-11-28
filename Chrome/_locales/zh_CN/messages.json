@@ -14,6 +14,9 @@
   "modelUnavailable": {
     "message": "请检查 MacHelper 中的「AI 连接」。"
   },
+  "retrySubtitles": {
+    "message": "重试"
+  },
   "moveSubtitles": {
     "message": "移动字幕"
   },
