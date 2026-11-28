@@ -645,10 +645,11 @@ test("retries immediately after a failed preroll read and backs off after the fi
   assert.equal(page.requests.length, 3);
 });
 
-test("recovers a foreground watch after a temporary caption extraction failure", () => {
+test("recovers a foreground watch after its first caption request times out", () => {
   const page = browser({ currentTime: 3 });
   const initial = page.requests[0];
-  page.captions([], { error: "captions-unavailable" });
+  page.runTimers(20_000);
+  assert.deepEqual(page.cancelledRequests, [initial]);
   assertNativeCaptionsAvailable(page);
   assert.equal(page.ports.length, 0);
 
