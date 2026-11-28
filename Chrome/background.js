@@ -1,18 +1,25 @@
 "use strict";
 
 const host = "com.nelson007.online_subtitle";
-const pageOrigin = "https://www.youtube.com";
+const youtubeOrigin = "https://www.youtube.com";
+const netflixOrigin = "https://www.netflix.com";
+const netflixEnabled = chrome.runtime.getManifest().content_scripts?.some(
+  script => script.matches.includes(netflixOrigin + "/*")
+);
 const errorCodes = new Set(["unavailable", "busy", "model", "translation", "invalid"]);
 const supportedLanguages = new Set(["zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "pt", "it"]);
 const utf8 = new TextEncoder();
 
 function isWatchPage(sender) {
-  if (sender?.id !== chrome.runtime.id || sender.frameId !== 0 || sender.origin !== pageOrigin ||
+  if (sender?.id !== chrome.runtime.id || sender.frameId !== 0 ||
       !Number.isInteger(sender.tab?.id) || typeof sender.url !== "string") return false;
   try {
     const url = new URL(sender.url);
-    return url.origin === pageOrigin && url.pathname === "/watch" &&
-      /^[A-Za-z0-9_-]{11}$/.test(url.searchParams.get("v") ?? "");
+    if (sender.origin !== url.origin) return false;
+    if (url.origin === youtubeOrigin) {
+      return url.pathname === "/watch" && /^[A-Za-z0-9_-]{11}$/.test(url.searchParams.get("v") ?? "");
+    }
+    return netflixEnabled && url.origin === netflixOrigin && /^\/watch\/[0-9]+$/.test(url.pathname);
   } catch {
     return false;
   }

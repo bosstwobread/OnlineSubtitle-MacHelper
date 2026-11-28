@@ -30,11 +30,16 @@ def feature_files(manifest):
     return {name: (FEATURE_SOURCE / name).read_bytes() for name in sorted(paths)}
 
 
-def build(browser, files, base_manifest, version):
+def build(browser, base_manifest, version):
     manifest = dict(base_manifest, version=version)
-    files = dict(files)
+    chromium = browser in ("chrome", "edge")
+    if not chromium:
+        manifest["content_scripts"] = [
+            entry for entry in manifest["content_scripts"] if entry["matches"] == [YOUTUBE]
+        ]
+    files = feature_files(manifest)
     files["managed-transport.js"] = (MANAGED_SOURCE / "managed-transport.js").read_bytes()
-    if browser in ("chrome", "edge"):
+    if chromium:
         manifest["background"] = {"service_worker": "managed-background.js"}
         files["managed-background.js"] = (MANAGED_SOURCE / "managed-background.js").read_bytes()
     else:
@@ -80,9 +85,8 @@ def main():
         parser.error("the output directory must be empty")
     base_manifest = json.loads((FEATURE_SOURCE / "manifest.json").read_bytes())
     version = json.loads((ROOT / "MacHelperExtension/extension.json").read_bytes())["version"]
-    features = feature_files(base_manifest)
     for browser in ("chrome", "edge", "firefox", "safari"):
-        files = build(browser, features, base_manifest, version)
+        files = build(browser, base_manifest, version)
         write_browser(output / browser, files)
         if browser == "chrome":
             write_inventory(output / "chromium-companion.json", files)

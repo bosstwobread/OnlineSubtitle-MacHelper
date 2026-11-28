@@ -1,31 +1,35 @@
 # OnlineSubtitle
 
-A MacHelper source extension and browser companions that display bilingual captions on YouTube watch pages. OnlineSubtitle joins related caption fragments and asks the configured AI to correct obvious transcription errors and translate the result in one request. The source and translation appear together in one movable caption panel. Click a word in the source line to see what it means in that sentence. OnlineSubtitle prefers captions that match the video’s audio language, using the available YouTube captions or transcript. The translation target is a separate setting.
+A MacHelper source extension and browser companions that display bilingual captions on YouTube and Netflix. Chrome and Edge support both sites. Firefox and Safari support YouTube. The source and translation appear together in one movable caption panel. Click a word in the source line to see what it means in that sentence. On YouTube, OnlineSubtitle prefers captions that match the video’s audio language. It joins related fragments and asks the configured AI to correct obvious transcription errors and translate the result. The translation target is a separate setting.
 
 ## Set up in MacHelper
 
-OnlineSubtitle 0.6.2 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
+OnlineSubtitle 0.7.0 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
 
 1. Open **MacHelper → Extensions → Install Source…** and choose [MacHelperExtension](MacHelperExtension/). Review the listed browser companion identities and shared AI access before enabling the tool.
 2. Choose your provider and model under **AI Connection**. Captions go to that provider, including its online service if you select ChatGPT.
-3. Open **OnlineSubtitle → Browser Companions** and select **Set Up…** next to an installed browser. MacHelper registers its dedicated bridge and prepares the reviewed development files for Chrome, Edge, or Firefox. Follow the browser’s approval and reload a YouTube watch page.
+3. Open **OnlineSubtitle → Browser Companions** and select **Set Up…** next to an installed browser. MacHelper registers its dedicated bridge and prepares the reviewed development files for Chrome, Edge, or Firefox. Follow the browser’s approval and reload the watch page.
 4. Safari setup requires a signed containing app. Developers can generate its Xcode project using the [Safari build guide](BrowserCompanions/README.md#safari). MacHelper offers setup after the browser is first opened, even when it was installed after OnlineSubtitle.
 
 The browser source and package tooling are in this repository. Regular distribution requires valid browser-store listings or signed releases. [OnlineSubtitle 0.4.2](https://github.com/bosstwobread/OnlineSubtitle-MacHelper/tree/v0.4.2) is the previous Chrome-only edition for MacHelper 6.8.
 
 ## Settings and playback
 
-- Under **MacHelper → Extensions → OnlineSubtitle**, choose **Translate to** and edit the three prompts for captions, caption correction and translation, and word lookup. The default target is Simplified Chinese. The picker also offers Traditional Chinese, English, Japanese, Korean, French, German, Spanish, Portuguese, and Italian. Source captions can be in other languages, such as Arabic. Return to the YouTube tab for the new preference to take effect. The tool uses the provider and model saved in **AI Connection** for captions and lookups.
+- Under **MacHelper → Extensions → OnlineSubtitle**, choose **Translate to** and edit the three prompts for captions, caption correction and translation, and word lookup. The default target is Simplified Chinese. The picker also offers Traditional Chinese, English, Japanese, Korean, French, German, Spanish, Portuguese, and Italian. Source captions can be in other languages, such as Arabic. Return to the watch tab for the new preference to take effect. The tool uses the provider and model saved in **AI Connection** for captions and lookups.
 - Drag the caption background up or down. You can also focus the caption panel and press the Up or Down arrow. The position carries over to videos opened within the same watch page.
 - Click a word in the source line to pause playback and look up the word in that exact sentence. The player panel shows the word's contextual meaning in your target language. Close it with Escape or the close button.
 
-The browser asks for a one-time installation or permission approval. MacHelper must be running with OnlineSubtitle enabled for the bilingual overlay. Disabling it in MacHelper, pausing MacHelper, or losing the connection returns the page to YouTube’s normal captions immediately, using the player’s existing CC setting. Re-enabling restores the overlay on the open watch page.
+The browser asks for installation and site access approval. MacHelper must be running with OnlineSubtitle enabled for the bilingual overlay. Disabling it in MacHelper, pausing MacHelper, or losing the connection restores the player’s normal captions. Re-enabling restores the overlay on the open watch page.
 
 If YouTube’s caption track is late or a read fails, OnlineSubtitle makes up to three delayed reads in the visible tab. YouTube captions remain available during recovery. Use **Retry** in the subtitle error message to try again on the same page, including after an AI translation fails.
 
 Use **Check for Updates** for a marketplace installation. MacHelper reviews a changed browser declaration and preserves your settings. Use **Set Up…** again when loading a new developer package. In Chrome or Edge, use **Load unpacked** and select the newly prepared folder. If the browser reports that the old unpacked edition has the same ID, remove its old card first. Refresh the watch tab after the new edition is enabled.
 
-## How it works
+## Netflix in Chrome and Edge
+
+Open a title and choose the source language under Netflix’s **Audio & Subtitles**. OnlineSubtitle reads the captions Netflix displays for that track. The original caption stays visible while its translation is pending. Translations are requested as the captions appear, so a short caption can end before the AI responds. Once both lines are ready for the current caption, OnlineSubtitle displays them together and lets you look up words in the source line.
+
+## How it works on YouTube
 
 ```mermaid
 flowchart LR

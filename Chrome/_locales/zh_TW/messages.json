@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "透過 MacHelper 中設定的 AI 連線顯示 YouTube 雙語字幕。"
+    "message": "透過 MacHelper 中設定的 AI 連線顯示影片雙語字幕。"
   },
   "captionsUnavailable": {
     "message": "此影片暫無可用字幕。"

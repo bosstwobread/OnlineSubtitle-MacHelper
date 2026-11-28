@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const { createHash } = require('node:crypto');
 const { execFileSync } = require('node:child_process');
-const { mkdtempSync, readFileSync, rmSync } = require('node:fs');
+const { existsSync, mkdtempSync, readFileSync, rmSync } = require('node:fs');
 const { tmpdir } = require('node:os');
 const { join, resolve } = require('node:path');
 const { test } = require('node:test');
@@ -12,7 +12,7 @@ function manifest(folder) {
   return JSON.parse(readFileSync(join(folder, 'manifest.json'), 'utf8'));
 }
 
-test('all four browser packages share the YouTube-only implementation and exact published bridge identities', () => {
+test('browser packages scope Netflix to Chromium and retain the approved bridge identities', () => {
   const output = mkdtempSync(join(tmpdir(), 'online-subtitle-browser-tests-'));
   try {
     execFileSync('python3', [join(root, 'scripts/build-browser-companions.py'), '--output', output]);
@@ -35,10 +35,25 @@ test('all four browser packages share the YouTube-only implementation and exact 
     for (const browser of ['chrome', 'edge', 'firefox', 'safari']) {
       const folder = join(output, browser);
       const entry = manifest(folder);
+      const chromium = browser === 'chrome' || browser === 'edge';
+      const youtube = 'https://www.youtube.com/*';
+      const netflix = 'https://www.netflix.com/*';
       assert.equal(entry.version, version);
       assert.deepEqual(entry.permissions, ['nativeMessaging']);
+      assert.deepEqual(entry.content_scripts.map(block => block.matches),
+        chromium ? [[youtube], [youtube], [netflix]] : [[youtube], [youtube]]);
+      if (chromium) {
+        assert.deepEqual(entry.content_scripts[2], {
+          matches: [netflix], js: ['sound-labels.js', 'subtitle-interactions.js', 'netflix.js'],
+          css: ['subtitles.css', 'netflix.css'], run_at: 'document_start',
+        });
+      } else {
+        assert.deepEqual(entry.host_permissions, [youtube]);
+        for (const asset of ['netflix.js', 'netflix.css']) {
+          assert.equal(existsSync(join(folder, asset)), false);
+        }
+      }
       for (const block of entry.content_scripts) {
-        assert.deepEqual(block.matches, ['https://www.youtube.com/*']);
         for (const asset of [...block.js, ...(block.css || [])]) {
           assert.deepEqual(readFileSync(join(folder, asset)), readFileSync(join(root, 'Chrome', asset)));
         }

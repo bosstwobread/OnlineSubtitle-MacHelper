@@ -1,8 +1,9 @@
 {
   "schemaVersion": 1,
-  "description": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
+  "description": "Translate video captions and explain clicked words using MacHelper’s AI connection.",
   "capabilities": [
     "Show original captions with translations in the chosen language over the YouTube player.",
+    "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.",
     "Drag the bilingual subtitles vertically.",
     "Click a word in the original subtitles to see its meaning in context."
   ],
@@ -12,6 +13,7 @@
   ],
   "keywords": [
     "YouTube",
+    "Netflix",
     "subtitles",
     "captions",
     "bilingual",
@@ -26,7 +28,8 @@
     "language learning"
   ],
   "limitations": [
-    "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection."
+    "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.",
+    "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube."
   ],
   "platforms": [
     "macOS",
@@ -38,172 +41,198 @@
   "translations": {
     "en": {
       "Watch YouTube in English with Chinese subtitles.": "Watch YouTube in English with Chinese subtitles.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Translate video captions and explain clicked words using MacHelper’s AI connection.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Show original captions with translations in the chosen language over the YouTube player.",
       "Drag the bilingual subtitles vertically.": "Drag the bilingual subtitles vertically.",
       "Click a word in the original subtitles to see its meaning in context.": "Click a word in the original subtitles to see its meaning in context.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Learn Spanish with original YouTube captions, English translations, and clickable words.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "Use MacHelper 6.9.0 or later on macOS 14+.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube."
     },
     "zh-Hans": {
       "Watch YouTube in English with Chinese subtitles.": "看 YouTube 英语视频时显示中文字幕。",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 连接翻译 YouTube 字幕，并解释点击的词语。",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 连接翻译视频字幕，并解释点击的词语。",
       "Show original captions with translations in the chosen language over the YouTube player.": "在 YouTube 播放器上同时显示原文字幕和所选语言的译文。",
       "Drag the bilingual subtitles vertically.": "上下拖动双语字幕。",
       "Click a word in the original subtitles to see its meaning in context.": "点击原文字幕中的词语，查看它在句中的含义。",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "选择「添加到 MacHelper」，查看浏览器配套扩展的权限，然后在 MacHelper 中配置 AI 连接。",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "用 YouTube 西班牙语原文字幕、英语译文和可点击的词语学习西班牙语。",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "需要可读取的 YouTube 字幕、已批准的浏览器扩展和有效的 MacHelper AI 连接。",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "需要可读取的视频字幕、已批准的浏览器扩展和有效的 MacHelper AI 连接。",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "使用 macOS 14 或以上版本和 MacHelper 6.9.0 或以上版本。",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "在 MacHelper 中打开 OnlineSubtitle，选择所用浏览器旁的「设置」。",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "在浏览器中完成设置，再重新加载带字幕的 YouTube 视频。Safari 需要已签名的配套应用。"
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "在浏览器中完成设置，再重新加载带字幕的 YouTube 视频。Safari 需要已签名的配套应用。",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "在 Chrome 和 Microsoft Edge 中播放 Netflix 视频时显示双语字幕。",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Netflix 仅在 Chrome 和 Microsoft Edge 的视频播放器中受支持。Firefox 和 Safari 支持 YouTube。"
     },
     "zh-Hant": {
       "Watch YouTube in English with Chinese subtitles.": "觀看 YouTube 英語影片時顯示中文字幕。",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 連線翻譯 YouTube 字幕，並解釋點選的詞語。",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 連線翻譯影片字幕，並解釋點選的詞語。",
       "Show original captions with translations in the chosen language over the YouTube player.": "在 YouTube 播放器上同時顯示原文字幕和所選語言的譯文。",
       "Drag the bilingual subtitles vertically.": "上下拖曳雙語字幕。",
       "Click a word in the original subtitles to see its meaning in context.": "點選原文字幕中的詞語，查看它在句中的含義。",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "選擇「加入 MacHelper」，檢視瀏覽器擴充功能的權限，然後在 MacHelper 中設定 AI 連線。",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "透過 YouTube 西班牙文原文字幕、英文譯文及可點選的詞語學習西班牙文。",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "需要可讀取的 YouTube 字幕、已核准的瀏覽器擴充功能和有效的 MacHelper AI 連線。",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "需要可讀取的影片字幕、已核准的瀏覽器擴充功能和有效的 MacHelper AI 連線。",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "使用 macOS 14 或以上版本和 MacHelper 6.9.0 或以上版本。",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "在 MacHelper 中打開 OnlineSubtitle，選擇使用的瀏覽器旁的「設定」。",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "在瀏覽器中完成設定，再重新載入有字幕的 YouTube 影片。Safari 需要已簽署的配套 App。"
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "在瀏覽器中完成設定，再重新載入有字幕的 YouTube 影片。Safari 需要已簽署的配套 App。",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "在 Chrome 和 Microsoft Edge 中播放 Netflix 影片時顯示雙語字幕。",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Netflix 僅在 Chrome 和 Microsoft Edge 的影片播放器中受支援。Firefox 和 Safari 支援 YouTube。"
     },
     "es": {
       "Watch YouTube in English with Chinese subtitles.": "Ver vídeos de YouTube en inglés con subtítulos en chino.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce los subtítulos de YouTube y explica las palabras seleccionadas mediante la conexión de IA de MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduce los subtítulos de vídeos y explica las palabras en las que haces clic mediante la conexión de IA de MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Muestra los subtítulos originales y su traducción al idioma elegido en el reproductor de YouTube.",
       "Drag the bilingual subtitles vertically.": "Arrastra los subtítulos bilingües en sentido vertical.",
       "Click a word in the original subtitles to see its meaning in context.": "Haz clic en una palabra de los subtítulos originales para ver su significado en contexto.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "Selecciona Añadir a MacHelper, revisa los permisos del complemento del navegador y configura la conexión de IA en MacHelper.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Aprender español con subtítulos originales de YouTube, traducciones al inglés y palabras que se pueden pulsar.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "Requiere subtítulos de YouTube accesibles, un complemento del navegador autorizado y una conexión de IA activa en MacHelper.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "Requiere subtítulos de vídeo accesibles, una extensión del navegador autorizada y una conexión de IA activa en MacHelper.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "Usa MacHelper 6.9.0 o posterior en macOS 14 o posterior.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "Abre OnlineSubtitle en MacHelper y selecciona Configurar junto al navegador que usas.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Termina la configuración en tu navegador y vuelve a cargar un vídeo de YouTube con subtítulos. Safari necesita una aplicación contenedora firmada."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Termina la configuración en tu navegador y vuelve a cargar un vídeo de YouTube con subtítulos. Safari necesita una aplicación contenedora firmada.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Muestra subtítulos bilingües durante la reproducción de Netflix en Chrome y Microsoft Edge.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "La compatibilidad con Netflix se limita al reproductor de vídeo de Chrome y Microsoft Edge. Firefox y Safari son compatibles con YouTube."
     },
     "fr": {
       "Watch YouTube in English with Chinese subtitles.": "Regarder des vidéos YouTube en anglais avec des sous-titres chinois.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduit les sous-titres YouTube et explique les mots sélectionnés avec la connexion IA de MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduit les sous-titres des vidéos et explique les mots sur lesquels vous cliquez grâce à la connexion IA de MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Affiche le texte original et sa traduction dans la langue choisie sur le lecteur YouTube.",
       "Drag the bilingual subtitles vertically.": "Déplacez les sous-titres bilingues verticalement en les faisant glisser.",
       "Click a word in the original subtitles to see its meaning in context.": "Cliquez sur un mot des sous-titres d’origine pour voir son sens en contexte.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "Sélectionnez Ajouter à MacHelper, examinez les autorisations de l’extension de navigateur, puis configurez la connexion IA dans MacHelper.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Apprendre l’espagnol avec les sous-titres originaux de YouTube, une traduction en anglais et des mots cliquables.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "Nécessite des sous-titres YouTube accessibles, une extension de navigateur autorisée et une connexion IA fonctionnelle dans MacHelper.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "Nécessite des sous-titres vidéo accessibles, une extension de navigateur autorisée et une connexion IA fonctionnelle dans MacHelper.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "Utilisez MacHelper 6.9.0 ou ultérieur sous macOS 14 ou ultérieur.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "Ouvrez OnlineSubtitle dans MacHelper et choisissez Configurer à côté de votre navigateur.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Terminez la configuration dans le navigateur et rechargez une vidéo YouTube sous-titrée. Safari nécessite une application conteneur signée."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Terminez la configuration dans le navigateur et rechargez une vidéo YouTube sous-titrée. Safari nécessite une application conteneur signée.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Affiche des sous-titres bilingues pendant la lecture sur Netflix dans Chrome et Microsoft Edge.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "La prise en charge de Netflix se limite au lecteur vidéo dans Chrome et Microsoft Edge. Firefox et Safari prennent en charge YouTube."
     },
     "de": {
       "Watch YouTube in English with Chinese subtitles.": "Englische YouTube-Videos mit chinesischen Untertiteln ansehen.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Übersetzt YouTube-Untertitel und erklärt angeklickte Wörter mit der KI-Verbindung von MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Übersetzt Videountertitel und erklärt angeklickte Wörter über die KI-Verbindung von MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Zeigt die Originaluntertitel und die Übersetzung in der gewählten Sprache im YouTube-Player an.",
       "Drag the bilingual subtitles vertically.": "Verschiebe die zweisprachigen Untertitel nach oben oder unten.",
       "Click a word in the original subtitles to see its meaning in context.": "Klicke auf ein Wort im Originaluntertitel, um seine Bedeutung im Kontext zu sehen.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "Wähle Zu MacHelper hinzufügen, prüfe die Berechtigungen der Browsererweiterung und richte die KI-Verbindung in MacHelper ein.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Spanisch mit Originaluntertiteln auf YouTube, englischer Übersetzung und anklickbaren Wörtern lernen.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "Erfordert lesbare YouTube-Untertitel, eine genehmigte Browser-Erweiterung und eine funktionierende KI-Verbindung in MacHelper.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "Erfordert lesbare Videountertitel, eine genehmigte Browser-Erweiterung und eine funktionierende KI-Verbindung in MacHelper.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "Verwende MacHelper 6.9.0 oder neuer unter macOS 14 oder neuer.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "Öffne OnlineSubtitle in MacHelper und wähle neben deinem Browser Einrichten.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Schließe die Einrichtung im Browser ab und lade ein YouTube-Video mit Untertiteln neu. Safari benötigt eine signierte Container-App."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Schließe die Einrichtung im Browser ab und lade ein YouTube-Video mit Untertiteln neu. Safari benötigt eine signierte Container-App.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Zeigt bei der Netflix-Wiedergabe in Chrome und Microsoft Edge zweisprachige Untertitel an.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Die Netflix-Unterstützung ist auf den Videoplayer in Chrome und Microsoft Edge beschränkt. Firefox und Safari unterstützen YouTube."
     },
     "ja": {
       "Watch YouTube in English with Chinese subtitles.": "YouTube の英語動画を中国語字幕で視聴したい。",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper の AI 接続を使って YouTube の字幕を翻訳し、クリックした単語の意味を説明します。",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "MacHelper の AI 接続を使って動画の字幕を翻訳し、クリックした単語の意味を説明します。",
       "Show original captions with translations in the chosen language over the YouTube player.": "YouTube プレーヤーに原文の字幕と選択した言語の翻訳を同時に表示します。",
       "Drag the bilingual subtitles vertically.": "二言語字幕を上下にドラッグできます。",
       "Click a word in the original subtitles to see its meaning in context.": "原文字幕の単語をクリックすると、その文脈での意味を確認できます。",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "「MacHelper に追加」を選び、ブラウザー拡張機能の権限を確認して、MacHelper の AI 接続を設定します。",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "YouTube のスペイン語字幕、英語訳、クリックできる単語でスペイン語を学ぶ。",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "読み取り可能な YouTube 字幕、承認済みのブラウザ拡張機能、利用可能な MacHelper の AI 接続が必要です。",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "読み取り可能な動画字幕、承認済みのブラウザ拡張機能、利用可能な MacHelper の AI 接続が必要です。",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "macOS 14 以降で MacHelper 6.9.0 以降を使用します。",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "MacHelper で OnlineSubtitle を開き、お使いのブラウザの横にある「設定」を選択します。",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "ブラウザで設定を完了し、字幕付きの YouTube 動画を再読み込みしてください。Safari には署名済みのコンテナアプリが必要です。"
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "ブラウザで設定を完了し、字幕付きの YouTube 動画を再読み込みしてください。Safari には署名済みのコンテナアプリが必要です。",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Chrome または Microsoft Edge で Netflix の動画を再生中に、二言語字幕を表示します。",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Netflix に対応するのは Chrome と Microsoft Edge の動画プレーヤーのみです。Firefox と Safari では YouTube に対応します。"
     },
     "ko": {
       "Watch YouTube in English with Chinese subtitles.": "영어 YouTube 영상을 중국어 자막과 함께 보기.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper의 AI 연결로 YouTube 자막을 번역하고 클릭한 단어의 뜻을 설명합니다.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "MacHelper의 AI 연결로 동영상 자막을 번역하고 클릭한 단어의 뜻을 설명합니다.",
       "Show original captions with translations in the chosen language over the YouTube player.": "YouTube 플레이어에서 원본 자막과 선택한 언어의 번역을 함께 표시합니다.",
       "Drag the bilingual subtitles vertically.": "이중 언어 자막을 위아래로 드래그할 수 있습니다.",
       "Click a word in the original subtitles to see its meaning in context.": "원본 자막의 단어를 클릭하면 문맥 속 뜻을 볼 수 있습니다.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "MacHelper에 추가를 선택하고 브라우저 확장 프로그램 권한을 확인한 뒤 MacHelper의 AI 연결을 설정합니다.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "YouTube의 스페인어 원문 자막, 영어 번역, 클릭할 수 있는 단어로 스페인어를 학습하기.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "읽을 수 있는 YouTube 자막, 승인된 브라우저 확장 프로그램 및 작동하는 MacHelper AI 연결이 필요합니다.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "읽을 수 있는 동영상 자막, 승인된 브라우저 확장 프로그램, 작동하는 MacHelper AI 연결이 필요합니다.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "macOS 14 이상에서 MacHelper 6.9.0 이상을 사용합니다.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "MacHelper에서 OnlineSubtitle을 열고 사용하는 브라우저 옆의 설정을 선택합니다.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "브라우저에서 설정을 마친 다음 자막이 있는 YouTube 동영상을 새로고침합니다. Safari에는 서명된 컨테이너 앱이 필요합니다."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "브라우저에서 설정을 마친 다음 자막이 있는 YouTube 동영상을 새로고침합니다. Safari에는 서명된 컨테이너 앱이 필요합니다.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Chrome 및 Microsoft Edge에서 Netflix를 재생하는 동안 이중 언어 자막을 표시합니다.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Netflix는 Chrome 및 Microsoft Edge의 동영상 플레이어에서만 지원됩니다. Firefox와 Safari에서는 YouTube를 지원합니다."
     },
     "pt": {
       "Watch YouTube in English with Chinese subtitles.": "Assistir a vídeos do YouTube em inglês com legendas em chinês.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduz legendas do YouTube e explica as palavras selecionadas usando a conexão de IA do MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduz legendas de vídeo e explica as palavras em que você clica usando a conexão de IA do MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Exibe as legendas originais e a tradução no idioma escolhido sobre o player do YouTube.",
       "Drag the bilingual subtitles vertically.": "Arraste as legendas bilíngues para cima ou para baixo.",
       "Click a word in the original subtitles to see its meaning in context.": "Clique em uma palavra da legenda original para ver o significado no contexto.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "Selecione Adicionar ao MacHelper, revise as permissões da extensão do navegador e configure a conexão de IA no MacHelper.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Aprender espanhol com legendas originais do YouTube, traduções em inglês e palavras clicáveis.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "Requer legendas do YouTube legíveis, uma extensão do navegador aprovada e uma ligação de IA funcional no MacHelper.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "Requer legendas de vídeo acessíveis, uma extensão de navegador aprovada e uma conexão de IA funcional no MacHelper.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "Use o MacHelper 6.9.0 ou posterior no macOS 14 ou posterior.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "Abra o OnlineSubtitle no MacHelper e escolha Configurar ao lado do seu navegador.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Conclua a configuração no navegador e recarregue um vídeo do YouTube com legendas. O Safari precisa de uma aplicação contentora assinada."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Conclua a configuração no navegador e recarregue um vídeo do YouTube com legendas. O Safari precisa de uma aplicação contentora assinada.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Exibe legendas bilíngues durante a reprodução da Netflix no Chrome e no Microsoft Edge.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "O suporte à Netflix se limita ao player de vídeo no Chrome e no Microsoft Edge. O Firefox e o Safari são compatíveis com o YouTube."
     },
     "ar": {
       "Watch YouTube in English with Chinese subtitles.": "مشاهدة فيديوهات YouTube بالإنجليزية مع ترجمة صينية.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "يترجم ترجمات YouTube النصية ويشرح الكلمات التي تنقر عليها باستخدام اتصال الذكاء الاصطناعي في MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "يترجم النصوص المصاحبة للفيديو ويشرح الكلمات التي تنقر عليها باستخدام اتصال الذكاء الاصطناعي في MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "يعرض النص الأصلي وترجمته باللغة المختارة معًا على مشغل YouTube.",
       "Drag the bilingual subtitles vertically.": "اسحب الترجمة ثنائية اللغة إلى أعلى أو أسفل.",
       "Click a word in the original subtitles to see its meaning in context.": "انقر على كلمة في النص الأصلي المصاحب للفيديو لعرض معناها في السياق.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "اختر «إضافة إلى MacHelper»، وراجع أذونات إضافة المتصفح، ثم اضبط اتصال الذكاء الاصطناعي في MacHelper.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "تعلم الإسبانية بالنص الإسباني الأصلي على YouTube وترجمته الإنجليزية وإمكانية النقر على الكلمات.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "يتطلب ترجمات YouTube النصية القابلة للقراءة وإضافة متصفح معتمدة واتصال ذكاء اصطناعي فعالًا في MacHelper.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "يتطلب نصوص فيديو قابلة للقراءة وإضافة متصفح معتمدة واتصال ذكاء اصطناعي يعمل في MacHelper.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "استخدم MacHelper 6.9.0 أو إصدارًا أحدث على macOS 14 أو أحدث.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "افتح OnlineSubtitle في MacHelper واختر الإعداد بجانب المتصفح الذي تستخدمه.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "أكمل الإعداد في المتصفح وأعد تحميل فيديو YouTube يتضمن نصًا مصاحبًا. يتطلب Safari تطبيقًا حاويًا موقّعًا."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "أكمل الإعداد في المتصفح وأعد تحميل فيديو YouTube يتضمن نصًا مصاحبًا. يتطلب Safari تطبيقًا حاويًا موقّعًا.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "يعرض نصوصًا مصاحبة ثنائية اللغة أثناء تشغيل Netflix في Chrome وMicrosoft Edge.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "يقتصر دعم Netflix على مشغّل الفيديو في Chrome وMicrosoft Edge. يدعم Firefox وSafari موقع YouTube."
     },
     "hi": {
       "Watch YouTube in English with Chinese subtitles.": "अंग्रेज़ी YouTube वीडियो चीनी उपशीर्षकों के साथ देखें।",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper के AI कनेक्शन से YouTube उपशीर्षकों का अनुवाद करें और क्लिक किए गए शब्दों का अर्थ जानें।",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "MacHelper के AI कनेक्शन से वीडियो के उपशीर्षकों का अनुवाद करें और क्लिक किए गए शब्दों का अर्थ जानें।",
       "Show original captions with translations in the chosen language over the YouTube player.": "YouTube प्लेयर पर मूल उपशीर्षक और चुनी हुई भाषा में उनका अनुवाद साथ दिखाएँ।",
       "Drag the bilingual subtitles vertically.": "द्विभाषी उपशीर्षकों को ऊपर या नीचे खींचें।",
       "Click a word in the original subtitles to see its meaning in context.": "संदर्भ में किसी शब्द का अर्थ देखने के लिए मूल उपशीर्षक में उस शब्द पर क्लिक करें।",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "MacHelper में जोड़ें चुनें, ब्राउज़र एक्सटेंशन की अनुमतियाँ देखें, फिर MacHelper में AI कनेक्शन सेट करें।",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "YouTube के मूल स्पैनिश कैप्शन, अंग्रेज़ी अनुवाद और क्लिक करने योग्य शब्दों से स्पैनिश सीखें।",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "पढ़ने योग्य YouTube कैप्शन, मंज़ूर किया गया ब्राउज़र एक्सटेंशन और MacHelper का सक्रिय AI कनेक्शन ज़रूरी है।",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "पढ़ने योग्य वीडियो उपशीर्षक, मंज़ूर किया गया ब्राउज़र एक्सटेंशन और MacHelper का सक्रिय AI कनेक्शन ज़रूरी है।",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "macOS 14 या बाद के संस्करण पर MacHelper 6.9.0 या बाद का संस्करण इस्तेमाल करें।",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "MacHelper में OnlineSubtitle खोलें और अपने ब्राउज़र के पास सेट अप चुनें।",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "ब्राउज़र में सेटअप पूरा करें और कैप्शन वाला YouTube वीडियो फिर से लोड करें। Safari के लिए हस्ताक्षरित कंटेनर ऐप ज़रूरी है।"
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "ब्राउज़र में सेटअप पूरा करें और कैप्शन वाला YouTube वीडियो फिर से लोड करें। Safari के लिए हस्ताक्षरित कंटेनर ऐप ज़रूरी है।",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Chrome और Microsoft Edge में Netflix वीडियो चलाते समय द्विभाषी उपशीर्षक दिखाएँ।",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Netflix का समर्थन Chrome और Microsoft Edge के वीडियो प्लेयर तक सीमित है। Firefox और Safari में YouTube का समर्थन है।"
     },
     "ru": {
       "Watch YouTube in English with Chinese subtitles.": "Смотреть YouTube на английском с китайскими субтитрами.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Переводит субтитры YouTube и объясняет выбранные слова через подключение ИИ в MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Переводит субтитры к видео и объясняет слова, на которые вы нажимаете, через подключение к ИИ в MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Показывает оригинальные субтитры и перевод на выбранный язык поверх проигрывателя YouTube.",
       "Drag the bilingual subtitles vertically.": "Перетаскивайте двуязычные субтитры вверх или вниз.",
       "Click a word in the original subtitles to see its meaning in context.": "Нажмите на слово в оригинальных субтитрах, чтобы узнать его значение в контексте.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "Нажмите «Добавить в MacHelper», проверьте разрешения расширения браузера, затем настройте подключение к ИИ в MacHelper.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Учить испанский по оригинальным субтитрам на YouTube, их английскому переводу и словам, значение которых можно открыть нажатием.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "Требуются читаемые субтитры YouTube, одобренное расширение браузера и рабочее подключение к ИИ в MacHelper.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "Требуются доступные субтитры к видео, одобренное расширение браузера и рабочее подключение к ИИ в MacHelper.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "Используйте MacHelper 6.9.0 или новее на macOS 14 или новее.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "Откройте OnlineSubtitle в MacHelper и нажмите «Настроить» рядом с вашим браузером.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Завершите настройку в браузере и перезагрузите видео YouTube с субтитрами. Для Safari требуется подписанное приложение-контейнер."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Завершите настройку в браузере и перезагрузите видео YouTube с субтитрами. Для Safari требуется подписанное приложение-контейнер.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Показывает двуязычные субтитры при просмотре Netflix в Chrome и Microsoft Edge.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Поддержка Netflix ограничена видеоплеером в Chrome и Microsoft Edge. В Firefox и Safari поддерживается YouTube."
     },
     "it": {
       "Watch YouTube in English with Chinese subtitles.": "Guardare video di YouTube in inglese con sottotitoli in cinese.",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce i sottotitoli di YouTube e spiega le parole selezionate con la connessione IA di MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduce i sottotitoli dei video e spiega le parole su cui fai clic usando la connessione IA di MacHelper.",
       "Show original captions with translations in the chosen language over the YouTube player.": "Mostra i sottotitoli originali e la traduzione nella lingua scelta sul player di YouTube.",
       "Drag the bilingual subtitles vertically.": "Trascina i sottotitoli bilingui verso l’alto o verso il basso.",
       "Click a word in the original subtitles to see its meaning in context.": "Fai clic su una parola nei sottotitoli originali per vederne il significato nel contesto.",
       "Choose Add to MacHelper, review the browser companion permissions, then configure AI Connection in MacHelper.": "Seleziona Aggiungi a MacHelper, controlla i permessi dell’estensione del browser, quindi configura la connessione IA in MacHelper.",
       "Learn Spanish with original YouTube captions, English translations, and clickable words.": "Imparare lo spagnolo con sottotitoli originali di YouTube, traduzioni in inglese e parole cliccabili.",
-      "Requires readable YouTube captions, an approved browser companion, and a working MacHelper AI connection.": "Richiede sottotitoli YouTube leggibili, un’estensione del browser approvata e una connessione IA funzionante in MacHelper.",
+      "Requires readable video captions, an approved browser companion, and a working MacHelper AI connection.": "Richiede sottotitoli video accessibili, un’estensione del browser approvata e una connessione IA funzionante in MacHelper.",
       "Use MacHelper 6.9.0 or later on macOS 14+.": "Usa MacHelper 6.9.0 o successivo su macOS 14 o successivo.",
       "Open OnlineSubtitle in MacHelper and choose Set Up beside the browser you use.": "Apri OnlineSubtitle in MacHelper e scegli Configura accanto al browser che usi.",
-      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Completa la configurazione nel browser e ricarica un video di YouTube con sottotitoli. Safari richiede un’app contenitore firmata."
+      "Finish setup in your browser and reload a YouTube video with captions. Safari needs a signed containing app.": "Completa la configurazione nel browser e ricarica un video di YouTube con sottotitoli. Safari richiede un’app contenitore firmata.",
+      "Show bilingual captions during Netflix playback in Chrome and Microsoft Edge.": "Mostra sottotitoli bilingui durante la riproduzione di Netflix in Chrome e Microsoft Edge.",
+      "Netflix support is limited to the video player in Chrome and Microsoft Edge. Firefox and Safari support YouTube.": "Il supporto per Netflix è limitato al lettore video di Chrome e Microsoft Edge. Firefox e Safari supportano YouTube."
     }
   },
   "installSteps": [

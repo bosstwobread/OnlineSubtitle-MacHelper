@@ -1,0 +1,3 @@
+[data-uia="watch-video"] [data-uia="player"] .player-timedtext[data-online-subtitle-netflix-replaced] {
+  opacity: 0 !important;
+}

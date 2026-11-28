@@ -168,7 +168,7 @@ test("the caption worker keeps the existing command and response contract", { ti
   }
 
   assert.deepEqual(await invoke("status", ""), {
-    title: "OnlineSubtitle", text: "OnlineSubtitle is ready for its YouTube companion."
+    title: "OnlineSubtitle", text: "OnlineSubtitle is ready for its browser companion."
   });
 
   const invalid = { ok: false, error: "invalid" };

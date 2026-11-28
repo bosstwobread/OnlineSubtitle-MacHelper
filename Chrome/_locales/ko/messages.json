@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "MacHelper에 설정된 AI 연결을 사용하는 YouTube 이중 언어 자막입니다."
+    "message": "MacHelper에 설정된 AI 연결로 동영상에 이중 언어 자막을 표시합니다."
   },
   "captionsUnavailable": {
     "message": "이 동영상에는 사용할 수 있는 자막이 없습니다."

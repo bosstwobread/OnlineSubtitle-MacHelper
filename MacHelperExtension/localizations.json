@@ -3,7 +3,7 @@
   "translations": {
     "en": {
       "OnlineSubtitle status": "OnlineSubtitle status",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Translate video captions and explain clicked words using MacHelper’s AI connection.",
       "Caption translation prompt": "Caption translation prompt",
       "Caption correction and translation prompt": "Caption correction and translation prompt",
       "Translate captions": "Translate captions",
@@ -14,7 +14,7 @@
     },
     "zh-Hans": {
       "OnlineSubtitle status": "OnlineSubtitle 状态",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 连接翻译 YouTube 字幕，并解释点击的词语。",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 连接翻译视频字幕，并解释点击的词语。",
       "Caption translation prompt": "字幕翻译提示词",
       "Caption correction and translation prompt": "字幕纠错和翻译提示词",
       "Translate captions": "翻译字幕",
@@ -25,7 +25,7 @@
     },
     "zh-Hant": {
       "OnlineSubtitle status": "OnlineSubtitle 狀態",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 連線翻譯 YouTube 字幕，並解釋點選的詞語。",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "使用 MacHelper 的 AI 連線翻譯影片字幕，並解釋點選的詞語。",
       "Caption translation prompt": "字幕翻譯提示詞",
       "Caption correction and translation prompt": "字幕校正與翻譯提示詞",
       "Translate captions": "翻譯字幕",
@@ -36,7 +36,7 @@
     },
     "es": {
       "OnlineSubtitle status": "Estado de OnlineSubtitle",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce los subtítulos de YouTube y explica las palabras seleccionadas mediante la conexión de IA de MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduce los subtítulos de vídeos y explica las palabras en las que haces clic mediante la conexión de IA de MacHelper.",
       "Caption translation prompt": "Instrucciones de traducción de subtítulos",
       "Caption correction and translation prompt": "Instrucciones de corrección y traducción de subtítulos",
       "Translate captions": "Traducir subtítulos",
@@ -47,7 +47,7 @@
     },
     "fr": {
       "OnlineSubtitle status": "État d’OnlineSubtitle",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduit les sous-titres YouTube et explique les mots sélectionnés avec la connexion IA de MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduit les sous-titres des vidéos et explique les mots sur lesquels vous cliquez grâce à la connexion IA de MacHelper.",
       "Caption translation prompt": "Consigne de traduction des sous-titres",
       "Caption correction and translation prompt": "Consigne de correction et de traduction des sous-titres",
       "Translate captions": "Traduire les sous-titres",
@@ -58,7 +58,7 @@
     },
     "de": {
       "OnlineSubtitle status": "OnlineSubtitle-Status",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Übersetzt YouTube-Untertitel und erklärt angeklickte Wörter mit der KI-Verbindung von MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Übersetzt Videountertitel und erklärt angeklickte Wörter über die KI-Verbindung von MacHelper.",
       "Caption translation prompt": "Anweisung zur Untertitelübersetzung",
       "Caption correction and translation prompt": "Anweisung zur Korrektur und Übersetzung von Untertiteln",
       "Translate captions": "Untertitel übersetzen",
@@ -69,7 +69,7 @@
     },
     "ja": {
       "OnlineSubtitle status": "OnlineSubtitle の状態",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper の AI 接続を使って YouTube の字幕を翻訳し、クリックした単語の意味を説明します。",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "MacHelper の AI 接続を使って動画の字幕を翻訳し、クリックした単語の意味を説明します。",
       "Caption translation prompt": "字幕翻訳プロンプト",
       "Caption correction and translation prompt": "字幕校正と翻訳のプロンプト",
       "Translate captions": "字幕を翻訳",
@@ -80,7 +80,7 @@
     },
     "ko": {
       "OnlineSubtitle status": "OnlineSubtitle 상태",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper의 AI 연결로 YouTube 자막을 번역하고 클릭한 단어의 뜻을 설명합니다.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "MacHelper의 AI 연결로 동영상 자막을 번역하고 클릭한 단어의 뜻을 설명합니다.",
       "Caption translation prompt": "자막 번역 프롬프트",
       "Caption correction and translation prompt": "자막 교정 및 번역 프롬프트",
       "Translate captions": "자막 번역",
@@ -91,7 +91,7 @@
     },
     "pt": {
       "OnlineSubtitle status": "Status do OnlineSubtitle",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduz legendas do YouTube e explica as palavras selecionadas usando a conexão de IA do MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduz legendas de vídeo e explica as palavras em que você clica usando a conexão de IA do MacHelper.",
       "Caption translation prompt": "Instrução de tradução de legendas",
       "Caption correction and translation prompt": "Instrução de correção e tradução de legendas",
       "Translate captions": "Traduzir legendas",
@@ -102,7 +102,7 @@
     },
     "ar": {
       "OnlineSubtitle status": "حالة OnlineSubtitle",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "يترجم ترجمات YouTube النصية ويشرح الكلمات التي تنقر عليها باستخدام اتصال الذكاء الاصطناعي في MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "يترجم النصوص المصاحبة للفيديو ويشرح الكلمات التي تنقر عليها باستخدام اتصال الذكاء الاصطناعي في MacHelper.",
       "Caption translation prompt": "تعليمات ترجمة النصوص المصاحبة للفيديو",
       "Caption correction and translation prompt": "تعليمات تصحيح النصوص المصاحبة للفيديو وترجمتها",
       "Translate captions": "ترجمة النصوص المصاحبة للفيديو",
@@ -113,7 +113,7 @@
     },
     "hi": {
       "OnlineSubtitle status": "OnlineSubtitle की स्थिति",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "MacHelper के AI कनेक्शन से YouTube उपशीर्षकों का अनुवाद करें और क्लिक किए गए शब्दों का अर्थ जानें।",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "MacHelper के AI कनेक्शन से वीडियो के उपशीर्षकों का अनुवाद करें और क्लिक किए गए शब्दों का अर्थ जानें।",
       "Caption translation prompt": "उपशीर्षक अनुवाद का प्रॉम्प्ट",
       "Caption correction and translation prompt": "उपशीर्षक सुधार और अनुवाद का प्रॉम्प्ट",
       "Translate captions": "उपशीर्षकों का अनुवाद करें",
@@ -124,7 +124,7 @@
     },
     "ru": {
       "OnlineSubtitle status": "Статус OnlineSubtitle",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Переводит субтитры YouTube и объясняет выбранные слова через подключение ИИ в MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Переводит субтитры к видео и объясняет слова, на которые вы нажимаете, через подключение к ИИ в MacHelper.",
       "Caption translation prompt": "Инструкция для перевода субтитров",
       "Caption correction and translation prompt": "Инструкция для исправления и перевода субтитров",
       "Translate captions": "Перевести субтитры",
@@ -135,7 +135,7 @@
     },
     "it": {
       "OnlineSubtitle status": "Stato di OnlineSubtitle",
-      "Translate YouTube captions and explain clicked words using MacHelper’s AI connection.": "Traduce i sottotitoli di YouTube e spiega le parole selezionate con la connessione IA di MacHelper.",
+      "Translate video captions and explain clicked words using MacHelper’s AI connection.": "Traduce i sottotitoli dei video e spiega le parole su cui fai clic usando la connessione IA di MacHelper.",
       "Caption translation prompt": "Istruzioni per la traduzione dei sottotitoli",
       "Caption correction and translation prompt": "Istruzioni per la correzione e la traduzione dei sottotitoli",
       "Translate captions": "Traduci i sottotitoli",

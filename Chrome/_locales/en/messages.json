@@ -1,6 +1,6 @@
 {
   "extensionDescription": {
-    "message": "Bilingual YouTube captions using the AI connection configured in MacHelper."
+    "message": "Bilingual video captions using the AI connection configured in MacHelper."
   },
   "captionsUnavailable": {
     "message": "Captions unavailable for this video."

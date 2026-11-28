@@ -7,8 +7,10 @@ const { runInNewContext } = require('node:vm');
 const source = readFileSync(resolve(__dirname, '../Chrome/background.js'), 'utf8');
 const managedSource = readFileSync(resolve(__dirname, '../BrowserCompanions/managed-transport.js'), 'utf8');
 const origin = 'https://www.youtube.com';
+const netflixOrigin = 'https://www.netflix.com';
 const extensionID = 'ndmbmmhddeibbojclldpaabmkcielfmj';
 const sender = { id: extensionID, frameId: 0, origin, tab: { id: 1 }, url: origin + '/watch?v=abcdefghijk' };
+const netflixSender = { ...sender, origin: netflixOrigin, url: netflixOrigin + '/watch/81234567?trackId=1' };
 const request = { type: 'watchStatus' };
 const enabled = { type: 'status', enabled: true };
 const settingsRequest = { type: 'getSettings' };
@@ -33,13 +35,16 @@ function makePort(name, from) {
   };
 }
 
-function loadBackground({ managed = false, sendNativeMessage } = {}) {
+function loadBackground({ managed = false, sendNativeMessage, netflix = !sendNativeMessage } = {}) {
   const nativePorts = [];
   const timers = new Map();
   let lastTimer = 0;
   const runtime = {
     id: extensionID,
     onConnect: event(),
+    getManifest() {
+      return { content_scripts: [{ matches: [(netflix ? netflixOrigin : origin) + '/*'] }] };
+    },
     connectNative(host) {
       assert.equal(host, managed ? 'com.localaibasetools.companion' : 'com.nelson007.online_subtitle');
       const port = makePort(host);
@@ -186,6 +191,40 @@ test('status bridge accepts only the current extension on a top-frame YouTube wa
     assert.equal(background.connect(from).disconnected, true);
   }
   assert.equal(background.nativePorts.length, 0);
+});
+
+test('Netflix watch pages reach the approved Chrome or Edge bridge', () => {
+  for (const managed of [false, true]) {
+    const background = loadBackground({ managed });
+    const browser = background.connect(netflixSender, 'online-subtitle-translate');
+    assert.equal(browser.disconnected, false);
+    browser.onMessage.emit(settingsRequest);
+    const [native] = background.nativePorts;
+    assert.deepEqual(native.messages, [managed ? {
+      type: 'invoke', extension: 'com.nelson007.online-subtitle',
+      command: 'caption-settings', payload: JSON.stringify(settingsRequest),
+    } : settingsRequest]);
+  }
+});
+
+test('Netflix routing requires the declared site and an exact top-level watch page', () => {
+  const background = loadBackground({ managed: true });
+  for (const from of [
+    { ...netflixSender, frameId: 1 }, { ...netflixSender, tab: undefined }, { ...netflixSender, id: 'other' },
+    { ...netflixSender, origin }, { ...netflixSender, url: 'https://netflix.com/watch/123' },
+    { ...netflixSender, url: 'http://www.netflix.com/watch/123' },
+    { ...netflixSender, url: 'https://www.netflix.com.example/watch/123' },
+    ...['/browse', '/watch', '/watch/title', '/watch/123/', '/watch/123/extra'].map(path =>
+      ({ ...netflixSender, url: netflixOrigin + path })),
+  ]) {
+    assert.equal(background.connect(from).disconnected, true, JSON.stringify(from));
+  }
+  assert.equal(background.nativePorts.length, 0);
+
+  const youtubeOnly = loadBackground({ managed: true, netflix: false });
+  assert.equal(youtubeOnly.connect(netflixSender).disconnected, true);
+  assert.equal(youtubeOnly.connect().disconnected, false);
+  assert.equal(youtubeOnly.nativePorts.length, 0);
 });
 
 test('status bridge subscribes once and relays successive boolean updates', () => {

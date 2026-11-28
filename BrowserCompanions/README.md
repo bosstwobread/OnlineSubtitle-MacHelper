@@ -1,6 +1,6 @@
 # OnlineSubtitle browser companions
 
-OnlineSubtitle shares one YouTube-only caption reader, overlay, and permission boundary across Chrome, Edge, Firefox, and Safari. MacHelper detects a supported browser and owns setup of the managed connection. Each browser still controls its own approval and YouTube access. OnlineSubtitle sends the active video’s captions and clicked source word to MacHelper for translation or explanation through the configured AI connection. There is no telemetry.
+OnlineSubtitle shares its YouTube caption reader across Chrome, Edge, Firefox, and Safari. The Chrome and Edge package also reads the subtitle track selected in Netflix's player and translates it as captions appear. MacHelper detects a supported browser and owns setup of the managed connection. Each browser controls its own installation and site access. OnlineSubtitle sends the active video’s captions and clicked source word to MacHelper for translation or explanation through the configured AI connection. There is no telemetry.
 
 ## Build for development or publication
 

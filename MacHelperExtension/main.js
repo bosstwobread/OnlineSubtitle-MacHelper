@@ -190,7 +190,7 @@
   }
 
   MacHelper.define({ commands: {
-    status() { return { title: "OnlineSubtitle", text: "OnlineSubtitle is ready for its YouTube companion." }; },
+    status() { return { title: "OnlineSubtitle", text: "OnlineSubtitle is ready for its browser companion." }; },
 
     "caption-settings"(input) {
       try {
