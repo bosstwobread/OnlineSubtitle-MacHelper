@@ -55,7 +55,8 @@ function playerMetadata(videoId, tracks, captionIndex, audioTracks = [{captionTr
 
 function fixture({
   tracks, captionIndex, playerVideo = videoId, initialPlayerResponse, initialDataVideo = videoId,
-  optionTracks, audioTracks, defaultAudioTrackIndex, resourceURLs = [], modern = false, fetch
+  optionTracks, audioTracks, defaultAudioTrackIndex, resourceURLs = [], modern = false, fetch,
+  client = {clientName: "WEB", clientVersion: "2.20261125"}
 }) {
   const document = new EventTarget();
   const location = new URL(`${origin}/watch?v=${videoId}`);
@@ -68,7 +69,10 @@ function fixture({
     }}]
   };
   if (modern) {
-    const command = {updateEngagementPanelContentCommand: {
+    const command = modern === "show" ? {showEngagementPanelEndpoint: {
+      identifier: {surface: "ENGAGEMENT_PANEL_SURFACE_WATCH", tag: "PAmodern_transcript_view"},
+      globalConfiguration: {params: "current-video-panel"}
+    }} : {updateEngagementPanelContentCommand: {
       targetPanelIdentifier: {tag: "engagement-panel-timeline-view-consolidated"},
       contentSourcePanelIdentifier: {surface: "ENGAGEMENT_PANEL_SURFACE_WATCH", tag: "PAmodern_transcript_view"},
       globalConfiguration: {params: "current-video-panel"}
@@ -92,7 +96,7 @@ function fixture({
     TextEncoder, TextDecoder, performance: {getEntriesByType: () => resourceURLs.map(name => ({name}))},
     window: {
       ytInitialPlayerResponse: initialPlayerResponse,
-      ytcfg: {get: () => ({client: {clientName: "WEB", clientVersion: "2.20261125"}})}
+      ytcfg: {get: () => ({client})}
     }
   });
   function request(id = 1) {
@@ -306,6 +310,57 @@ test("uses the newer viewer transcript with its exact indexed timing and current
   });
   assert.equal(requests.length, 2);
   assert.equal(requests[1], origin + "/youtubei/v1/get_panel?prettyPrint=false");
+});
+
+test("requests the Spanish transcript for an English viewer without changing YouTube's client locale", async () => {
+  const client = {clientName: "WEB", clientVersion: "2.20261125", hl: "en"};
+  const tracks = [track("en", "English"), track("es", "Spanish"), track("es", "Spanish (automatic)", {kind: "asr"})];
+  const audioTracks = [{captionTrackIndices: [0, 1, 2], defaultCaptionTrackIndex: 0}];
+  const cue = {start: 0, end: 2, text: "El pueblo."};
+  const marker = {macroMarkersPanelItemViewModel: {
+    panelId: "PAmodern_transcript_view", index: 1,
+    onTap: {innertubeCommand: {watchEndpoint: {videoId, startTimeSeconds: 0}}},
+    item: {timelineItemViewModel: {contentItems: [{transcriptSegmentViewModel: {simpleText: cue.text}}]}}
+  }};
+  const section = {itemSectionRenderer: {contents: [marker]}};
+  const panel = {content: {engagementPanelSectionListRenderer: {
+    identifier: {tag: "PAmodern_transcript_view"}, content: {sectionListRenderer: {contents: [section]}}
+  }}, frameworkUpdates: {entityBatchUpdate: {mutations: [{payload: {timedMarkersListSyncEntity: {
+    timedListData: {sections: [{timedSyncDataList: [{videoTimeMs: "0"}, {videoTimeMs: "0", endTimeMs: "2000"}]}]}
+  }}}]}}};
+  for (const availableASR of [false, true]) {
+    const requestedTracks = [];
+    const requestedLocales = [];
+    const harness = fixture({tracks, audioTracks, client, modern: "show",
+      fetch: async (url, options) => {
+        if (options.method) {
+          const payload = JSON.parse(options.body);
+          if (payload.panelId === "PAmodern_transcript_view") {
+            requestedLocales.push(payload.context.client.hl);
+            return Response.json(panel);
+          }
+          return new Response("");
+        }
+        requestedTracks.push([url.searchParams.get("lang"), url.searchParams.get("kind")]);
+        if (availableASR && url.searchParams.get("kind") === "asr") {
+          return Response.json({events: [{tStartMs: 0, dDurationMs: 2000, segs: [{utf8: "Otro pueblo."}]}]});
+        }
+        return new Response("");
+      }
+    });
+    const result = await harness.requestResult();
+    assert.deepEqual(requestedTracks, [["es", null], ["es", "asr"]]);
+    assert.deepEqual(requestedLocales, ["es"]);
+    assert.equal(client.hl, "en");
+    assert.equal(result.sourceLanguage, "es");
+    if (availableASR) {
+      assert.equal(result.unconfirmedLanguage, undefined);
+      assert.equal(result.cues[0].text, "Otro pueblo.");
+    } else {
+      assert.equal(result.unconfirmedLanguage, true);
+      assert.deepEqual(result.cues, [cue]);
+    }
+  }
 });
 
 test("uses the current video's exposed native timed-text URL and rejects other origins and IDs", async () => {

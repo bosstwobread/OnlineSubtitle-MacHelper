@@ -18,6 +18,7 @@
   const maximumBusyRetryDelay = 5_000;
   const wordLookupTimeout = 30_000;
   const defaultLanguage = "zh-CN";
+  const languageTag = /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8}){0,4}$/;
   const targetLanguages = new Set(["zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "pt", "it"]);
   const playerCheckInterval = 400;
   const statusTimeout = 5_000;
@@ -481,6 +482,7 @@
   function cancelCaptionRequest(state) {
     const id = state.requestId;
     state.requestId = undefined;
+    state.verifyingCaptionId = undefined;
     clearTimeout(state.captionTimer);
     if (id) {
       document.dispatchEvent(new CustomEvent(captionCancelEvent, { detail: JSON.stringify({ id, videoId: state.videoId }) }));
@@ -532,7 +534,26 @@
     }
   }
 
-  function receiveCaptions(event) {
+  async function detectTranscriptLanguage(raw, requested) {
+    if (!chrome.i18n?.detectLanguage || !Array.isArray(raw) || !raw.length || raw.length > maximumCues) return "";
+    // YouTube's multilingual transcript panel takes a locale hint but does not label its response.
+    // Sample across the video so an intro or a single proper name does not decide the language.
+    const count = Math.min(16, raw.length);
+    const sample = Array.from({ length: count }, (_, i) =>
+      captionText(raw[Math.floor(i * raw.length / count)]?.text, maximumCueBytes)
+    ).join(" ").slice(0, 4096).trim();
+    if (!sample) return "";
+    try {
+      const result = await chrome.i18n.detectLanguage(sample);
+      const language = result?.isReliable && result.languages?.find(item => item.percentage >= 70)?.language;
+      if (typeof language !== "string" || language === "und" || !languageTag.test(language)) return "";
+      return language.split("-")[0].toLowerCase() === requested.split("-")[0].toLowerCase() ? requested : language;
+    } catch {
+      return "";
+    }
+  }
+
+  async function receiveCaptions(event) {
     const state = session;
     // A string crosses Firefox's isolated and main worlds without sharing
     // an object owned by the page. The page still supplies untrusted data.
@@ -540,15 +561,22 @@
         event.detail.length > maximumCaptionEventLength) return;
     let detail;
     try { detail = JSON.parse(event.detail); } catch { return; }
-    if (!detail || detail.id !== state.requestId || detail.videoId !== state.videoId) return;
+    if (!detail || detail.id !== state.requestId || detail.videoId !== state.videoId ||
+        detail.id === state.verifyingCaptionId) return;
+    let sourceLanguage = typeof detail.sourceLanguage === "string" && languageTag.test(detail.sourceLanguage)
+      ? detail.sourceLanguage : "";
+    if (detail.unconfirmedLanguage === true && !detail.error) {
+      state.verifyingCaptionId = detail.id;
+      sourceLanguage = await detectTranscriptLanguage(detail.cues, sourceLanguage);
+      if (!isCurrent(state) || state.requestId !== detail.id) return;
+      state.verifyingCaptionId = undefined;
+    }
     clearTimeout(state.captionTimer);
     state.requestId = undefined;
     if (detail.error) {
       captionsUnavailable(state);
       return;
     }
-    const sourceLanguage = typeof detail.sourceLanguage === "string" &&
-      /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8}){0,4}$/.test(detail.sourceLanguage) ? detail.sourceLanguage : "";
     const { cues, soundOnly } = normalizeCues(detail.cues, sourceLanguage);
     if (!cues.length && !soundOnly.length) {
       captionsUnavailable(state);

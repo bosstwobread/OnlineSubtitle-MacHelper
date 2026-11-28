@@ -69,7 +69,7 @@ function signal() {
 }
 
 function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true, adClass, timestamp = "",
-  settings = defaultSettings } = {}) {
+  settings = defaultSettings, detectLanguage } = {}) {
   const location = { origin: "https://www.youtube.com", pathname: "/watch", search: `?v=${id}${timestamp}` };
   const document = new EventTarget();
   const window = new EventTarget();
@@ -108,7 +108,7 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
   document.addEventListener("online-subtitle-cancel-captions", event => cancelledRequests.push(JSON.parse(event.detail)));
   window.top = window;
   vm.runInNewContext(script, {
-    chrome: { runtime: {
+    chrome: { i18n: { getMessage: () => "", detectLanguage }, runtime: {
       connect(options) {
         const status = options.name === "online-subtitle-status";
         if (!status) assert.equal(options.name, "online-subtitle-translate");
@@ -184,8 +184,8 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
         translation: root?.children[0]?.children[1], status: statusRow?.children[0], retry: statusRow?.children[1]
       };
     },
-    captions(cues, { request = requests.at(-1), sourceLanguage = "en", error } = {}) {
-      document.dispatchEvent(new CustomEvent("online-subtitle-captions", { detail: JSON.stringify({ ...request, cues, sourceLanguage, error }) }));
+    captions(cues, { request = requests.at(-1), sourceLanguage = "en", unconfirmedLanguage, error } = {}) {
+      document.dispatchEvent(new CustomEvent("online-subtitle-captions", { detail: JSON.stringify({ ...request, cues, sourceLanguage, unconfirmedLanguage, error }) }));
     },
     status(enabled, port = statusPorts.at(-1)) {
       port.onMessage.emit({ type: "status", enabled });
@@ -222,6 +222,36 @@ function browser({ id = videoId, currentTime = 0, hidden = false, enabled = true
 }
 
 const cues = Array.from({ length: 14 }, (_, index) => ({ start: index * 5, end: index * 5 + 4, text: `Sentence ${index + 1}` }));
+
+test("unlabeled multilingual panels use the detected language, preserving a matching regional tag", async () => {
+  for (const [detected, expected] of [["es", "es-MX"], ["en", "en"], ["und", ""]]) {
+    const page = browser({ detectLanguage: async sample => {
+      assert.match(sample, /Sentence 1/);
+      return { isReliable: true, languages: [{ language: detected, percentage: 99 }] };
+    } });
+    page.captions(cues, { sourceLanguage: "es-MX", unconfirmedLanguage: true });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(page.overlay.original.lang, expected);
+    assert.equal(page.ports.length, 1);
+  }
+});
+
+test("an unlabeled panel still works without a detector and a late detection cannot restore a disabled session", async () => {
+  const unsupported = browser();
+  unsupported.captions(cues, { sourceLanguage: "es", unconfirmedLanguage: true });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(unsupported.overlay.original.lang, "");
+  assert.equal(unsupported.ports.length, 1);
+
+  let resolveLanguage;
+  const page = browser({ detectLanguage: () => new Promise(resolve => { resolveLanguage = resolve; }) });
+  page.captions(cues, { sourceLanguage: "es", unconfirmedLanguage: true });
+  page.status(false);
+  resolveLanguage({ isReliable: true, languages: [{ language: "es", percentage: 100 }] });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(page.overlay.root, undefined);
+  assert.equal(page.ports.length, 0);
+});
 
 function translate(batches, port) {
   batches.push(port.sent.cues.map(cue => cue.id));

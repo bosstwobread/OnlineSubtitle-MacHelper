@@ -1,10 +1,10 @@
 # OnlineSubtitle
 
-A MacHelper source extension and browser companions that display bilingual captions on YouTube and Netflix. Chrome and Edge support both sites. Firefox and Safari support YouTube. The source and translation appear together in one movable caption panel. Click a word in the source line to see what it means in that sentence. On YouTube, OnlineSubtitle prefers captions that match the video’s audio language. It joins related fragments and asks the configured AI to correct obvious transcription errors and translate the result. The translation target is a separate setting.
+A MacHelper source extension and browser companions that display bilingual captions on YouTube and Netflix. Chrome and Edge support both sites. Firefox and Safari support YouTube. The source and translation appear together in one movable caption panel. Click a word in the source line to see what it means in that sentence. When YouTube identifies the audio language, OnlineSubtitle requests a matching caption track or transcript. You can leave YouTube’s own subtitles set to English while reading a Spanish video in Spanish. It joins related fragments and asks the configured AI to correct obvious transcription errors and translate the result. The translation target is a separate setting.
 
 ## Set up in MacHelper
 
-OnlineSubtitle 0.7.1 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
+OnlineSubtitle 0.7.2 requires macOS 14 or later and [MacHelper](https://github.com/bosstwobread/LocalAIBaseTools) 6.9.0 or later. The installed MacHelper app includes the JavaScript worker needed to run the extension.
 
 1. Open **MacHelper → Extensions → Install Source…** and choose [MacHelperExtension](MacHelperExtension/). Review the listed browser companion identities and shared AI access before enabling the tool.
 2. Choose your provider and model under **AI Connection**. Captions go to that provider, including its online service if you select ChatGPT.

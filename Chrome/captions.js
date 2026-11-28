@@ -85,13 +85,19 @@
       const button = Array.isArray(items) && items.slice(0, 64).find(item => item?.videoDescriptionTranscriptSectionRenderer)
         ?.videoDescriptionTranscriptSectionRenderer?.primaryButton?.buttonRenderer;
       const commands = button?.command?.commandExecutorCommand?.commands;
-      const modern = Array.isArray(commands) && commands.slice(0, 8)
-        .map(command => command?.updateEngagementPanelContentCommand)
-        .find(command => command?.contentSourcePanelIdentifier?.surface === "ENGAGEMENT_PANEL_SURFACE_WATCH"
-          && command.contentSourcePanelIdentifier.tag === "PAmodern_transcript_view"
-          && command.targetPanelIdentifier?.tag === "engagement-panel-timeline-view-consolidated");
+      const modern = Array.isArray(commands) && commands.slice(0, 8).map(command => {
+        const show = command?.showEngagementPanelEndpoint;
+        if (isTranscriptPanel(show?.identifier)) return show;
+        const update = command?.updateEngagementPanelContentCommand;
+        if (isTranscriptPanel(update?.contentSourcePanelIdentifier)
+            && update.targetPanelIdentifier?.tag === "engagement-panel-timeline-view-consolidated") return update;
+      }).find(command => validParams(command?.globalConfiguration?.params));
       if (panel || modern) return {panel, modern};
     }
+  }
+
+  function isTranscriptPanel(identifier) {
+    return identifier?.surface === "ENGAGEMENT_PANEL_SURFACE_WATCH" && identifier.tag === "PAmodern_transcript_view";
   }
 
   function getTracks(player, response, videoId) {
@@ -134,8 +140,8 @@
     // spoken-language track. Prefer the language of the default audio.
     const spokenLanguage = languagePattern.test(audioLanguage) ? primaryLanguage(audioLanguage) :
       primaryLanguage(captionTracks.find(track => track.automatic && track.belongsToAudioTrack)?.language) ||
-      primaryLanguage(captionTracks.find(track => track.preferredByPlayer)?.language) ||
-      (automaticLanguages.size === 1 ? automaticLanguages.values().next().value : "");
+      (automaticLanguages.size === 1 ? automaticLanguages.values().next().value : "") ||
+      primaryLanguage(captionTracks.find(track => track.preferredByPlayer)?.language);
     for (const track of captionTracks) track.matchesAudio = primaryLanguage(track.language) === spokenLanguage;
     return captionTracks.sort((left, right) => trackRank(left) - trackRank(right));
   }
@@ -265,7 +271,7 @@
     return typeof params === "string" && /^[A-Za-z0-9_+/%=-]{1,4096}$/.test(params);
   }
 
-  async function viewerRequest(path, request, signal) {
+  async function viewerRequest(path, request, signal, language) {
     const context = window.ytcfg?.get?.("INNERTUBE_CONTEXT");
     if (!context?.client || !validParams(request.params)) return;
     const headers = {"Content-Type": "application/json"};
@@ -278,10 +284,13 @@
     if (typeof visitorData === "string" && /^[A-Za-z0-9_+/%=-]{1,512}$/.test(visitorData)) {
       headers["X-Goog-Visitor-Id"] = visitorData;
     }
+    // The modern transcript panel follows the request locale when it offers several
+    // languages. Scope this to our request so YouTube keeps the viewer's CC and UI choices.
+    const client = language ? {...context.client, hl: language} : context.client;
     return readJSON(
       origin + path + "?prettyPrint=false",
       signal,
-      {method: "POST", headers, body: JSON.stringify({context: {client: context.client}, ...request})}
+      {method: "POST", headers, body: JSON.stringify({context: {client}, ...request})}
     );
   }
 
@@ -301,17 +310,20 @@
     if (!metadata || !tracks.length) return;
     const {panel, modern} = metadata;
     const preferred = tracks[0];
-    const modernTrack = tracks.find(track => track.preferredByPlayer) ?? (tracks.length === 1 ? tracks[0] : undefined);
     let modernResult;
-    if (modern && modernTrack) {
+    if (modern) {
+      const multipleLanguages = tracks.some(track => primaryLanguage(track.language) !== primaryLanguage(preferred.language));
       const result = await viewerRequest("/youtubei/v1/get_panel", {
         panelId: "PAmodern_transcript_view",
         params: modern.globalConfiguration?.params
-      }, signal);
+      }, signal, multipleLanguages ? preferred.language : undefined);
       const cues = modernTranscriptCues(result, videoId);
       if (cues.length) {
-        modernResult = resultFor(cues, modernTrack);
-        if (modernTrack === preferred) return modernResult;
+        modernResult = resultFor(cues, preferred);
+        if (!multipleLanguages) return modernResult;
+        // The panel does not identify the language of its segments. An explicitly
+        // selected legacy transcript can confirm it; otherwise the isolated reader checks it.
+        modernResult.unconfirmedLanguage = true;
       }
     }
     if (!panel || signal.aborted) return modernResult;
@@ -328,8 +340,8 @@
     }
     const selected = items.find(item => item?.selected);
     const track = tracks.find(track => track.name && track.name === selected?.title)
-      ?? (tracks.length === 1 ? preferred : tracks.find(track => track.preferredByPlayer));
-    if (!track || (modernResult && trackRank(modernResult.track) <= trackRank(track))) return modernResult;
+      ?? (tracks.length === 1 ? preferred : undefined);
+    if (!track || (modernResult && trackRank(modernResult.track) < trackRank(track))) return modernResult;
     const cues = transcriptCues(renderer);
     if (cues.length) return resultFor(cues, track);
     return modernResult;
@@ -358,10 +370,14 @@
     let transcriptFallback;
     for (const [index, track] of tracks.slice(0, 3).entries()) {
       if (!isCurrentVideo(videoId)) return;
-      if (signal.aborted || (transcriptFallback && trackRank(transcriptFallback.track) < trackRank(track))) break;
-      const url = exposedCaptionURL(videoId, track) ?? track.url;
-      if (url) {
-        const cues = timedTextCues(await readJSON(url, AbortSignal.any([signal, AbortSignal.timeout(3000)])));
+      if (signal.aborted) break;
+      if (transcriptFallback?.unconfirmedLanguage) {
+        if (primaryLanguage(track.language) !== primaryLanguage(transcriptFallback.track.language)) break;
+      } else if (transcriptFallback && trackRank(transcriptFallback.track) < trackRank(track)) break;
+      const trackSignal = AbortSignal.any([signal, AbortSignal.timeout(3000)]);
+      for (const url of [exposedCaptionURL(videoId, track), track.url]) {
+        if (!url || trackSignal.aborted) continue;
+        const cues = timedTextCues(await readJSON(url, trackSignal));
         if (cues.length) return resultFor(cues, track);
       }
       if (index === 0 && isCurrentVideo(videoId) && !signal.aborted) {
@@ -374,7 +390,7 @@
         transcriptFallback = await extractFromTranscript(
           metadata, tracks, videoId, AbortSignal.any([signal, AbortSignal.timeout(4500)])
         );
-        if (transcriptFallback?.track === track) return transcriptFallback;
+        if (transcriptFallback?.track === track && !transcriptFallback.unconfirmedLanguage) return transcriptFallback;
       }
     }
     return transcriptFallback;
@@ -411,7 +427,8 @@
     if (request.controller.signal.aborted || activeRequest !== request || !isCurrentVideo(videoId)) return;
     activeRequest = undefined;
     const captions = result
-      ? {cues: result.cues, sourceLanguage: result.track.language}
+      ? {cues: result.cues, sourceLanguage: result.track.language,
+        ...(result.unconfirmedLanguage ? {unconfirmedLanguage: true} : {})}
       : {cues: [], sourceLanguage: "", error: "captions-unavailable"};
     document.dispatchEvent(new CustomEvent(responseEvent, {
       detail: JSON.stringify({id, videoId, ...captions})

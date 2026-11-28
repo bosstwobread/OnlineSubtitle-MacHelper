@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OnlineSubtitle",
   "description": "__MSG_extensionDescription__",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "minimum_chrome_version": "116",
   "default_locale": "en",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxuuQSwOefWwrMi0KeRWQbr+O3JTVFDTwg2eMRYacHwT9H5ot7r2BJ5rSi3ZTiyrL0oaMy3B7kTJFFWL2gdPEpks37KHso60CJdjniRoDMsXlYiYDgUplKT0/Epv3rnO520PFoZH8CSFzoQs8/G7YFYPTof44+4ni02oCAFFlaMUuKo4fGwi+03wAqYlGquDaOxuIfFGuUdmUoD2m4WZH/ez/7vVR1L8kVNuDJQXvAQMrd96ZIzoJHTaxBfW9jAOflPL+6hnwQCvbc+914pHynjFXE/kqEW0N9I2QOzvCn24JIi7ishkrpf+VRMTJQ6i8MRjRX6OptA0HI44pLpo4dQIDAQAB",
